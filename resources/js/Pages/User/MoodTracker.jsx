@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import LayoutUser from "../../Components/Layout/LayoutUser";
 
 export default function MoodTracker() {
@@ -6,6 +6,9 @@ export default function MoodTracker() {
     const [message, setMessage] = useState("");
     const [selectedSession, setSelectedSession] = useState(1);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [mlPrediction, setMlPrediction] = useState(null);
+    const [isAnalyzing, setIsAnalyzing] = useState(false);
+    const [chatMessages, setChatMessages] = useState([]);
 
 
     const sessions = [
@@ -115,7 +118,211 @@ export default function MoodTracker() {
         ]
     };
 
-    const currentChatMessages = allChatMessages[selectedSession] || [];
+    const currentChatMessages = chatMessages.length > 0 ? chatMessages : allChatMessages[selectedSession] || [];
+
+    // Fungsi untuk analisis mood menggunakan ML
+    const analyzeMoodWithML = async (userMessage) => {
+        setIsAnalyzing(true);
+        
+        try {
+            // Extract activities dari pesan user
+            const activities = extractActivitiesFromMessage(userMessage);
+            
+            // Get current time dan weekday
+            const now = new Date();
+            const time = now.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: true 
+            });
+            const weekday = now.toLocaleDateString('en-US', { weekday: 'long' });
+            
+            // Prepare data untuk ML prediction
+            const mlData = {
+                time: time,
+                weekday: weekday,
+                activities: activities.join(' | ')
+            };
+            
+            // Call Simple Mood API (lebih akurat)
+            const response = await fetch('http://localhost:5002/analyze-mood', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    text: userMessage
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                setMlPrediction(result);
+                return result;
+            } else {
+                console.error('ML Prediction failed:', result.error);
+                return null;
+            }
+            
+        } catch (error) {
+            console.error('Error analyzing mood:', error);
+            return null;
+        } finally {
+            setIsAnalyzing(false);
+        }
+    };
+
+    // Fungsi untuk extract activities dan mood indicators dari pesan
+    const extractActivitiesFromMessage = (message) => {
+        const activities = [];
+        const messageLower = message.toLowerCase();
+        
+        // Mapping kata kunci ke activities
+        const activityKeywords = {
+            'reading': ['membaca', 'baca', 'reading', 'book'],
+            'learning': ['belajar', 'learning', 'study', 'kuliah'],
+            'prayer': ['sholat', 'prayer', 'doa', 'berdoa'],
+            'fasting': ['puasa', 'fasting'],
+            'walk': ['jalan', 'walk', 'jalan-jalan'],
+            'meditation': ['meditasi', 'meditation', 'zen'],
+            'shower': ['mandi', 'shower', 'bath'],
+            'writing': ['menulis', 'writing', 'tulis'],
+            'cooking': ['masak', 'cooking', 'memasak'],
+            'coding': ['coding', 'programming', 'ngoding'],
+            'travel': ['travel', 'jalan-jalan', 'liburan'],
+            'cleaning': ['bersih', 'cleaning', 'membersihkan'],
+            'research': ['research', 'riset', 'penelitian'],
+            'yoga': ['yoga', 'olahraga'],
+            'music': ['musik', 'music', 'lagu', 'songs'],
+            'watching': ['nonton', 'watching', 'film', 'series'],
+            'gaming': ['game', 'gaming', 'main game'],
+            'social': ['social', 'sosial', 'teman', 'friends']
+        };
+        
+        // Negative activity indicators (yang menunjukkan mood buruk)
+        const negativeActivities = {
+            'no_energy': ['tidak ada energi', 'tidak ada tenaga', 'lemas', 'tidak bertenaga'],
+            'no_shower': ['tidak mandi', 'tidak sempat mandi', 'belum mandi'],
+            'no_eat': ['tidak makan', 'tidak sempat makan', 'tidak makan dengan baik', 'makan tidak teratur'],
+            'crying': ['menangis', 'cry', 'terisak', 'menangis sepanjang hari'],
+            'difficult_day': ['hari yang sulit', 'hari terburuk', 'hari yang berat', 'hari yang tidak menyenangkan'],
+            'depressed': ['terpuruk', 'depresi', 'sedih', 'murung', 'down'],
+            'no_activities': ['tidak melakukan apapun', 'tidak ada aktivitas', 'hanya tidur', 'tidak produktif']
+        };
+        
+        // Extract positive activities
+        Object.entries(activityKeywords).forEach(([activity, keywords]) => {
+            keywords.forEach(keyword => {
+                if (messageLower.includes(keyword)) {
+                    activities.push(activity);
+                }
+            });
+        });
+        
+        // Extract negative activities (yang menunjukkan mood buruk)
+        Object.entries(negativeActivities).forEach(([activity, keywords]) => {
+            keywords.forEach(keyword => {
+                if (messageLower.includes(keyword)) {
+                    activities.push(activity);
+                }
+            });
+        });
+        
+        return [...new Set(activities)]; // Remove duplicates
+    };
+
+    // Fungsi untuk generate AI response berdasarkan ML prediction
+    const generateAIResponse = (mlResult, userMessage) => {
+        if (!mlResult) {
+            return "Saya mengerti perasaan Anda. Bisa ceritakan lebih detail apa yang Anda rasakan hari ini?";
+        }
+        
+        const { mood, confidence, suggestion } = mlResult;
+        
+        // Generate response berdasarkan mood
+        const responses = {
+            'Amazing': [
+                `Wah, berdasarkan analisis saya, mood Anda hari ini luar biasa! (Confidence: ${(confidence * 100).toFixed(1)}%)`,
+                `Saya merasakan energi positif yang sangat kuat dari pesan Anda! Mood Anda hari ini benar-benar amazing!`,
+                `Fantastis! Mood Anda hari ini sangat baik. Pertahankan energi positif ini!`
+            ],
+            'Good': [
+                `Berdasarkan analisis saya, mood Anda hari ini baik! (Confidence: ${(confidence * 100).toFixed(1)}%)`,
+                `Saya merasakan perasaan positif dari pesan Anda. Mood Anda hari ini terlihat baik!`,
+                `Bagus! Mood Anda hari ini positif. Lanjutkan aktivitas yang membuat Anda bahagia!`
+            ],
+            'Normal': [
+                `Analisis saya menunjukkan mood Anda hari ini normal. (Confidence: ${(confidence * 100).toFixed(1)}%)`,
+                `Mood Anda hari ini terlihat stabil. Mungkin bisa coba aktivitas baru untuk variasi?`,
+                `Perasaan Anda hari ini seimbang. Pertimbangkan untuk melakukan hal yang menyenangkan!`
+            ],
+            'Bad': [
+                `Saya merasakan mood Anda hari ini kurang baik. (Confidence: ${(confidence * 100).toFixed(1)}%)`,
+                `Analisis saya menunjukkan mood Anda hari ini tidak terlalu baik. Coba lakukan aktivitas yang menenangkan.`,
+                `Mood Anda hari ini terlihat rendah. Mungkin perlu istirahat atau melakukan hal yang Anda sukai?`
+            ],
+            'Awful': [
+                `Saya sangat merasakan kesulitan yang Anda alami hari ini. (Confidence: ${(confidence * 100).toFixed(1)}%)`,
+                `Analisis saya menunjukkan mood Anda hari ini sangat buruk. Sangat penting untuk merawat diri sendiri.`,
+                `Mood Anda hari ini terlihat sangat sulit. Ini saat yang tepat untuk fokus pada self-care.`
+            ]
+        };
+        
+        const moodResponses = responses[mood] || responses['Normal'];
+        const randomResponse = moodResponses[Math.floor(Math.random() * moodResponses.length)];
+        
+        return `${randomResponse} ${suggestion}`;
+    };
+
+    // Fungsi untuk handle send message
+    const handleSendMessage = async () => {
+        if (!message.trim()) return;
+        
+        // Add user message
+        const userMessage = {
+            id: Date.now(),
+            type: 'user',
+            message: message,
+            timestamp: new Date().toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: true 
+            })
+        };
+        
+        setChatMessages(prev => [...prev, userMessage]);
+        
+        // Analyze mood with ML
+        const mlResult = await analyzeMoodWithML(message);
+        
+        // Generate AI response
+        const aiResponse = generateAIResponse(mlResult, message);
+        
+        // Add AI message
+        const aiMessage = {
+            id: Date.now() + 1,
+            type: 'ai',
+            message: aiResponse,
+            timestamp: new Date().toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: true 
+            })
+        };
+        
+        setChatMessages(prev => [...prev, aiMessage]);
+        
+        // Clear input
+        setMessage('');
+    };
+
+    // Handle enter key
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            handleSendMessage();
+        }
+    };
 
     return (
         <LayoutUser>
@@ -226,9 +433,45 @@ export default function MoodTracker() {
                     </div>
 
 
+                    {/* ML Prediction Indicator */}
+                    {mlPrediction && (
+                        <div className="bg-gradient-to-r from-cyan-400/10 to-teal-500/10 rounded-2xl p-4 mb-6 border border-cyan-400/20">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-3">
+                                    <div className="text-2xl">
+                                        {mlPrediction.mood === 'Amazing' ? '🌟' : 
+                                         mlPrediction.mood === 'Good' ? '😊' : 
+                                         mlPrediction.mood === 'Normal' ? '😐' : 
+                                         mlPrediction.mood === 'Bad' ? '😔' : '😢'}
+                                    </div>
+                                    <div>
+                                        <h4 className="text-white font-semibold">AI Mood Analysis</h4>
+                                        <p className="text-white/70 text-sm">
+                                            Prediksi: <span className="text-cyan-400 font-medium">{mlPrediction.mood}</span>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="text-right">
+                                    <div className="text-cyan-400 font-semibold">
+                                        {(mlPrediction.confidence * 100).toFixed(1)}%
+                                    </div>
+                                    <div className="text-white/60 text-xs">Confidence</div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     {/* Chat Messages */}
                     <div className="bg-slate-700 rounded-2xl p-4 lg:p-6 mb-6 border border-slate-600">
-                        <h3 className="text-white font-semibold text-base lg:text-lg mb-4">Chat Terbaru</h3>
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-white font-semibold text-base lg:text-lg">Chat Terbaru</h3>
+                            {isAnalyzing && (
+                                <div className="flex items-center space-x-2 text-cyan-400">
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-cyan-400"></div>
+                                    <span className="text-sm">Menganalisis mood...</span>
+                                </div>
+                            )}
+                        </div>
                         <div className="space-y-3 lg:space-y-4 max-h-80 lg:max-h-96 overflow-y-auto">
                             {currentChatMessages.length === 0 ? (
                                 // Greeting saat chat kosong
@@ -270,14 +513,24 @@ export default function MoodTracker() {
                                 type="text"
                                 value={message}
                                 onChange={(e) => setMessage(e.target.value)}
+                                onKeyPress={handleKeyPress}
                                 placeholder="Ceritakan lebih detail tentang perasaanmu..."
                                 className="flex-1 bg-transparent text-white placeholder-white/50 border-none outline-none text-sm lg:text-lg"
+                                disabled={isAnalyzing}
                             />
                             {/* Send Button */}
-                            <button className="bg-gradient-to-r from-cyan-400 to-teal-500 hover:from-cyan-500 hover:to-teal-600 text-white p-2 lg:p-3 rounded-xl transition-all duration-200 hover:scale-105 flex-shrink-0">
-                                <svg className="w-4 h-4 lg:w-5 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                                </svg>
+                            <button 
+                                onClick={handleSendMessage}
+                                disabled={isAnalyzing || !message.trim()}
+                                className="bg-gradient-to-r from-cyan-400 to-teal-500 hover:from-cyan-500 hover:to-teal-600 text-white p-2 lg:p-3 rounded-xl transition-all duration-200 hover:scale-105 flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {isAnalyzing ? (
+                                    <div className="animate-spin rounded-full h-4 w-4 lg:h-5 lg:w-5 border-b-2 border-white"></div>
+                                ) : (
+                                    <svg className="w-4 h-4 lg:w-5 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                                    </svg>
+                                )}
                             </button>
                             {/* Voice Recording Button */}
                             <button className="bg-gradient-to-r from-cyan-400 to-teal-500 hover:from-cyan-500 hover:to-teal-600 text-white p-2 lg:p-3 rounded-xl transition-all duration-200 hover:scale-105 flex-shrink-0">
