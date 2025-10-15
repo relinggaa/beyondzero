@@ -55,7 +55,6 @@ export default function Healing() {
 
     return (
         <LayoutUser>
-            
             <div className="p-4 lg:p-8">
                 {/* Header Section */}
                 <div className="mb-8">

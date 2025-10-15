@@ -1,14 +1,25 @@
 import React, { useState } from "react";
+import { useForm, Link } from "@inertiajs/react";
 import LayoutUser from "../../Components/Layout/LayoutUser";
 
-export default function Psikolog() {
+export default function Psikolog({ psikologs }) {
     const [selectedPsikolog, setSelectedPsikolog] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
     const [isChatbotOpen, setIsChatbotOpen] = useState(false);
     const [chatMessage, setChatMessage] = useState("");
     const [chatMessages, setChatMessages] = useState([]);
 
-    const psikologList = [
+    const { data, setData, post, processing, errors } = useForm({
+        psikolog_id: "",
+        appointment_date: "",
+        appointment_time: "",
+        session_type: "online",
+        notes: ""
+    });
+
+    // Use data from database, fallback to dummy data if empty
+    const psikologList = psikologs && psikologs.length > 0 ? psikologs : [
         {
             id: 1,
             name: "Dr. Sarah Wijaya, M.Psi., Psikolog",
@@ -87,6 +98,37 @@ export default function Psikolog() {
         setSelectedPsikolog(null);
     };
 
+    const handleOpenBooking = (psikolog) => {
+        setSelectedPsikolog(psikolog);
+        setData('psikolog_id', psikolog.id);
+        setIsBookingModalOpen(true);
+    };
+
+    const handleCloseBookingModal = () => {
+        setIsBookingModalOpen(false);
+        setSelectedPsikolog(null);
+        setData({
+            psikolog_id: "",
+            appointment_date: "",
+            appointment_time: "",
+            session_type: "online",
+            notes: ""
+        });
+    };
+
+    const handleBookingSubmit = (e) => {
+        e.preventDefault();
+        post('/booking-psikolog', {
+            onSuccess: () => {
+                handleCloseBookingModal();
+                alert('Jadwal konseling berhasil dibuat! Psikolog akan mengkonfirmasi jadwal Anda.');
+            },
+            onError: (errors) => {
+                console.error('Booking errors:', errors);
+            }
+        });
+    };
+
     const handleOpenChatbot = () => {
         setIsChatbotOpen(true);
         // Initialize chat with welcome message
@@ -134,16 +176,28 @@ export default function Psikolog() {
 
     return (
         <LayoutUser>
-            
             <div className="container mx-auto px-4 py-8">
                 {/* Header */}
                 <div className="text-center mb-8">
                     <h1 className="text-3xl lg:text-4xl font-bold text-white mb-4">
                         👨‍⚕️ Tim Psikolog Kami
                     </h1>
-                    <p className="text-white/70 text-lg">
+                    <p className="text-white/70 text-lg mb-6">
                         Temukan psikolog yang tepat untuk kebutuhan kesehatan mental Anda
                     </p>
+                    
+                    {/* Booking Status Button */}
+                    <div className="flex justify-center">
+                        <Link
+                            href="/booking-psikolog"
+                            className="bg-gradient-to-r from-cyan-400 to-teal-500 hover:from-cyan-500 hover:to-teal-600 text-white px-8 py-3 rounded-lg transition-all duration-200 hover:scale-105 font-medium flex items-center space-x-2"
+                        >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                            </svg>
+                            <span>📋 Lihat Status Booking</span>
+                        </Link>
+                    </div>
                 </div>
 
                 {/* Psikolog Cards Grid */}
@@ -151,13 +205,13 @@ export default function Psikolog() {
                     {psikologList.map((psikolog) => (
                         <div key={psikolog.id} className="bg-slate-700 rounded-2xl p-6 border border-slate-600 hover:border-cyan-400/50 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl">
                             {/* Psikolog Image */}
-                            <div className="flex justify-center mb-4">
-                                <img
-                                    src={psikolog.image}
-                                    alt={psikolog.name}
-                                    className="w-24 h-24 rounded-full object-cover border-4 border-cyan-400/30"
-                                />
-                            </div>
+                                    <div className="flex justify-center mb-4">
+                                        <img
+                                            src={psikolog.image ? `/storage/${psikolog.image}` : 'https://via.placeholder.com/96x96/06b6d4/ffffff?text=IMG'}
+                                            alt={psikolog.name}
+                                            className="w-24 h-24 rounded-full object-cover border-4 border-cyan-400/30"
+                                        />
+                                    </div>
 
                             {/* Psikolog Info */}
                             <div className="text-center mb-4">
@@ -184,7 +238,6 @@ export default function Psikolog() {
                         </div>
                     ))}
                 </div>
-            </div>
 
             {/* Modal Detail Psikolog */}
             {isModalOpen && selectedPsikolog && (
@@ -192,12 +245,12 @@ export default function Psikolog() {
                     <div className="bg-slate-800 rounded-2xl p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto border border-slate-600">
                         {/* Modal Header */}
                         <div className="flex items-start justify-between mb-6">
-                            <div className="flex items-center space-x-4">
-                                <img
-                                    src={selectedPsikolog.image}
-                                    alt={selectedPsikolog.name}
-                                    className="w-20 h-20 rounded-full object-cover border-4 border-cyan-400/30"
-                                />
+                                        <div className="flex items-center space-x-4">
+                                            <img
+                                                src={selectedPsikolog.image ? `/storage/${selectedPsikolog.image}` : 'https://via.placeholder.com/80x80/06b6d4/ffffff?text=IMG'}
+                                                alt={selectedPsikolog.name}
+                                                className="w-20 h-20 rounded-full object-cover border-4 border-cyan-400/30"
+                                            />
                                 <div>
                                     <h2 className="text-2xl font-bold text-white mb-1">{selectedPsikolog.name}</h2>
                                     <p className="text-cyan-400 font-medium">{selectedPsikolog.experience} pengalaman</p>
@@ -268,7 +321,13 @@ export default function Psikolog() {
                         </div>
 
                         {/* Modal Footer */}
-                        <div className="flex justify-end mt-8 pt-6 border-t border-slate-600">
+                        <div className="flex justify-between mt-8 pt-6 border-t border-slate-600">
+                            <button
+                                onClick={() => handleOpenBooking(selectedPsikolog)}
+                                className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-8 py-3 rounded-lg transition-all duration-200 hover:scale-105 font-medium"
+                            >
+                                📅 Atur Jadwal Konseling
+                            </button>
                             <button
                                 onClick={handleCloseModal}
                                 className="bg-gradient-to-r from-cyan-400 to-teal-500 hover:from-cyan-500 hover:to-teal-600 text-white px-8 py-3 rounded-lg transition-all duration-200 hover:scale-105 font-medium"
@@ -276,6 +335,152 @@ export default function Psikolog() {
                                 Tutup
                             </button>
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Booking Modal */}
+            {isBookingModalOpen && selectedPsikolog && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                    <div className="bg-slate-800 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-slate-600">
+                        {/* Modal Header */}
+                        <div className="flex items-center justify-between mb-6">
+                            <div>
+                                <h2 className="text-2xl font-bold text-white mb-2">
+                                    📅 Atur Jadwal Konseling
+                                </h2>
+                                <p className="text-cyan-400">
+                                    dengan {selectedPsikolog.name}
+                                </p>
+                            </div>
+                            <button
+                                onClick={handleCloseBookingModal}
+                                className="text-white/60 hover:text-white transition-colors p-2 hover:bg-slate-700 rounded-lg"
+                            >
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        {/* Booking Form */}
+                        <form onSubmit={handleBookingSubmit} className="space-y-6">
+                            {/* Date and Time */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-white font-medium mb-2">
+                                        📅 Tanggal Konseling *
+                                    </label>
+                                    <input
+                                        type="date"
+                                        value={data.appointment_date}
+                                        onChange={(e) => setData('appointment_date', e.target.value)}
+                                        min={new Date().toISOString().split('T')[0]}
+                                        required
+                                        className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:border-cyan-400 focus:outline-none transition-colors"
+                                    />
+                                    {errors.appointment_date && <p className="text-red-400 text-sm mt-1">{errors.appointment_date}</p>}
+                                </div>
+                                <div>
+                                    <label className="block text-white font-medium mb-2">
+                                        🕐 Waktu Konseling *
+                                    </label>
+                                    <input
+                                        type="time"
+                                        value={data.appointment_time}
+                                        onChange={(e) => setData('appointment_time', e.target.value)}
+                                        required
+                                        className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:border-cyan-400 focus:outline-none transition-colors"
+                                    />
+                                    {errors.appointment_time && <p className="text-red-400 text-sm mt-1">{errors.appointment_time}</p>}
+                                </div>
+                            </div>
+
+                            {/* Session Type */}
+                            <div>
+                                <label className="block text-white font-medium mb-2">
+                                    💻 Tipe Sesi *
+                                </label>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <label className="flex items-center space-x-3 p-4 bg-slate-700 rounded-lg border border-slate-600 hover:border-cyan-400/50 transition-colors cursor-pointer">
+                                        <input
+                                            type="radio"
+                                            name="session_type"
+                                            value="online"
+                                            checked={data.session_type === 'online'}
+                                            onChange={(e) => setData('session_type', e.target.value)}
+                                            className="text-cyan-400 focus:ring-cyan-400"
+                                        />
+                                        <div>
+                                            <div className="text-white font-medium">🌐 Online</div>
+                                            <div className="text-white/60 text-sm">Video call</div>
+                                        </div>
+                                    </label>
+                                    <label className="flex items-center space-x-3 p-4 bg-slate-700 rounded-lg border border-slate-600 hover:border-cyan-400/50 transition-colors cursor-pointer">
+                                        <input
+                                            type="radio"
+                                            name="session_type"
+                                            value="offline"
+                                            checked={data.session_type === 'offline'}
+                                            onChange={(e) => setData('session_type', e.target.value)}
+                                            className="text-cyan-400 focus:ring-cyan-400"
+                                        />
+                                        <div>
+                                            <div className="text-white font-medium">🏢 Offline</div>
+                                            <div className="text-white/60 text-sm">Bertemu langsung</div>
+                                        </div>
+                                    </label>
+                                </div>
+                                {errors.session_type && <p className="text-red-400 text-sm mt-1">{errors.session_type}</p>}
+                            </div>
+
+                            {/* Notes */}
+                            <div>
+                                <label className="block text-white font-medium mb-2">
+                                    📝 Catatan (Opsional)
+                                </label>
+                                <textarea
+                                    value={data.notes}
+                                    onChange={(e) => setData('notes', e.target.value)}
+                                    rows={3}
+                                    placeholder="Tuliskan hal-hal yang ingin Anda diskusikan dengan psikolog..."
+                                    className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white placeholder-white/50 focus:border-cyan-400 focus:outline-none transition-colors resize-none"
+                                />
+                                {errors.notes && <p className="text-red-400 text-sm mt-1">{errors.notes}</p>}
+                            </div>
+
+                            {/* Submit Buttons */}
+                            <div className="flex justify-end space-x-4 pt-4">
+                                <button
+                                    type="button"
+                                    onClick={handleCloseBookingModal}
+                                    className="px-6 py-3 border border-slate-600 text-slate-300 rounded-lg hover:bg-slate-700 transition-colors"
+                                >
+                                    Batal
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={processing}
+                                    className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                                >
+                                    {processing ? (
+                                        <>
+                                            <svg className="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                            </svg>
+                                            <span>Menyimpan...</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                            </svg>
+                                            <span>Buat Jadwal</span>
+                                        </>
+                                    )}
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             )}
@@ -368,6 +573,7 @@ export default function Psikolog() {
                     </div>
                 </div>
             )}
+            </div>
         </LayoutUser>
     );
 }

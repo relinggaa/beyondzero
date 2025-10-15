@@ -1,7 +1,9 @@
 import React, { useState } from "react";
+import { Link, usePage } from "@inertiajs/react";
 
 export default function NavbarUser() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const { auth } = usePage().props;
 
     return (
         <div className="flex justify-center">
@@ -79,10 +81,19 @@ export default function NavbarUser() {
                             
                         </button> */}
 
-                        {/* Masuk Button */}
-                        <button className="bg-gradient-to-r from-cyan-400 to-teal-500 hover:from-cyan-500 hover:to-teal-600 text-white px-4 lg:px-8 py-2 lg:py-3 rounded-full transition-all duration-200 font-bold text-xs lg:text-sm tracking-wide">
-                            Logout
-                        </button>
+                        {/* User Info & Logout */}
+                        <div className="flex items-center space-x-4">
+                            <span className="text-gray-700 text-sm">
+                                Halo, {auth?.user?.name || 'User'}
+                            </span>
+                            <Link
+                                href="/logout"
+                                method="post"
+                                className="bg-gradient-to-r from-cyan-400 to-teal-500 hover:from-cyan-500 hover:to-teal-600 text-white px-4 lg:px-8 py-2 lg:py-3 rounded-full transition-all duration-200 font-bold text-xs lg:text-sm tracking-wide"
+                            >
+                                Logout
+                            </Link>
+                        </div>
                     </div>
                 </div>
 
