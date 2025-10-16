@@ -119,7 +119,6 @@ export default function Curhat() {
 
     return (
         <LayoutUser>
-            
             <div className="flex flex-col lg:flex-row">
                 {/* Mobile Sidebar Overlay */}
                 {isSidebarOpen && (

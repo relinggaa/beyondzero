@@ -1,7 +1,10 @@
 import React from "react";
 import { createInertiaApp } from "@inertiajs/react";
 import { createRoot } from "react-dom/client";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "../css/app.css";
+import { Ziggy } from "./ziggy";
 
 createInertiaApp({
     resolve: (name) => {
@@ -9,6 +12,27 @@ createInertiaApp({
         return pages[`./Pages/${name}.jsx`];
     },
     setup({ el, App, props }) {
-        createRoot(el).render(<App {...props} />);
+        // Make Ziggy routes available globally
+        window.route = (name, params, absolute, config = Ziggy) => {
+            return route(name, params, absolute, config);
+        };
+        
+        createRoot(el).render(
+            <>
+                <App {...props} />
+                <ToastContainer
+                    position="top-right"
+                    autoClose={3000}
+                    hideProgressBar={false}
+                    newestOnTop={false}
+                    closeOnClick
+                    rtl={false}
+                    pauseOnFocusLoss
+                    draggable
+                    pauseOnHover
+                    theme="dark"
+                />
+            </>
+        );
     },
 });

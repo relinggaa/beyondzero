@@ -1,41 +1,19 @@
 import React, { useState } from "react";
+import { toast } from "react-toastify";
+import { useForm, router } from "@inertiajs/react";
 import LayoutUser from "../../Components/Layout/LayoutUser";
 
-export default function Journaling() {
+export default function Journaling({ journals = [] }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingJournal, setEditingJournal] = useState(null);
-    const [journals, setJournals] = useState([
-        {
-            id: 1,
-            date: "15/10/2025",
-            mood: "😊",
-            gratitude: "Bersyukur bisa menyelesaikan proyek tepat waktu",
-            achievement: "Menyelesaikan laporan bulanan",
-            challenge: "Menghadapi deadline yang ketat",
-            reflection: "Belajar bahwa komunikasi yang baik sangat penting",
-            tomorrowGoal: "Menyiapkan presentasi untuk meeting besok",
-            affirmation: "Saya mampu menghadapi tantangan dengan tenang"
-        },
-        {
-            id: 2,
-            date: "14/10/2025",
-            mood: "😌",
-            gratitude: "Bersyukur atas dukungan keluarga",
-            achievement: "Berhasil meditasi 10 menit",
-            challenge: "Mengatasi kecemasan sebelum presentasi",
-            reflection: "Meditasi membantu menenangkan pikiran",
-            tomorrowGoal: "Mempersiapkan materi presentasi",
-            affirmation: "Saya percaya pada kemampuan diri sendiri"
-        }
-    ]);
-    const [formData, setFormData] = useState({
+    const { data, setData, post, put, delete: destroy, processing, errors } = useForm({
         date: "",
         mood: "",
         gratitude: "",
         achievement: "",
         challenge: "",
         reflection: "",
-        tomorrowGoal: "",
+        tomorrow_goal: "",
         affirmation: ""
     });
 
@@ -52,69 +30,85 @@ export default function Journaling() {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
+        setData(name, value);
     };
 
     const handleMoodSelect = (mood) => {
-        setFormData(prev => ({
-            ...prev,
-            mood: mood.emoji
-        }));
+        setData('mood', mood.emoji);
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
         if (editingJournal) {
             // Edit existing journal
-            setJournals(prev => prev.map(journal => 
-                journal.id === editingJournal.id 
-                    ? { ...journal, ...formData }
-                    : journal
-            ));
+            put(`/journaling/${editingJournal.id}`, {
+                onSuccess: () => {
+                    toast.success('Jurnal berhasil diperbarui!');
+                    handleCloseModal();
+                },
+                onError: (errors) => {
+                    console.error('Update errors:', errors);
+                }
+            });
         } else {
             // Create new journal
-            const newJournal = {
-                id: Date.now(),
-                ...formData
-            };
-            setJournals(prev => [newJournal, ...prev]);
+            post('/journaling', {
+                onSuccess: () => {
+                    toast.success('Jurnal berhasil dibuat!');
+                    handleCloseModal();
+                },
+                onError: (errors) => {
+                    console.error('Create errors:', errors);
+                }
+            });
         }
-        handleCloseModal();
     };
 
     const handleEdit = (journal) => {
         setEditingJournal(journal);
-        setFormData(journal);
+        setData({
+            date: journal.date,
+            mood: journal.mood,
+            gratitude: journal.gratitude || '',
+            achievement: journal.achievement || '',
+            challenge: journal.challenge || '',
+            reflection: journal.reflection || '',
+            tomorrow_goal: journal.tomorrow_goal || '',
+            affirmation: journal.affirmation || ''
+        });
         setIsModalOpen(true);
     };
 
     const handleDelete = (journalId) => {
         if (window.confirm("Apakah Anda yakin ingin menghapus jurnal ini?")) {
-            setJournals(prev => prev.filter(journal => journal.id !== journalId));
+            destroy(`/journaling/${journalId}`, {
+                onSuccess: () => {
+                    toast.success('Jurnal berhasil dihapus!');
+                },
+                onError: (errors) => {
+                    console.error('Delete errors:', errors);
+                }
+            });
         }
     };
 
     const handleCloseModal = () => {
         setIsModalOpen(false);
         setEditingJournal(null);
-        setFormData({
+        setData({
             date: "",
             mood: "",
             gratitude: "",
             achievement: "",
             challenge: "",
             reflection: "",
-            tomorrowGoal: "",
+            tomorrow_goal: "",
             affirmation: ""
         });
     };
 
     const formatDate = (dateString) => {
-        const [day, month, year] = dateString.split('/');
-        const date = new Date(year, month - 1, day);
+        const date = new Date(dateString);
         return date.toLocaleDateString('id-ID', { 
             weekday: 'long', 
             year: 'numeric', 
@@ -125,7 +119,6 @@ export default function Journaling() {
 
     return (
         <LayoutUser>
-            
             <div className="container mx-auto px-4 py-8">
                 {/* Header */}
                 <div className="text-center mb-8">
@@ -156,7 +149,7 @@ export default function Journaling() {
                                 <div className="flex items-center space-x-3">
                                     <span className="text-2xl">{journal.mood}</span>
                                     <div>
-                                        <h3 className="text-white font-semibold text-lg">{journal.date}</h3>
+                                        <h3 className="text-white font-semibold text-lg">{new Date(journal.date).toLocaleDateString('id-ID')}</h3>
                                         <p className="text-white/60 text-sm">{formatDate(journal.date)}</p>
                                     </div>
                                 </div>
@@ -192,10 +185,10 @@ export default function Journaling() {
                                     </div>
                                 )}
                                 
-                                {journal.tomorrowGoal && (
+                                {journal.tomorrow_goal && (
                                     <div>
                                         <h4 className="text-blue-400 font-medium text-sm mb-1">🎯 Tujuan Besok</h4>
-                                        <p className="text-white/80 text-sm">{journal.tomorrowGoal}</p>
+                                        <p className="text-white/80 text-sm">{journal.tomorrow_goal}</p>
                                     </div>
                                 )}
                                 
@@ -234,7 +227,6 @@ export default function Journaling() {
                         <p className="text-white/60">Mulai menulis jurnal pertama Anda untuk merefleksikan hari-hari Anda</p>
                     </div>
                 )}
-            </div>
 
             {/* Modal Form */}
             {isModalOpen && (
@@ -259,11 +251,10 @@ export default function Journaling() {
                             <div>
                                 <label className="block text-white font-medium mb-2">📅 Tanggal</label>
                                 <input
-                                    type="text"
+                                    type="date"
                                     name="date"
-                                    value={formData.date}
+                                    value={data.date}
                                     onChange={handleInputChange}
-                                    placeholder="Masukkan Tanggal Jurnal (DD/MM/YYYY)"
                                     className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white placeholder-white/50 focus:border-cyan-400 focus:outline-none transition-colors"
                                     required
                                 />
@@ -279,7 +270,7 @@ export default function Journaling() {
                                             type="button"
                                             onClick={() => handleMoodSelect(mood)}
                                             className={`p-3 rounded-lg border-2 transition-all duration-200 ${
-                                                formData.mood === mood.emoji
+                                                data.mood === mood.emoji
                                                     ? 'border-cyan-400 bg-cyan-400/20'
                                                     : 'border-slate-600 hover:border-cyan-400/50'
                                             }`}
@@ -296,7 +287,7 @@ export default function Journaling() {
                                 <label className="block text-white font-medium mb-2">🙏 Rasa Syukur</label>
                                 <textarea
                                     name="gratitude"
-                                    value={formData.gratitude}
+                                    value={data.gratitude}
                                     onChange={handleInputChange}
                                     placeholder="Apa yang Anda syukuri hari ini?"
                                     rows={3}
@@ -309,7 +300,7 @@ export default function Journaling() {
                                 <label className="block text-white font-medium mb-2">🏆 Pencapaian</label>
                                 <textarea
                                     name="achievement"
-                                    value={formData.achievement}
+                                    value={data.achievement}
                                     onChange={handleInputChange}
                                     placeholder="Apa yang Anda capai hari ini?"
                                     rows={3}
@@ -322,7 +313,7 @@ export default function Journaling() {
                                 <label className="block text-white font-medium mb-2">⚡ Tantangan</label>
                                 <textarea
                                     name="challenge"
-                                    value={formData.challenge}
+                                    value={data.challenge}
                                     onChange={handleInputChange}
                                     placeholder="Tantangan terbesar hari ini adalah..."
                                     rows={3}
@@ -335,7 +326,7 @@ export default function Journaling() {
                                 <label className="block text-white font-medium mb-2">💭 Refleksi</label>
                                 <textarea
                                     name="reflection"
-                                    value={formData.reflection}
+                                    value={data.reflection}
                                     onChange={handleInputChange}
                                     placeholder="Apa yang Anda pelajari hari ini?"
                                     rows={3}
@@ -347,8 +338,8 @@ export default function Journaling() {
                             <div>
                                 <label className="block text-white font-medium mb-2">🎯 Tujuan untuk Besok</label>
                                 <textarea
-                                    name="tomorrowGoal"
-                                    value={formData.tomorrowGoal}
+                                    name="tomorrow_goal"
+                                    value={data.tomorrow_goal}
                                     onChange={handleInputChange}
                                     placeholder="Apa tujuan Anda untuk besok?"
                                     rows={3}
@@ -361,7 +352,7 @@ export default function Journaling() {
                                 <label className="block text-white font-medium mb-2">✨ Afirmasi Pribadi</label>
                                 <textarea
                                     name="affirmation"
-                                    value={formData.affirmation}
+                                    value={data.affirmation}
                                     onChange={handleInputChange}
                                     placeholder="Tuliskan afirmasi positif Anda"
                                     rows={3}
@@ -380,15 +371,17 @@ export default function Journaling() {
                                 </button>
                                 <button
                                     type="submit"
-                                    className="flex-1 bg-gradient-to-r from-cyan-400 to-teal-500 hover:from-cyan-500 hover:to-teal-600 text-white py-3 px-6 rounded-lg transition-all duration-200 hover:scale-105 font-medium"
+                                    disabled={processing}
+                                    className="flex-1 bg-gradient-to-r from-cyan-400 to-teal-500 hover:from-cyan-500 hover:to-teal-600 text-white py-3 px-6 rounded-lg transition-all duration-200 hover:scale-105 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                    {editingJournal ? 'Update Jurnal' : 'Simpan Jurnal'}
+                                    {processing ? 'Menyimpan...' : (editingJournal ? 'Update Jurnal' : 'Simpan Jurnal')}
                                 </button>
                             </div>
                         </form>
                     </div>
                 </div>
             )}
+            </div>
         </LayoutUser>
     );
 }

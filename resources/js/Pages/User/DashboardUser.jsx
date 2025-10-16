@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "@inertiajs/react";
 import LayoutUser from "../../Components/Layout/LayoutUser";
 
 export default function DashboardUser() {
@@ -10,9 +11,60 @@ export default function DashboardUser() {
                     <h1 className="text-3xl lg:text-4xl font-bold text-white mb-2">
                         Selamat Datang di BeyondMind
                     </h1>
-                    <p className="text-white/70 text-lg">
+                    <p className="text-white/70 text-lg mb-6">
                         Pantau kesehatan mental Anda dengan tools yang tepat
                     </p>
+                    
+                    {/* Navigation Menu */}
+                    <div className="flex flex-wrap gap-4 mb-8">
+                        <Link
+                            href="/moodtracker"
+                            className="bg-gradient-to-r from-cyan-400 to-teal-500 hover:from-cyan-500 hover:to-teal-600 text-white px-6 py-3 rounded-lg transition-all duration-200 hover:scale-105 font-medium flex items-center space-x-2"
+                        >
+                            <span className="text-xl">😊</span>
+                            <span>Mood Tracker</span>
+                        </Link>
+                        
+                        <Link
+                            href="/curhat"
+                            className="bg-gradient-to-r from-cyan-400 to-teal-500 hover:from-cyan-500 hover:to-teal-600 text-white px-6 py-3 rounded-lg transition-all duration-200 hover:scale-105 font-medium flex items-center space-x-2"
+                        >
+                            <span className="text-xl">💬</span>
+                            <span>Curhat</span>
+                        </Link>
+                        
+                        <Link
+                            href="/journaling"
+                            className="bg-gradient-to-r from-cyan-400 to-teal-500 hover:from-cyan-500 hover:to-teal-600 text-white px-6 py-3 rounded-lg transition-all duration-200 hover:scale-105 font-medium flex items-center space-x-2"
+                        >
+                            <span className="text-xl">📝</span>
+                            <span>Journaling</span>
+                        </Link>
+                        
+                        <Link
+                            href="/psikolog"
+                            className="bg-gradient-to-r from-cyan-400 to-teal-500 hover:from-cyan-500 hover:to-teal-600 text-white px-6 py-3 rounded-lg transition-all duration-200 hover:scale-105 font-medium flex items-center space-x-2"
+                        >
+                            <span className="text-xl">👨‍⚕️</span>
+                            <span>Psikolog</span>
+                        </Link>
+                        
+                        <Link
+                            href="/healing"
+                            className="bg-gradient-to-r from-cyan-400 to-teal-500 hover:from-cyan-500 hover:to-teal-600 text-white px-6 py-3 rounded-lg transition-all duration-200 hover:scale-105 font-medium flex items-center space-x-2"
+                        >
+                            <span className="text-xl">🧘‍♀️</span>
+                            <span>Healing</span>
+                        </Link>
+                        
+                        <Link
+                            href="/booking-psikolog"
+                            className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-6 py-3 rounded-lg transition-all duration-200 hover:scale-105 font-medium flex items-center space-x-2"
+                        >
+                            <span className="text-xl">📋</span>
+                            <span>Status Booking</span>
+                        </Link>
+                    </div>
                 </div>
 
                 {/* Stats Cards */}
