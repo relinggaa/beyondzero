@@ -79,21 +79,17 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/booking-psikolog', [BookPsikologController::class, 'index'])->name('booking.index');
     Route::post('/booking-psikolog/{booking}/cancel', [BookPsikologController::class, 'cancel'])->name('booking.cancel');
 
-Route::get('/healing', function () {
-    return Inertia('User/Healing');
-});
+    Route::get('/ml-prediction', function () {
+        return Inertia::render('User/MLPrediction');
+    });
 
-Route::get('/ml-prediction', function () {
-    return Inertia('User/MLPrediction');
-});
-
-// ML API Routes
-Route::prefix('api/ml')->group(function () {
-    Route::post('/predict', [App\Http\Controllers\MLController::class, 'predict']);
-    Route::post('/predict/batch', [App\Http\Controllers\MLController::class, 'predictBatch']);
-    Route::get('/health', [App\Http\Controllers\MLController::class, 'health']);
-    Route::get('/model-info', [App\Http\Controllers\MLController::class, 'modelInfo']);
-});
+    // ML API Routes
+    Route::prefix('api/ml')->group(function () {
+        Route::post('/predict', [App\Http\Controllers\MLController::class, 'predict']);
+        Route::post('/predict/batch', [App\Http\Controllers\MLController::class, 'predictBatch']);
+        Route::get('/health', [App\Http\Controllers\MLController::class, 'health']);
+        Route::get('/model-info', [App\Http\Controllers\MLController::class, 'modelInfo']);
+    });
     // Psikolog routes
     Route::get('/psikolog/login', [PsikologAuthController::class, 'showLogin'])->name('psikolog.login');
     Route::post('/psikolog/login', [PsikologAuthController::class, 'login']);
