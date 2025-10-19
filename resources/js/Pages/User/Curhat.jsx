@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import LayoutUser from "../../Components/Layout/LayoutUser";
 
 export default function Curhat() {
@@ -6,6 +6,10 @@ export default function Curhat() {
     const [message, setMessage] = useState("");
     const [selectedSession, setSelectedSession] = useState(1);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [chatMessages, setChatMessages] = useState([]);
+    const [isTyping, setIsTyping] = useState(false);
+    const [isConnected, setIsConnected] = useState(false);
+    const chatContainerRef = useRef(null);
 
 
     const sessions = [
@@ -115,10 +119,146 @@ export default function Curhat() {
         ]
     };
 
-    const currentChatMessages = allChatMessages[selectedSession] || [];
+    const currentChatMessages = chatMessages.length > 0 ? chatMessages : allChatMessages[selectedSession] || [];
+
+    // Auto-scroll function
+    const scrollToBottom = () => {
+        if (chatContainerRef.current) {
+            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        }
+    };
+
+    // Check Ollama connection status
+    useEffect(() => {
+        const checkOllamaStatus = async () => {
+            try {
+                const response = await fetch('http://localhost:5004/status');
+                const data = await response.json();
+                setIsConnected(data.ollama_running);
+            } catch (error) {
+                console.error('Error checking Ollama status:', error);
+                setIsConnected(false);
+            }
+        };
+
+        checkOllamaStatus();
+        const interval = setInterval(checkOllamaStatus, 10000); // Check every 10 seconds
+
+        return () => clearInterval(interval);
+    }, []);
+
+    // Auto-scroll when new messages are added
+    useEffect(() => {
+        scrollToBottom();
+    }, [currentChatMessages]);
+
+    // Function to send message to Ollama
+    const sendMessageToOllama = async (userMessage) => {
+        setIsTyping(true);
+        
+        try {
+            const response = await fetch('http://localhost:5004/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: userMessage,
+                    timestamp: new Date().toISOString()
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Add AI response to chat
+                const aiMessage = {
+                    id: Date.now() + 1,
+                    type: 'ai',
+                    message: data.response,
+                    timestamp: new Date().toLocaleTimeString('en-US', { 
+                        hour: '2-digit', 
+                        minute: '2-digit',
+                        hour12: true 
+                    })
+                };
+                
+                setChatMessages(prev => [...prev, aiMessage]);
+            } else {
+                // Add error message
+                const errorMessage = {
+                    id: Date.now() + 1,
+                    type: 'ai',
+                    message: `Maaf, terjadi kesalahan: ${data.error}`,
+                    timestamp: new Date().toLocaleTimeString('en-US', { 
+                        hour: '2-digit', 
+                        minute: '2-digit',
+                        hour12: true 
+                    })
+                };
+                
+                setChatMessages(prev => [...prev, errorMessage]);
+            }
+        } catch (error) {
+            console.error('Error sending message to Ollama:', error);
+            
+            // Add error message
+            const errorMessage = {
+                id: Date.now() + 1,
+                type: 'ai',
+                message: 'Maaf, tidak dapat terhubung ke AI. Pastikan Ollama sudah berjalan.',
+                timestamp: new Date().toLocaleTimeString('en-US', { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    hour12: true 
+                })
+            };
+            
+            setChatMessages(prev => [...prev, errorMessage]);
+        } finally {
+            setIsTyping(false);
+        }
+    };
+
+    // Function to handle send message
+    const handleSendMessage = async () => {
+        if (!message.trim()) return;
+        
+        // Add user message
+        const userMessage = {
+            id: Date.now(),
+            type: 'user',
+            message: message.trim(),
+            timestamp: new Date().toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: true 
+            })
+        };
+        
+        setChatMessages(prev => [...prev, userMessage]);
+        
+        // Send to Ollama
+        await sendMessageToOllama(message.trim());
+        
+        // Clear input
+        setMessage('');
+    };
+
+    // Handle enter key
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleSendMessage();
+        }
+    };
 
     return (
         <LayoutUser>
+            <div 
+                className="min-h-screen cursor-gaming mood-tracker-bg pt-20"
+            >
+                <div className="min-h-screen">
             <div className="flex flex-col lg:flex-row">
                 {/* Mobile Sidebar Overlay */}
                 {isSidebarOpen && (
@@ -131,7 +271,7 @@ export default function Curhat() {
                 {/* Left Sidebar */}
                 <div className={`
                     fixed lg:relative inset-y-0 left-0 z-50 lg:z-auto
-                    w-80 bg-slate-800 border-r border-slate-700 p-4 lg:p-6
+                    w-80 bg-black/20 backdrop-blur-md border-r border-white/20 p-4 lg:p-6
                     transform transition-transform duration-300 ease-in-out
                     ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
                 `}>
@@ -209,7 +349,7 @@ export default function Curhat() {
                 </div>
 
                 {/* Main Content */}
-                <div className="flex-1 bg-slate-800 p-4 lg:p-8">
+                <div className="flex-1 p-4 lg:p-8">
                     {/* Mobile Header with Hamburger */}
                     <div className="flex items-center justify-between mb-6 lg:mb-8 lg:hidden">
                         <button 
@@ -226,9 +366,32 @@ export default function Curhat() {
 
 
                     {/* Chat Messages */}
-                    <div className="bg-slate-700 rounded-2xl p-4 lg:p-6 mb-6 border border-slate-600">
-                        <h3 className="text-white font-semibold text-base lg:text-lg mb-4">Chat Terbaru</h3>
-                        <div className="space-y-3 lg:space-y-4 max-h-80 lg:max-h-96 overflow-y-auto">
+                    <div className="bg-black/30 backdrop-blur-md rounded-2xl p-4 lg:p-6 mb-6 border border-white/20">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-white font-semibold text-base lg:text-lg">Chat Terbaru</h3>
+                            <div className="flex items-center space-x-2">
+                                {/* Ollama Connection Status */}
+                                <div className={`flex items-center space-x-2 ${isConnected ? 'text-green-400' : 'text-red-400'}`}>
+                                    <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-400' : 'bg-red-400'} ${isConnected ? 'animate-pulse' : ''}`}></div>
+                                    <span className="text-sm">{isConnected ? 'Ollama Connected' : 'Ollama Disconnected'}</span>
+                                </div>
+                                {/* Typing Indicator */}
+                                {isTyping && (
+                                    <div className="flex items-center space-x-2 text-cyan-400">
+                                        <div className="flex space-x-1">
+                                            <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce"></div>
+                                            <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                                            <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                                        </div>
+                                        <span className="text-sm">AI sedang mengetik...</span>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                        <div 
+                            ref={chatContainerRef}
+                            className="space-y-3 lg:space-y-4 max-h-80 lg:max-h-96 overflow-y-auto"
+                        >
                             {currentChatMessages.length === 0 ? (
                                 // Greeting saat chat kosong
                                 <div className="flex flex-col items-center justify-center py-8 text-center">
@@ -239,18 +402,25 @@ export default function Curhat() {
                                     <p className="text-white/70 text-sm lg:text-base max-w-md">
                                         Ceritakan apa yang mengganggu pikiranmu atau hal-hal yang ingin dibagikan. Mulai curhat dengan mengetik pesan di bawah ini.
                                     </p>
+                                    {!isConnected && (
+                                        <div className="mt-4 p-3 bg-red-500/20 border border-red-500/30 rounded-lg">
+                                            <p className="text-red-400 text-sm">
+                                                ⚠️ Ollama tidak terhubung. Pastikan Ollama sudah berjalan untuk menggunakan AI chatbot.
+                                            </p>
+                                        </div>
+                                    )}
                                 </div>
                             ) : (
                                 // Chat messages
                                 currentChatMessages.map((msg) => (
-                                    <div key={msg.id} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}>
-                                        <div className={`max-w-[85%] sm:max-w-xs lg:max-w-md px-3 lg:px-4 py-2 lg:py-3 rounded-2xl ${
+                                    <div key={msg.id} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'} chat-message`}>
+                                        <div className={`max-w-[85%] sm:max-w-xs lg:max-w-md px-3 lg:px-4 py-2 lg:py-3 rounded-2xl transition-all duration-300 hover:scale-105 ${
                                             msg.type === 'user' 
-                                                ? 'bg-gradient-to-r from-cyan-400 to-teal-500 text-white' 
-                                                : 'bg-slate-600 text-white'
+                                                ? 'bg-gradient-to-r from-cyan-400 to-teal-500 text-white shadow-lg' 
+                                                : 'bg-black/40 backdrop-blur-md text-white border border-white/20 shadow-lg'
                                         }`}>
-                                            <p className="text-xs lg:text-sm break-words">{msg.message}</p>
-                                            <p className={`text-xs mt-1 ${
+                                            <p className="text-xs lg:text-sm break-words font-medium">{msg.message}</p>
+                                            <p className={`text-xs mt-1 font-light ${
                                                 msg.type === 'user' ? 'text-white/70' : 'text-white/50'
                                             }`}>
                                                 {msg.timestamp}
@@ -263,23 +433,38 @@ export default function Curhat() {
                     </div>
 
                     {/* Message Input */}
-                    <div className="bg-slate-700 rounded-2xl p-4 lg:p-6 border border-slate-600">
+                    <div className="bg-black/30 backdrop-blur-md rounded-2xl p-4 lg:p-6 border border-white/20">
                         <div className="flex items-center space-x-2 lg:space-x-4">
                             <input
                                 type="text"
                                 value={message}
                                 onChange={(e) => setMessage(e.target.value)}
-                                placeholder="Ceritakan apa yang mengganggu pikiranmu..."
-                                className="flex-1 bg-transparent text-white placeholder-white/50 border-none outline-none text-sm lg:text-lg"
+                                onKeyPress={handleKeyPress}
+                                placeholder={isTyping ? "AI sedang mengetik..." : "Ceritakan apa yang mengganggu pikiranmu..."}
+                                className={`flex-1 bg-transparent text-white placeholder-white/50 border-none outline-none text-sm lg:text-lg ${
+                                    isTyping ? 'placeholder-cyan-400' : ''
+                                }`}
+                                disabled={isTyping}
                             />
                             {/* Send Button */}
-                            <button className="bg-gradient-to-r from-cyan-400 to-teal-500 hover:from-cyan-500 hover:to-teal-600 text-white p-2 lg:p-3 rounded-xl transition-all duration-200 hover:scale-105 flex-shrink-0">
+                            <button 
+                                onClick={handleSendMessage}
+                                disabled={isTyping || !message.trim()}
+                                className="bg-gradient-to-r from-cyan-400 to-teal-500 hover:from-cyan-500 hover:to-teal-600 text-white p-2 lg:p-3 rounded-xl transition-all duration-200 hover:scale-105 flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {isTyping ? (
+                                    <div className="animate-spin rounded-full h-4 w-4 lg:h-5 lg:w-5 border-b-2 border-white"></div>
+                                ) : (
                                 <svg className="w-4 h-4 lg:w-5 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                                 </svg>
+                                )}
                             </button>
                             {/* Voice Recording Button */}
-                            <button className="bg-gradient-to-r from-cyan-400 to-teal-500 hover:from-cyan-500 hover:to-teal-600 text-white p-2 lg:p-3 rounded-xl transition-all duration-200 hover:scale-105 flex-shrink-0">
+                            <button 
+                                disabled={isTyping}
+                                className="bg-gradient-to-r from-cyan-400 to-teal-500 hover:from-cyan-500 hover:to-teal-600 text-white p-2 lg:p-3 rounded-xl transition-all duration-200 hover:scale-105 flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
                                 <svg className="w-4 h-4 lg:w-5 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
                                 </svg>
@@ -293,6 +478,8 @@ export default function Curhat() {
                     </p>
                 </div>
             </div>
+        </div>
+    </div>
         </LayoutUser>
     );
 }

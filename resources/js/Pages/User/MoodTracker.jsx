@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import LayoutUser from "../../Components/Layout/LayoutUser";
+import io from 'socket.io-client';
+
 
 export default function MoodTracker() {
     const [selectedMood, setSelectedMood] = useState(null);
@@ -14,6 +16,10 @@ export default function MoodTracker() {
     const [recognition, setRecognition] = useState(null);
     const [voiceStatus, setVoiceStatus] = useState('');
     const [showMoodTemplates, setShowMoodTemplates] = useState(false);
+    const [socket, setSocket] = useState(null);
+    const [isConnected, setIsConnected] = useState(false);
+    const [isTyping, setIsTyping] = useState(false);
+    const chatContainerRef = useRef(null);
 
 
     const sessions = [
@@ -125,6 +131,118 @@ export default function MoodTracker() {
 
     const currentChatMessages = chatMessages.length > 0 ? chatMessages : allChatMessages[selectedSession] || [];
 
+    // Auto-scroll function
+    const scrollToBottom = () => {
+        if (chatContainerRef.current) {
+            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        }
+    };
+
+    // Initialize WebSocket connection
+    useEffect(() => {
+        console.log('Initializing WebSocket connection...');
+        
+        // Clean up existing socket if any
+        if (socket) {
+            socket.disconnect();
+        }
+        
+        const newSocket = io('http://localhost:5003', {
+            transports: ['websocket', 'polling'],
+            timeout: 20000,
+            forceNew: true,
+            reconnection: true,
+            reconnectionDelay: 1000,
+            reconnectionAttempts: 5
+        });
+
+        newSocket.on('connect', () => {
+            console.log('✅ Connected to WebSocket server');
+            setIsConnected(true);
+            newSocket.emit('join_session', { session_id: `session_${selectedSession}` });
+        });
+
+        newSocket.on('disconnect', (reason) => {
+            console.log('❌ Disconnected from WebSocket:', reason);
+            setIsConnected(false);
+        });
+
+        newSocket.on('connect_error', (error) => {
+            console.error('❌ WebSocket connection error:', error);
+            setIsConnected(false);
+        });
+
+        newSocket.on('reconnect', (attemptNumber) => {
+            console.log('🔄 Reconnected to WebSocket after', attemptNumber, 'attempts');
+            setIsConnected(true);
+            newSocket.emit('join_session', { session_id: `session_${selectedSession}` });
+        });
+
+        newSocket.on('connected', (data) => {
+            console.log('🎉 WebSocket server response:', data.message);
+        });
+
+        newSocket.on('joined_session', (data) => {
+            console.log('📝 Joined session:', data.session_id);
+        });
+
+        newSocket.on('mood_result', (data) => {
+            console.log('🎯 Mood analysis result received:', data);
+            if (data.success) {
+                setMlPrediction(data);
+                setIsAnalyzing(false);
+                
+                // Generate AI response
+                const aiResponse = generateAIResponse(data, '');
+                
+                // Add AI message
+                const aiMessage = {
+                    id: Date.now() + 1,
+                    type: 'ai',
+                    message: aiResponse,
+                    timestamp: new Date().toLocaleTimeString('en-US', { 
+                        hour: '2-digit', 
+                        minute: '2-digit',
+                        hour12: true 
+                    })
+                };
+                
+                setChatMessages(prev => [...prev, aiMessage]);
+                
+                // Auto-scroll after AI response
+                setTimeout(scrollToBottom, 100);
+            }
+        });
+
+        newSocket.on('mood_error', (data) => {
+            console.error('❌ Mood analysis error:', data.error);
+            setIsAnalyzing(false);
+        });
+
+        newSocket.on('typing', (data) => {
+            console.log('⌨️ Typing indicator:', data.is_typing);
+            setIsTyping(data.is_typing);
+        });
+
+        newSocket.on('scroll_to_bottom', () => {
+            console.log('📜 Auto-scroll triggered');
+            scrollToBottom();
+        });
+
+        setSocket(newSocket);
+
+        return () => {
+            console.log('🧹 Cleaning up WebSocket connection...');
+            newSocket.disconnect();
+            newSocket.removeAllListeners();
+        };
+    }, [selectedSession]);
+
+    // Auto-scroll when new messages are added
+    useEffect(() => {
+        scrollToBottom();
+    }, [currentChatMessages]);
+
     // Template mood untuk new session
     const moodTemplates = [
         {
@@ -134,8 +252,8 @@ export default function MoodTracker() {
             color: 'from-red-500 to-red-600',
             bgColor: 'bg-red-500/10',
             borderColor: 'border-red-500/30',
-            title: 'Hari Terburuk',
-            description: 'Sangat sedih, depresi, tidak ada energi',
+            title: 'Unraveling cognitive distortions',
+            description: 'Understanding and challenging negative thought patterns',
             examples: [
                 'Hari ini adalah hari terburuk dalam hidupku',
                 'Tidak ada semangat sama sekali, badan lemas',
@@ -150,8 +268,8 @@ export default function MoodTracker() {
             color: 'from-orange-500 to-orange-600',
             bgColor: 'bg-orange-500/10',
             borderColor: 'border-orange-500/30',
-            title: 'Mood Rendah',
-            description: 'Lelah, stres, tidak produktif',
+            title: 'Cognitive restructuring',
+            description: 'Reframing thoughts for better mental health',
             examples: [
                 'Hari ini aku merasa lelah dan stres',
                 'Bangun terlambat, tidak sempat sholat',
@@ -166,8 +284,8 @@ export default function MoodTracker() {
             color: 'from-gray-500 to-gray-600',
             bgColor: 'bg-gray-500/10',
             borderColor: 'border-gray-500/30',
-            title: 'Hari Biasa',
-            description: 'Stabil, tidak ada yang istimewa',
+            title: 'Exposure and response prevention',
+            description: 'Facing fears while managing anxiety responses',
             examples: [
                 'Hari ini biasa saja',
                 'Bangun pagi, mandi, makan, dan kerja',
@@ -182,8 +300,8 @@ export default function MoodTracker() {
             color: 'from-green-500 to-green-600',
             bgColor: 'bg-green-500/10',
             borderColor: 'border-green-500/30',
-            title: 'Mood Positif',
-            description: 'Bahagia, produktif, bersemangat',
+            title: 'Interoceptive exposure',
+            description: 'Building tolerance to internal sensations',
             examples: [
                 'Hari ini lumayan baik',
                 'Pagi aku sholat dan jalan-jalan',
@@ -198,8 +316,8 @@ export default function MoodTracker() {
             color: 'from-cyan-500 to-teal-600',
             bgColor: 'bg-cyan-500/10',
             borderColor: 'border-cyan-500/30',
-            title: 'Luar Biasa',
-            description: 'Sangat bahagia, energi tinggi, luar biasa',
+            title: 'Mindfulness and meditation',
+            description: 'Cultivating present-moment awareness',
             examples: [
                 'Hari ini aku merasa sangat bahagia!',
                 'Bangun pagi dengan energi tinggi',
@@ -232,7 +350,7 @@ export default function MoodTracker() {
                     
                     // Auto-send message after voice recognition
                     setTimeout(() => {
-                        if (transcript.trim()) {
+                        if (transcript && typeof transcript === 'string' && transcript.trim()) {
                             handleSendMessage(transcript);
                             setVoiceStatus('');
                         }
@@ -419,7 +537,7 @@ export default function MoodTracker() {
     // Fungsi untuk handle send message
     const handleSendMessage = async (customMessage = null) => {
         const messageToSend = customMessage || message;
-        if (!messageToSend.trim()) return;
+        if (!messageToSend || typeof messageToSend !== 'string' || !messageToSend.trim()) return;
         
         // Add user message
         const userMessage = {
@@ -435,25 +553,48 @@ export default function MoodTracker() {
         
         setChatMessages(prev => [...prev, userMessage]);
         
-        // Analyze mood with ML
-        const mlResult = await analyzeMoodWithML(messageToSend);
+        // Auto-scroll after user message
+        setTimeout(scrollToBottom, 100);
         
-        // Generate AI response
-        const aiResponse = generateAIResponse(mlResult, messageToSend);
+        // Emit message received for auto-scroll
+        if (socket && isConnected) {
+            socket.emit('message_received', {
+                session_id: `session_${selectedSession}`,
+                timestamp: Date.now()
+            });
+        }
         
-        // Add AI message
-        const aiMessage = {
-            id: Date.now() + 1,
-            type: 'ai',
-            message: aiResponse,
-            timestamp: new Date().toLocaleTimeString('en-US', { 
-                hour: '2-digit', 
-                minute: '2-digit',
-                hour12: true 
-            })
-        };
-        
-        setChatMessages(prev => [...prev, aiMessage]);
+        // Analyze mood with WebSocket
+        if (socket && isConnected) {
+            setIsAnalyzing(true);
+            socket.emit('analyze_mood', {
+                text: messageToSend,
+                session_id: `session_${selectedSession}`
+            });
+        } else {
+            // Fallback to HTTP API if WebSocket not available
+            const mlResult = await analyzeMoodWithML(messageToSend);
+            
+            // Generate AI response
+            const aiResponse = generateAIResponse(mlResult, messageToSend);
+            
+            // Add AI message
+            const aiMessage = {
+                id: Date.now() + 1,
+                type: 'ai',
+                message: aiResponse,
+                timestamp: new Date().toLocaleTimeString('en-US', { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    hour12: true 
+                })
+            };
+            
+            setChatMessages(prev => [...prev, aiMessage]);
+            
+            // Auto-scroll after AI response
+            setTimeout(scrollToBottom, 100);
+        }
         
         // Clear input
         setMessage('');
@@ -501,8 +642,11 @@ export default function MoodTracker() {
 
     return (
         <LayoutUser>
-            
-            <div className="flex flex-col lg:flex-row">
+            <div 
+                className="min-h-screen cursor-gaming mood-tracker-bg pt-20"
+            >
+                <div className="min-h-screen">
+                    <div className="flex flex-col lg:flex-row">
                 {/* Mobile Sidebar Overlay */}
                 {isSidebarOpen && (
                     <div 
@@ -514,7 +658,7 @@ export default function MoodTracker() {
                 {/* Left Sidebar */}
                 <div className={`
                     fixed lg:relative inset-y-0 left-0 z-50 lg:z-auto
-                    w-80 bg-slate-800 border-r border-slate-700 p-4 lg:p-6
+                    w-80 bg-black/20 backdrop-blur-md border-r border-white/20 p-4 lg:p-6
                     transform transition-transform duration-300 ease-in-out
                     ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
                 `}>
@@ -592,7 +736,7 @@ export default function MoodTracker() {
                 </div>
 
                 {/* Main Content */}
-                <div className="flex-1 bg-slate-800 p-4 lg:p-8">
+                <div className="flex-1 p-4 lg:p-8">
                     {/* Mobile Header with Hamburger */}
                     <div className="flex items-center justify-between mb-6 lg:mb-8 lg:hidden">
                         <button 
@@ -610,7 +754,7 @@ export default function MoodTracker() {
 
                     {/* ML Prediction Indicator */}
                     {mlPrediction && (
-                        <div className="bg-gradient-to-r from-cyan-400/10 to-teal-500/10 rounded-2xl p-4 mb-6 border border-cyan-400/20">
+                        <div className="bg-black/30 backdrop-blur-md rounded-2xl p-4 mb-6 border border-white/20">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center space-x-3">
                                     <div className="text-2xl">
@@ -637,7 +781,7 @@ export default function MoodTracker() {
                     )}
 
                     {/* Chat Messages */}
-                    <div className="bg-slate-700 rounded-2xl p-4 lg:p-6 mb-6 border border-slate-600">
+                    <div className="bg-black/30 backdrop-blur-md rounded-2xl p-4 lg:p-6 mb-6 border border-white/20">
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-white font-semibold text-base lg:text-lg">Chat Terbaru</h3>
                             <div className="flex items-center space-x-2">
@@ -669,153 +813,129 @@ export default function MoodTracker() {
                                         <span className="text-sm">{voiceStatus}</span>
                                     </div>
                                 )}
+                                {/* WebSocket Connection Status */}
+                                <div className={`flex items-center space-x-2 ${isConnected ? 'text-green-400' : 'text-red-400'}`}>
+                                    <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-400' : 'bg-red-400'} ${isConnected ? 'animate-pulse' : ''}`}></div>
+                                    <span className="text-sm">{isConnected ? 'WebSocket Connected' : 'WebSocket Disconnected'}</span>
+                                </div>
+                                {/* Typing Indicator */}
+                                {isTyping && (
+                                    <div className="flex items-center space-x-2 text-cyan-400 typing-indicator">
+                                        <div className="flex space-x-1">
+                                            <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce"></div>
+                                            <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                                            <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                                        </div>
+                                        <span className="text-sm font-medium">AI sedang menganalisis...</span>
+                                    </div>
+                                )}
                             </div>
                         </div>
-                        <div className="space-y-3 lg:space-y-4 max-h-80 lg:max-h-96 overflow-y-auto">
+                        <div 
+                            ref={chatContainerRef}
+                            className="space-y-3 lg:space-y-4 max-h-80 lg:max-h-96 overflow-y-auto"
+                        >
                             {currentChatMessages.length === 0 ? (
-                                // Greeting saat chat kosong
+                                // Greeting saat chat kosong dengan cards langsung terlihat
                                 <div className="flex flex-col items-center justify-center py-8 text-center">
                                     <div className="text-4xl mb-4">👋</div>
                                     <h2 className="text-xl lg:text-2xl font-bold text-white mb-2">
-                                        Hai! Bagaimana perasaanmu hari ini?
+                                        Hi! What brings you here today?
                                     </h2>
-                                    <p className="text-white/70 text-sm lg:text-base max-w-md mb-6">
-                                        Pantau mood dan emosi Anda untuk memahami diri sendiri lebih baik. Mulai percakapan dengan mengetik pesan atau menggunakan voice input.
-                                    </p>
                                     
-                                    {/* Mood Templates Section */}
-                                    <div className="w-full max-w-4xl">
-                                        <div className="flex items-center justify-center mb-4">
-                                            <button
-                                                onClick={toggleMoodTemplates}
-                                                className="flex items-center space-x-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-4 py-2 rounded-lg transition-all duration-200 hover:scale-105"
-                                            >
-                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                                                </svg>
-                                                <span className="text-sm font-medium">
-                                                    {showMoodTemplates ? 'Sembunyikan Template' : 'Lihat Template Mood'}
-                                                </span>
-                                            </button>
-                                        </div>
-
-                                        {showMoodTemplates && (
-                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                                                {moodTemplates.map((template) => (
-                                                    <div
-                                                        key={template.id}
-                                                        onClick={() => useMoodTemplate(template)}
-                                                        className="bg-gradient-to-br from-slate-700/50 to-slate-800/50 backdrop-blur-sm border border-slate-600/30 rounded-2xl p-6 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-cyan-500/10 group relative overflow-hidden"
-                                                    >
-                                                        {/* Background Glow Effect */}
-                                                        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
-                                                        
-                                                        {/* Icon Section */}
-                                                        <div className="relative z-10 flex flex-col items-center text-center mb-4">
-                                                            <div className="w-16 h-16 mb-4 relative">
-                                                                {/* Head Profile Icon */}
-                                                                <div className="w-full h-full bg-gradient-to-br from-slate-600 to-slate-700 rounded-full flex items-center justify-center relative overflow-hidden">
-                                                                    {/* Head Profile with Thought Patterns */}
-                                                                    <div className="absolute inset-2">
-                                                                        {template.id === 'awful' && (
-                                                                            <svg viewBox="0 0 24 24" className="w-full h-full text-red-400/70">
-                                                                                {/* Tangled/Confused thoughts pattern */}
-                                                                                <path d="M8 6c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2zm4 0c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2z" fill="currentColor"/>
-                                                                                <path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" fill="currentColor"/>
-                                                                                <path d="M10 14c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm4 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" fill="currentColor"/>
-                                                                                <path d="M8 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm8 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" fill="currentColor"/>
-                                                                            </svg>
-                                                                        )}
-                                                                        {template.id === 'bad' && (
-                                                                            <svg viewBox="0 0 24 24" className="w-full h-full text-orange-400/70">
-                                                                                {/* Warning/Alert pattern */}
-                                                                                <path d="M12 2L1 21h22L12 2zm0 3.99L19.53 19H4.47L12 5.99z" fill="currentColor"/>
-                                                                                <path d="M11 16h2v2h-2v-2zm0-6h2v4h-2v-4z" fill="currentColor"/>
-                                                                            </svg>
-                                                                        )}
-                                                                        {template.id === 'normal' && (
-                                                                            <svg viewBox="0 0 24 24" className="w-full h-full text-gray-400/70">
-                                                                                {/* Neutral/Flat pattern */}
-                                                                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" fill="currentColor"/>
-                                                                                <path d="M8 10h8v4H8v-4z" fill="currentColor"/>
-                                                                            </svg>
-                                                                        )}
-                                                                        {template.id === 'good' && (
-                                                                            <svg viewBox="0 0 24 24" className="w-full h-full text-green-400/70">
-                                                                                {/* Growth/Positive pattern */}
-                                                                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor"/>
-                                                                                <path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-                                                                            </svg>
-                                                                        )}
-                                                                        {template.id === 'amazing' && (
-                                                                            <svg viewBox="0 0 24 24" className="w-full h-full text-cyan-400/70">
-                                                                                {/* Star/Excellence pattern */}
-                                                                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor"/>
-                                                                                <path d="M12 6l1.5 3L17 10.5l-3 2.5 1.5 3L12 15l-3.5 1 1.5-3-3-2.5L10.5 9 12 6z" fill="currentColor"/>
-                                                                            </svg>
-                                                                        )}
-                                                                    </div>
+                                    {/* Mood Templates Cards - Langsung ditampilkan */}
+                                    <div className="w-full max-w-5xl mb-8">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                            {moodTemplates.map((template) => (
+                                                <div
+                                                    key={template.id}
+                                                    onClick={() => useMoodTemplate(template)}
+                                                    className="bg-black/30 backdrop-blur-md border border-white/20 rounded-2xl p-6 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-cyan-500/20 group relative overflow-hidden"
+                                                >
+                                                    {/* Background Glow Effect */}
+                                                    <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
+                                                    
+                                                    {/* Icon Section */}
+                                                    <div className="relative z-10 flex flex-col items-center text-center mb-4">
+                                                        <div className="w-20 h-20 mb-4 relative">
+                                                            {/* Head Profile Icon */}
+                                                            <div className="w-full h-full bg-gradient-to-br from-slate-600/50 to-slate-700/50 rounded-full flex items-center justify-center relative overflow-hidden border border-slate-500/30">
+                                                                {/* Head Profile with Thought Patterns */}
+                                                                <div className="absolute inset-3">
+                                                                    {template.id === 'awful' && (
+                                                                        <svg viewBox="0 0 24 24" className="w-full h-full text-red-400/60">
+                                                                            {/* Tangled/Confused thoughts pattern */}
+                                                                            <path d="M8 6c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2zm4 0c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2z" fill="currentColor"/>
+                                                                            <path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" fill="currentColor"/>
+                                                                            <path d="M10 14c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm4 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" fill="currentColor"/>
+                                                                            <path d="M8 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm8 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" fill="currentColor"/>
+                                                                        </svg>
+                                                                    )}
+                                                                    {template.id === 'bad' && (
+                                                                        <svg viewBox="0 0 24 24" className="w-full h-full text-orange-400/60">
+                                                                            {/* Warning/Alert pattern */}
+                                                                            <path d="M12 2L1 21h22L12 2zm0 3.99L19.53 19H4.47L12 5.99z" fill="currentColor"/>
+                                                                            <path d="M11 16h2v2h-2v-2zm0-6h2v4h-2v-4z" fill="currentColor"/>
+                                                                        </svg>
+                                                                    )}
+                                                                    {template.id === 'normal' && (
+                                                                        <svg viewBox="0 0 24 24" className="w-full h-full text-gray-400/60">
+                                                                            {/* Neutral/Flat pattern */}
+                                                                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" fill="currentColor"/>
+                                                                            <path d="M8 10h8v4H8v-4z" fill="currentColor"/>
+                                                                        </svg>
+                                                                    )}
+                                                                    {template.id === 'good' && (
+                                                                        <svg viewBox="0 0 24 24" className="w-full h-full text-green-400/60">
+                                                                            {/* Growth/Positive pattern */}
+                                                                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor"/>
+                                                                            <path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+                                                                        </svg>
+                                                                    )}
+                                                                    {template.id === 'amazing' && (
+                                                                        <svg viewBox="0 0 24 24" className="w-full h-full text-cyan-400/60">
+                                                                            {/* Star/Excellence pattern */}
+                                                                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor"/>
+                                                                            <path d="M12 6l1.5 3L17 10.5l-3 2.5 1.5 3L12 15l-3.5 1 1.5-3-3-2.5L10.5 9 12 6z" fill="currentColor"/>
+                                                                        </svg>
+                                                                    )}
                                                                 </div>
-                                                                {/* Glow Effect */}
-                                                                <div className={`absolute inset-0 rounded-full bg-gradient-to-br ${template.color} opacity-20 blur-sm group-hover:opacity-40 transition-opacity duration-300`}></div>
                                                             </div>
-                                                            
-                                                            {/* Title */}
-                                                            <h3 className="text-white font-semibold text-base mb-2 group-hover:text-cyan-300 transition-colors duration-300">
-                                                                {template.title}
-                                                            </h3>
-                                                            
-                                                            {/* Description */}
-                                                            <p className="text-slate-300 text-sm leading-relaxed mb-4">
-                                                                {template.description}
-                                                            </p>
+                                                            {/* Glow Effect */}
+                                                            <div className={`absolute inset-0 rounded-full bg-gradient-to-br ${template.color} opacity-10 blur-sm group-hover:opacity-20 transition-opacity duration-300`}></div>
                                                         </div>
                                                         
-                                                        {/* Example Text */}
-                                                        <div className="relative z-10 space-y-2">
-                                                            <p className="text-slate-400 text-xs font-medium uppercase tracking-wide">Contoh:</p>
-                                                            {template.examples.slice(0, 1).map((example, index) => (
-                                                                <p key={index} className="text-slate-200 text-sm italic leading-relaxed">
-                                                                    "{example}"
-                                                                </p>
-                                                            ))}
-                                                        </div>
+                                                        {/* Title */}
+                                                        <h3 className="text-white font-semibold text-base mb-2 group-hover:text-cyan-300 transition-colors duration-300">
+                                                            {template.title}
+                                                        </h3>
                                                         
-                                                        {/* Hover Indicator */}
-                                                        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                                                            <div className="flex items-center space-x-2 text-cyan-400 text-xs font-medium">
-                                                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                                                                </svg>
-                                                                <span>Klik untuk menggunakan</span>
-                                                            </div>
-                                                        </div>
+                                                        {/* Description */}
+                                                        <p className="text-slate-300 text-sm leading-relaxed">
+                                                            {template.description}
+                                                        </p>
                                                     </div>
-                                                ))}
-                                            </div>
-                                        )}
-
-                                        {isSupported && (
-                                            <div className="flex items-center space-x-2 text-cyan-400 text-sm">
-                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-                                                </svg>
-                                                <span>Klik tombol mikrofon untuk voice input</span>
-                                            </div>
-                                        )}
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
+
+                                    {/* Disclaimer */}
+                                    <p className="text-white/50 text-xs lg:text-sm text-center">
+                                        The responses are generated by AI. They do not represent the views of calmify.ai.
+                                    </p>
                                 </div>
                             ) : (
                                 // Chat messages
                                 currentChatMessages.map((msg) => (
-                                    <div key={msg.id} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}>
-                                        <div className={`max-w-[85%] sm:max-w-xs lg:max-w-md px-3 lg:px-4 py-2 lg:py-3 rounded-2xl ${
+                                    <div key={msg.id} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'} chat-message`}>
+                                        <div className={`max-w-[85%] sm:max-w-xs lg:max-w-md px-3 lg:px-4 py-2 lg:py-3 rounded-2xl transition-all duration-300 hover:scale-105 ${
                                             msg.type === 'user' 
-                                                ? 'bg-gradient-to-r from-cyan-400 to-teal-500 text-white' 
-                                                : 'bg-slate-600 text-white'
+                                                ? 'bg-gradient-to-r from-cyan-400 to-teal-500 text-white shadow-lg' 
+                                                : 'bg-black/40 backdrop-blur-md text-white border border-white/20 shadow-lg'
                                         }`}>
-                                            <p className="text-xs lg:text-sm break-words">{msg.message}</p>
-                                            <p className={`text-xs mt-1 ${
+                                            <p className="text-xs lg:text-sm break-words font-medium">{msg.message}</p>
+                                            <p className={`text-xs mt-1 font-light ${
                                                 msg.type === 'user' ? 'text-white/70' : 'text-white/50'
                                             }`}>
                                                 {msg.timestamp}
@@ -828,31 +948,14 @@ export default function MoodTracker() {
                     </div>
 
                     {/* Message Input */}
-                    <div className="bg-slate-700 rounded-2xl p-4 lg:p-6 border border-slate-600">
-                        {/* Template Button */}
-                        {currentChatMessages.length === 0 && (
-                            <div className="flex justify-center mb-4">
-                                <button
-                                    onClick={toggleMoodTemplates}
-                                    className="flex items-center space-x-2 bg-gradient-to-r from-purple-500/20 to-pink-500/20 hover:from-purple-500/30 hover:to-pink-500/30 text-purple-300 hover:text-purple-200 px-4 py-2 rounded-lg transition-all duration-200 hover:scale-105 border border-purple-500/30"
-                                >
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                                    </svg>
-                                    <span className="text-sm font-medium">
-                                        {showMoodTemplates ? 'Sembunyikan Template' : 'Pilih Template Mood'}
-                                    </span>
-                                </button>
-                            </div>
-                        )}
-
+                    <div className="bg-black/30 backdrop-blur-md rounded-2xl p-4 lg:p-6 border border-white/20">
                         <div className="flex items-center space-x-2 lg:space-x-4">
                             <input
                                 type="text"
                                 value={message}
                                 onChange={(e) => setMessage(e.target.value)}
                                 onKeyPress={handleKeyPress}
-                                placeholder={isListening ? "Mendengarkan..." : "Ceritakan lebih detail tentang perasaanmu..."}
+                                placeholder={isListening ? "Mendengarkan..." : "Type a message..."}
                                 className={`flex-1 bg-transparent text-white placeholder-white/50 border-none outline-none text-sm lg:text-lg ${
                                     isListening ? 'placeholder-red-400' : ''
                                 }`}
@@ -896,104 +999,6 @@ export default function MoodTracker() {
                                 )}
                             </button>
                         </div>
-
-                        {/* Template Cards */}
-                        {currentChatMessages.length === 0 && showMoodTemplates && (
-                            <div className="mt-6">
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                                    {moodTemplates.map((template) => (
-                                        <div
-                                            key={template.id}
-                                            onClick={() => useMoodTemplate(template)}
-                                            className="bg-gradient-to-br from-slate-700/50 to-slate-800/50 backdrop-blur-sm border border-slate-600/30 rounded-xl p-4 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-cyan-500/10 group relative overflow-hidden"
-                                        >
-                                            {/* Background Glow Effect */}
-                                            <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl"></div>
-                                            
-                                            {/* Icon Section */}
-                                            <div className="relative z-10 flex flex-col items-center text-center mb-3">
-                                                <div className="w-12 h-12 mb-3 relative">
-                                                    {/* Head Profile Icon */}
-                                                    <div className="w-full h-full bg-gradient-to-br from-slate-600 to-slate-700 rounded-full flex items-center justify-center relative overflow-hidden">
-                                                        {/* Head Profile with Thought Patterns */}
-                                                        <div className="absolute inset-1.5">
-                                                            {template.id === 'awful' && (
-                                                                <svg viewBox="0 0 24 24" className="w-full h-full text-red-400/70">
-                                                                    {/* Tangled/Confused thoughts pattern */}
-                                                                    <path d="M8 6c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2zm4 0c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2z" fill="currentColor"/>
-                                                                    <path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" fill="currentColor"/>
-                                                                    <path d="M10 14c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm4 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" fill="currentColor"/>
-                                                                    <path d="M8 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm8 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" fill="currentColor"/>
-                                                                </svg>
-                                                            )}
-                                                            {template.id === 'bad' && (
-                                                                <svg viewBox="0 0 24 24" className="w-full h-full text-orange-400/70">
-                                                                    {/* Warning/Alert pattern */}
-                                                                    <path d="M12 2L1 21h22L12 2zm0 3.99L19.53 19H4.47L12 5.99z" fill="currentColor"/>
-                                                                    <path d="M11 16h2v2h-2v-2zm0-6h2v4h-2v-4z" fill="currentColor"/>
-                                                                </svg>
-                                                            )}
-                                                            {template.id === 'normal' && (
-                                                                <svg viewBox="0 0 24 24" className="w-full h-full text-gray-400/70">
-                                                                    {/* Neutral/Flat pattern */}
-                                                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" fill="currentColor"/>
-                                                                    <path d="M8 10h8v4H8v-4z" fill="currentColor"/>
-                                                                </svg>
-                                                            )}
-                                                            {template.id === 'good' && (
-                                                                <svg viewBox="0 0 24 24" className="w-full h-full text-green-400/70">
-                                                                    {/* Growth/Positive pattern */}
-                                                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor"/>
-                                                                    <path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-                                                                </svg>
-                                                            )}
-                                                            {template.id === 'amazing' && (
-                                                                <svg viewBox="0 0 24 24" className="w-full h-full text-cyan-400/70">
-                                                                    {/* Star/Excellence pattern */}
-                                                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor"/>
-                                                                    <path d="M12 6l1.5 3L17 10.5l-3 2.5 1.5 3L12 15l-3.5 1 1.5-3-3-2.5L10.5 9 12 6z" fill="currentColor"/>
-                                                                </svg>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                    {/* Glow Effect */}
-                                                    <div className={`absolute inset-0 rounded-full bg-gradient-to-br ${template.color} opacity-20 blur-sm group-hover:opacity-40 transition-opacity duration-300`}></div>
-                                                </div>
-                                                
-                                                {/* Title */}
-                                                <h4 className="text-white font-semibold text-sm mb-1 group-hover:text-cyan-300 transition-colors duration-300">
-                                                    {template.title}
-                                                </h4>
-                                                
-                                                {/* Description */}
-                                                <p className="text-slate-300 text-xs leading-relaxed mb-3">
-                                                    {template.description}
-                                                </p>
-                                            </div>
-                                            
-                                            {/* Example Text */}
-                                            <div className="relative z-10 space-y-1">
-                                                {template.examples.slice(0, 1).map((example, index) => (
-                                                    <p key={index} className="text-slate-200 text-xs italic leading-relaxed">
-                                                        "{example}"
-                                                    </p>
-                                                ))}
-                                            </div>
-                                            
-                                            {/* Hover Indicator */}
-                                            <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                                                <div className="flex items-center space-x-1 text-cyan-400 text-xs font-medium">
-                                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                                                    </svg>
-                                                    <span>Klik</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
                     </div>
 
                     {/* Disclaimer */}
@@ -1002,6 +1007,8 @@ export default function MoodTracker() {
                     </p>
                 </div>
             </div>
+        </div>
+    </div>
         </LayoutUser>
     );
 }

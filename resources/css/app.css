@@ -1,5 +1,170 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap');
 
 [x-cloak] {
     display: none;
+}
+
+/* Custom CSS untuk cursor kartun dengan tema gaming dan font modern */
+.cursor-gaming * {
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path d="M2 2 L2 28 L8 22 L14 28 L16 26 L10 20 L16 20 Z" fill="%23ff6b6b" stroke="%23ffffff" stroke-width="2"/><circle cx="6" cy="6" r="2" fill="%23ffffff"/><circle cx="12" cy="8" r="1.5" fill="%23ffffff"/></svg>'), auto !important;
+    font-family: 'Inter', 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+.cursor-gaming button:hover,
+.cursor-gaming a:hover,
+.cursor-gaming [role="button"]:hover {
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path d="M2 2 L2 28 L8 22 L14 28 L16 26 L10 20 L16 20 Z" fill="%234ecdc4" stroke="%23ffffff" stroke-width="2"/><circle cx="6" cy="6" r="2" fill="%23ffffff"/><circle cx="12" cy="8" r="1.5" fill="%23ffffff"/></svg>'), pointer !important;
+}
+
+.cursor-gaming input:hover,
+.cursor-gaming textarea:hover {
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path d="M2 2 L2 28 L8 22 L14 28 L16 26 L10 20 L16 20 Z" fill="%23ffe66d" stroke="%23ffffff" stroke-width="2"/><circle cx="6" cy="6" r="2" fill="%23ffffff"/><circle cx="12" cy="8" r="1.5" fill="%23ffffff"/></svg>'), text !important;
+}
+
+.cursor-gaming .animate-pulse {
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path d="M2 2 L2 28 L8 22 L14 28 L16 26 L10 20 L16 20 Z" fill="%23ff9ff3" stroke="%23ffffff" stroke-width="2"/><circle cx="6" cy="6" r="2" fill="%23ffffff"/><circle cx="12" cy="8" r="1.5" fill="%23ffffff"/></svg>'), auto !important;
+}
+
+.cursor-gaming .bg-gradient-to-r:hover {
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path d="M2 2 L2 28 L8 22 L14 28 L16 26 L10 20 L16 20 Z" fill="%23ff6b6b" stroke="%23ffffff" stroke-width="2"/><circle cx="6" cy="6" r="2" fill="%23ffffff"/><circle cx="12" cy="8" r="1.5" fill="%23ffffff"/><text x="16" y="28" text-anchor="middle" fill="%23ffffff" font-size="8" font-family="Arial">🎮</text></svg>'), pointer !important;
+}
+
+.cursor-gaming .animate-spin {
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path d="M2 2 L2 28 L8 22 L14 28 L16 26 L10 20 L16 20 Z" fill="%23ff9ff3" stroke="%23ffffff" stroke-width="2"/><circle cx="6" cy="6" r="2" fill="%23ffffff"/><circle cx="12" cy="8" r="1.5" fill="%23ffffff"/><text x="16" y="28" text-anchor="middle" fill="%23ffffff" font-size="8" font-family="Arial">⏳</text></svg>'), wait !important;
+}
+
+.chat-message {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: slideInUp 0.5s ease-out forwards;
+}
+
+@keyframes slideInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.typing-indicator {
+    animation: typingPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes typingPulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+}
+
+body {
+    font-family: 'Inter', 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+.navbar-floating {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 50 !important;
+}
+
+.mood-tracker-bg {
+    background-image: url('/storage/img/background_chat.jpg') !important;
+    background-attachment: fixed !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    min-height: 100vh !important;
+    width: 100% !important;
+    position: relative !important;
+}
+
+/* Global glassmorphism styles untuk semua halaman */
+.glassmorphism-card {
+    background: rgba(0, 0, 0, 0.3) !important;
+    backdrop-filter: blur(16px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 1rem !important;
+}
+
+.glassmorphism-sidebar {
+    background: rgba(0, 0, 0, 0.2) !important;
+    backdrop-filter: blur(12px) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.glassmorphism-input {
+    background: rgba(0, 0, 0, 0.3) !important;
+    backdrop-filter: blur(16px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 1rem !important;
+}
+
+/* Global chat message styles */
+.chat-message {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: slideInUp 0.5s ease-out forwards;
+}
+
+.chat-message-user {
+    background: linear-gradient(to right, #22d3ee, #14b8a6) !important;
+    color: white !important;
+    box-shadow: 0 10px 25px rgba(34, 211, 238, 0.3) !important;
+}
+
+.chat-message-ai {
+    background: rgba(0, 0, 0, 0.4) !important;
+    backdrop-filter: blur(16px) !important;
+    color: white !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Global button styles */
+.btn-primary {
+    background: linear-gradient(to right, #22d3ee, #14b8a6) !important;
+    color: white !important;
+    border-radius: 0.75rem !important;
+    transition: all 0.2s ease !important;
+    box-shadow: 0 4px 15px rgba(34, 211, 238, 0.3) !important;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(to right, #06b6d4, #0d9488) !important;
+    transform: scale(1.05) !important;
+    box-shadow: 0 6px 20px rgba(34, 211, 238, 0.4) !important;
+}
+
+/* Global text styles */
+.text-primary {
+    color: #22d3ee !important;
+}
+
+.text-secondary {
+    color: #14b8a6 !important;
+}
+
+.text-muted {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* Global spacing untuk konsistensi */
+.page-container {
+    min-height: 100vh !important;
+    padding-top: 5rem !important;
+}
+
+.sidebar-width {
+    width: 20rem !important;
+}
+
+.content-padding {
+    padding: 1rem 2rem !important;
+}
+
+@media (max-width: 1024px) {
+    .content-padding {
+        padding: 1rem !important;
+    }
 }

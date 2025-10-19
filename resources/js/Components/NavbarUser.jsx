@@ -6,9 +6,9 @@ export default function NavbarUser() {
     const { auth } = usePage().props;
 
     return (
-        <div className="flex justify-center">
+        <div className="fixed top-0 left-0 right-0 z-50 flex justify-center pt-4 pb-2">
             {/* Navbar Container */}
-            <nav className="bg-gray-200 rounded-3xl w-full max-w-6xl mx-4 px-4 sm:px-6 py-4">
+            <nav className="bg-slate-900/90 backdrop-blur-xl border border-slate-700/50 rounded-3xl w-full max-w-6xl mx-4 px-4 sm:px-6 py-4 shadow-2xl">
                 <div className="flex items-center justify-between">
                     {/* Logo/Brand */}
                     <div className="flex items-center">
@@ -20,120 +20,107 @@ export default function NavbarUser() {
                     {/* Mobile Menu Button */}
                     <button 
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
-                        className="md:hidden p-2 rounded-lg hover:bg-gray-300 transition-colors"
+                        className="md:hidden p-2 rounded-lg hover:bg-slate-700/50 transition-colors"
                     >
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-6 h-6 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
                     </button>
 
-                    {/* Desktop Navigation Links */}
-                    <div className="hidden md:flex items-center space-x-4 lg:space-x-8">
-                   
+                    {/* Desktop Navigation & Actions - Unified */}
+                    <div className="hidden md:flex items-center space-x-2 lg:space-x-3">
+                        {/* Navigation Links */}
                         <a 
                             href="/" 
-                            className="text-gray-700 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-teal-500 hover:bg-clip-text hover:text-transparent transition-all duration-200 text-sm lg:text-base"
+                            className="text-slate-300 hover:text-white hover:bg-slate-700/50 px-3 py-2 rounded-lg transition-all duration-200 text-sm lg:text-base font-medium"
                         >
                             Dashboard
                         </a>
-
-                        {/* Tes Psikologi */}
                         <a 
                             href="/moodtracker" 
-                            className="text-gray-700 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-teal-500 hover:bg-clip-text hover:text-transparent transition-all duration-200 text-sm lg:text-base"
+                            className="text-slate-300 hover:text-white hover:bg-slate-700/50 px-3 py-2 rounded-lg transition-all duration-200 text-sm lg:text-base font-medium"
                         >
                             MoodTracking
                         </a>
-
-                        {/* Tentang Kami */}
                         <a 
                             href="/curhat" 
-                            className="text-gray-700 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-teal-500 hover:bg-clip-text hover:text-transparent transition-all duration-200 text-sm lg:text-base"
+                            className="text-slate-300 hover:text-white hover:bg-slate-700/50 px-3 py-2 rounded-lg transition-all duration-200 text-sm lg:text-base font-medium"
                         >
                             Curhat
                         </a>
-
-                        {/* List Psikolog */}
                         <a 
                             href="/journaling" 
-                            className="text-gray-700 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-teal-500 hover:bg-clip-text hover:text-transparent transition-all duration-200 text-sm lg:text-base"
+                            className="text-slate-300 hover:text-white hover:bg-slate-700/50 px-3 py-2 rounded-lg transition-all duration-200 text-sm lg:text-base font-medium"
                         >
                             Journaling
                         </a>
                         <a 
                             href="/psikolog" 
-                            className="text-gray-700 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-teal-500 hover:bg-clip-text hover:text-transparent transition-all duration-200 text-sm lg:text-base"
+                            className="text-slate-300 hover:text-white hover:bg-slate-700/50 px-3 py-2 rounded-lg transition-all duration-200 text-sm lg:text-base font-medium"
                         >
                             Psikolog
                         </a>
                         <a 
                             href="/healing" 
-                            className="text-gray-700 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-teal-500 hover:bg-clip-text hover:text-transparent transition-all duration-200 text-sm lg:text-base"
+                            className="text-slate-300 hover:text-white hover:bg-slate-700/50 px-3 py-2 rounded-lg transition-all duration-200 text-sm lg:text-base font-medium"
                         >
                             Healing
                         </a>
-                    </div>
-
-                    {/* Desktop Action Buttons */}
-                    <div className="hidden md:flex items-center space-x-2 lg:space-x-4">
-                        {/* Booking Sesi Button */}
-                        {/* <button className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-full transition-colors duration-200 font-medium">
-                            
-                        </button> */}
-
+                        
+                        {/* Separator */}
+                        <div className="w-px h-6 bg-slate-600/50 mx-1"></div>
+                        
                         {/* User Info & Logout */}
-                        <div className="flex items-center space-x-4">
-                            <span className="text-gray-700 text-sm">
-                                Halo, {auth?.user?.name || 'User'}
-                            </span>
-                            <Link
-                                href="/logout"
-                                method="post"
-                                className="bg-gradient-to-r from-cyan-400 to-teal-500 hover:from-cyan-500 hover:to-teal-600 text-white px-4 lg:px-8 py-2 lg:py-3 rounded-full transition-all duration-200 font-bold text-xs lg:text-sm tracking-wide"
-                            >
-                                Logout
-                            </Link>
-                        </div>
+                        <span className="text-slate-300 text-sm font-medium px-2">
+                            Halo, {auth?.user?.name || 'User'}
+                        </span>
+                        <Link
+                            href="/logout"
+                            method="post"
+                            className="bg-gradient-to-r from-cyan-400 to-teal-500 hover:from-cyan-500 hover:to-teal-600 text-white px-4 lg:px-6 py-2 rounded-full transition-all duration-200 font-semibold text-xs lg:text-sm tracking-wide"
+                        >
+                            Logout
+                        </Link>
                     </div>
                 </div>
 
                 {/* Mobile Menu */}
                 {isMenuOpen && (
-                    <div className="md:hidden mt-4 pb-4 border-t border-gray-300">
+                    <div className="md:hidden mt-4 pb-4 border-t border-slate-700/50">
                         <div className="flex flex-col space-y-2 pt-4">
                             <a 
                                 href="#" 
-                                className="text-gray-700 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-teal-500 hover:bg-clip-text hover:text-transparent transition-all duration-200 py-2 px-4 rounded-lg"
+                                className="text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200 py-2 px-4 rounded-lg font-medium"
                             >
                                 Dashboard
                             </a>
                             <a 
                                 href="/moodtracker" 
-                                className="text-gray-700 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-teal-500 hover:bg-clip-text hover:text-transparent transition-all duration-200 py-2 px-4 rounded-lg"
+                                className="text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200 py-2 px-4 rounded-lg font-medium"
                             >
                                 MoodTracking
                             </a>
                             <a 
                                 href="/curhat" 
-                                className="text-gray-700 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-teal-500 hover:bg-clip-text hover:text-transparent transition-all duration-200 py-2 px-4 rounded-lg"
+                                className="text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200 py-2 px-4 rounded-lg font-medium"
                             >
                                 Curhat
                             </a>
                             <a 
                                 href="/journaling" 
-                                className="text-gray-700 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-teal-500 hover:bg-clip-text hover:text-transparent transition-all duration-200 py-2 px-4 rounded-lg"
+                                className="text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200 py-2 px-4 rounded-lg font-medium"
                             >
                                 Journaling
                             </a>
                             <a 
                                 href="/healing" 
-                                className="text-gray-700 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-teal-500 hover:bg-clip-text hover:text-transparent transition-all duration-200 py-2 px-4 rounded-lg"
+                                className="text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200 py-2 px-4 rounded-lg font-medium"
                             >
                                 Healing
                             </a>
                             <a 
                                 href="/psikolog" 
-                                className="text-gray-700 hover:bg-gradient-to-r hover:from-cyan-400 hover:to-teal-500 hover:bg-clip-text hover:text-transparent transition-all duration-200 py-2 px-4 rounded-lg"
+                                className="text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200 py-2 px-4 rounded-lg font-medium"
                             >
                                 Psikolog
                             </a>

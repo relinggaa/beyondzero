@@ -1,9 +1,12 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from flask_socketio import SocketIO, emit, join_room, leave_room
 import re
+import json
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins="*")
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 class SimpleMoodAnalyzer:
     def __init__(self):
@@ -232,11 +235,15 @@ analyzer = SimpleMoodAnalyzer()
 @app.route('/')
 def home():
     return jsonify({
-        "message": "Simple Mood Analysis API",
+        "message": "WebSocket Mood Analysis API",
         "status": "running",
         "endpoints": {
             "/analyze-mood": "POST - Analisis mood sederhana",
             "/health": "GET - Health check"
+        },
+        "websocket": {
+            "connect": "ws://localhost:5003/socket.io/",
+            "events": ["analyze_mood", "mood_result", "typing", "message_received"]
         }
     })
 
@@ -245,7 +252,8 @@ def health():
     return jsonify({
         "status": "healthy",
         "analyzer_loaded": True,
-        "mood_classes": list(analyzer.mood_keywords.keys())
+        "mood_classes": list(analyzer.mood_keywords.keys()),
+        "websocket_enabled": True
     })
 
 @app.route('/analyze-mood', methods=['POST'])
@@ -279,7 +287,79 @@ def analyze_mood():
     except Exception as e:
         return jsonify({"error": f"Server error: {str(e)}"}), 500
 
+# WebSocket Events
+@socketio.on('connect')
+def handle_connect():
+    print(f"Client connected: {request.sid}")
+    emit('connected', {'message': 'Connected to Mood Analysis WebSocket'})
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    print(f"Client disconnected: {request.sid}")
+
+@socketio.on('join_session')
+def handle_join_session(data):
+    session_id = data.get('session_id', 'default')
+    join_room(session_id)
+    emit('joined_session', {'session_id': session_id})
+
+@socketio.on('leave_session')
+def handle_leave_session(data):
+    session_id = data.get('session_id', 'default')
+    leave_room(session_id)
+    emit('left_session', {'session_id': session_id})
+
+@socketio.on('analyze_mood')
+def handle_analyze_mood(data):
+    try:
+        text = data.get('text', '')
+        session_id = data.get('session_id', 'default')
+        
+        if not text:
+            emit('mood_error', {'error': 'Text tidak ditemukan'})
+            return
+        
+        # Emit typing indicator
+        emit('typing', {'is_typing': True}, room=session_id)
+        
+        # Analyze mood
+        result = analyzer.analyze_mood(text)
+        suggestion = analyzer.get_suggestion(result['mood'], result['confidence'])
+        
+        # Emit result
+        emit('mood_result', {
+            'success': True,
+            'mood': result['mood'],
+            'confidence': result['confidence'],
+            'suggestion': suggestion,
+            'analysis': {
+                'scores': result['scores'],
+                'negative_activities': result['negative_activities'],
+                'positive_activities': result['positive_activities']
+            }
+        }, room=session_id)
+        
+        # Stop typing indicator
+        emit('typing', {'is_typing': False}, room=session_id)
+        
+    except Exception as e:
+        emit('mood_error', {'error': f"Server error: {str(e)}"})
+
+@socketio.on('message_received')
+def handle_message_received(data):
+    """Handle when a new message is received for auto-scroll"""
+    session_id = data.get('session_id', 'default')
+    emit('scroll_to_bottom', {'timestamp': data.get('timestamp')}, room=session_id)
+
+@socketio.on('user_typing')
+def handle_user_typing(data):
+    """Handle typing indicators"""
+    session_id = data.get('session_id', 'default')
+    is_typing = data.get('is_typing', False)
+    emit('typing_status', {'is_typing': is_typing}, room=session_id)
+
 if __name__ == '__main__':
-    print("Starting Simple Mood Analysis API...")
-    print("This API uses rule-based analysis for better accuracy.")
-    app.run(debug=True, host='0.0.0.0', port=5002)
+    print("Starting WebSocket Mood Analysis API...")
+    print("This API uses rule-based analysis with WebSocket support.")
+    print("WebSocket URL: ws://localhost:5003/socket.io/")
+    socketio.run(app, debug=True, host='0.0.0.0', port=5003)
