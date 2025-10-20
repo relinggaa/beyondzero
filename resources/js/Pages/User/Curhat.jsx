@@ -1,130 +1,181 @@
 import React, { useState, useEffect, useRef } from "react";
 import LayoutUser from "../../Components/Layout/LayoutUser";
+import ConfirmModal from "../../Components/ConfirmModal";
+import axios from "axios";
 
 export default function Curhat() {
     const [selectedMood, setSelectedMood] = useState(null);
     const [message, setMessage] = useState("");
-    const [selectedSession, setSelectedSession] = useState(1);
+    const [selectedSession, setSelectedSession] = useState(null);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [chatMessages, setChatMessages] = useState([]);
     const [isTyping, setIsTyping] = useState(false);
     const [isConnected, setIsConnected] = useState(false);
+    const [sessions, setSessions] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [authReady, setAuthReady] = useState(false);
+    const [authUser, setAuthUser] = useState(null);
     const chatContainerRef = useRef(null);
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [sessionToDelete, setSessionToDelete] = useState(null);
 
+    // Axios defaults for Sanctum/session auth
+    axios.defaults.withCredentials = true;
+    axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
 
-    const sessions = [
-        { id: 1, title: "Curhat Baru", date: "15/10/2025, 12:27:13", mood: "Belum dimulai" },
-        { id: 2, title: "Curhat Pagi", date: "15/10/2025, 12:27:13", mood: "Bahagia" },
-        { id: 3, title: "Curhat Sore", date: "14/10/2025, 15:45:22", mood: "Tenang" },
-        { id: 4, title: "Curhat Malam", date: "13/10/2025, 20:30:15", mood: "Cemas" }
-    ];
-
-    const allChatMessages = {
-        1: [], // Curhat baru - chat kosong
-        2: [
-            {
-                id: 1,
-                type: "user",
-                message: "Hari ini aku merasa sangat lelah dan stres dengan pekerjaan",
-                timestamp: "12:30"
-            },
-            {
-                id: 2,
-                type: "ai",
-                message: "Saya mengerti perasaan Anda. Stres di tempat kerja memang bisa sangat melelahkan. Bisa ceritakan lebih detail apa yang membuat Anda merasa stres hari ini?",
-                timestamp: "12:31"
-            },
-            {
-                id: 3,
-                type: "user",
-                message: "Boss memberikan deadline yang sangat ketat dan aku tidak yakin bisa menyelesaikannya tepat waktu",
-                timestamp: "12:32"
-            },
-            {
-                id: 4,
-                type: "ai",
-                message: "Deadline yang ketat memang bisa menimbulkan kecemasan. Coba kita breakdown tugas tersebut menjadi bagian-bagian kecil yang lebih mudah dikelola. Apa yang bisa Anda lakukan untuk mengurangi tekanan ini?",
-                timestamp: "12:33"
-            },
-            {
-                id: 5,
-                type: "user",
-                message: "Mungkin aku bisa bicara dengan boss tentang timeline yang lebih realistis",
-                timestamp: "12:35"
-            },
-            {
-                id: 6,
-                type: "ai",
-                message: "Itu ide yang bagus! Komunikasi yang jujur dengan atasan bisa membantu. Bagaimana perasaan Anda sekarang setelah membicarakannya?",
-                timestamp: "12:36"
+    // Ensure Sanctum CSRF cookie and (optionally) fetch user
+    const ensureAuth = async () => {
+        if (authReady) return true;
+        try {
+            // Get CSRF cookie
+            await axios.get('/sanctum/csrf-cookie');
+            // Verify session/user (optional but useful for debug)
+            try {
+                const userRes = await axios.get('/api/user');
+                setAuthUser(userRes.data);
+            } catch (e) {
+                // Not strictly required to proceed; API group still needs login
+                console.warn('User not fetched (possibly guest):', e?.response?.status);
             }
-        ],
-        3: [
-            {
-                id: 1,
-                type: "user",
-                message: "Aku merasa lebih tenang hari ini setelah meditasi pagi",
-                timestamp: "15:45"
-            },
-            {
-                id: 2,
-                type: "ai",
-                message: "Bagus sekali! Meditasi memang bisa membantu menenangkan pikiran. Bagaimana perasaan Anda sekarang dibandingkan pagi ini?",
-                timestamp: "15:46"
-            },
-            {
-                id: 3,
-                type: "user",
-                message: "Aku merasa lebih fokus dan energi positif",
-                timestamp: "15:47"
-            },
-            {
-                id: 4,
-                type: "ai",
-                message: "Sangat baik! Energi positif ini bisa membantu Anda menjalani hari dengan lebih baik. Apa yang membuat Anda merasa bersyukur hari ini?",
-                timestamp: "15:48"
-            }
-        ],
-        4: [
-            {
-                id: 1,
-                type: "user",
-                message: "Aku merasa cemas dan tidak bisa tidur",
-                timestamp: "20:30"
-            },
-            {
-                id: 2,
-                type: "ai",
-                message: "Saya mengerti kecemasan Anda. Kesulitan tidur bisa sangat mengganggu. Apa yang mengganggu pikiran Anda malam ini?",
-                timestamp: "20:31"
-            },
-            {
-                id: 3,
-                type: "user",
-                message: "Aku khawatir tentang presentasi besok dan takut tidak bisa perform dengan baik",
-                timestamp: "20:32"
-            },
-            {
-                id: 4,
-                type: "ai",
-                message: "Kekhawatiran tentang presentasi memang wajar. Coba kita lakukan teknik relaksasi sederhana. Tarik napas dalam-dalam dan bayangkan presentasi berjalan dengan lancar.",
-                timestamp: "20:33"
-            },
-            {
-                id: 5,
-                type: "user",
-                message: "Terima kasih, aku akan coba teknik itu",
-                timestamp: "20:35"
-            }
-        ]
+            setAuthReady(true);
+            return true;
+        } catch (e) {
+            console.error('Failed to init Sanctum/CSRF:', e);
+            setAuthReady(false);
+            return false;
+        }
     };
-
-    const currentChatMessages = chatMessages.length > 0 ? chatMessages : allChatMessages[selectedSession] || [];
 
     // Auto-scroll function
     const scrollToBottom = () => {
         if (chatContainerRef.current) {
             chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        }
+    };
+
+    // Load chat sessions from API
+    const loadChatSessions = async () => {
+        try {
+            await ensureAuth();
+            console.log('📡 Loading chat sessions...');
+            const response = await axios.get('/api/chat/sessions');
+            console.log('📋 Sessions response:', response.data);
+            
+            if (response.data.success) {
+                const sessionsData = response.data.data;
+                console.log('📊 Found sessions:', sessionsData.length);
+                
+                setSessions(sessionsData);
+                
+                // Always set first session as selected if none selected and sessions exist
+                if (!selectedSession && sessionsData.length > 0) {
+                    const firstSessionId = sessionsData[0].id;
+                    console.log('✅ Setting first session as selected:', firstSessionId);
+                    setSelectedSession(firstSessionId);
+                }
+                
+                // If no sessions exist, create a new one
+                if (sessionsData.length === 0) {
+                    console.log('⚠️ No sessions found, creating new session');
+                    await createNewSession();
+                }
+            } else {
+                console.error('❌ API returned unsuccessful response:', response.data);
+                // Try to create a session anyway
+                await createNewSession();
+            }
+        } catch (error) {
+            console.error('❌ Error loading chat sessions:', error);
+            console.error('Error details:', error.response?.data || error.message);
+            
+            // Try to create a session anyway
+            try {
+                console.log('🔄 Attempting to create new session after error...');
+                await createNewSession();
+            } catch (createError) {
+                console.error('❌ Failed to create session after error:', createError);
+            }
+        }
+    };
+
+    // Load messages for selected session
+    const loadChatMessages = async (sessionId) => {
+        try {
+            await ensureAuth();
+            console.log('Loading messages for session:', sessionId);
+            const response = await axios.get(`/api/chat/sessions/${sessionId}`);
+            console.log('Messages response:', response.data);
+            
+            if (response.data.success) {
+                setChatMessages(response.data.data.messages || []);
+                console.log('Messages loaded:', response.data.data.messages?.length || 0);
+            }
+        } catch (error) {
+            console.error('Error loading chat messages:', error);
+            setChatMessages([]);
+        }
+    };
+
+    // Create new chat session
+    const createNewSession = async () => {
+        try {
+            await ensureAuth();
+            console.log('🆕 Creating new chat session...');
+            const response = await axios.post('/api/chat/sessions', {
+                title: 'Curhat Baru',
+                mood: null
+            });
+            console.log('📝 New session response:', response.data);
+            
+            if (response.data.success) {
+                const newSessionId = response.data.data.id;
+                console.log('✅ New session created with ID:', newSessionId);
+                
+                // Reload sessions to get updated list
+                await loadChatSessions();
+                
+                // Set the new session as selected
+                setSelectedSession(newSessionId);
+                setChatMessages([]);
+                
+                console.log('✅ New session created and selected:', newSessionId);
+                return newSessionId;
+            } else {
+                console.error('❌ Failed to create session:', response.data);
+                throw new Error('Failed to create session: ' + (response.data.message || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error('❌ Error creating new session:', error);
+            console.error('Error details:', error.response?.data || error.message);
+            throw error;
+        }
+    };
+
+    const requestDeleteSession = (sessionId) => {
+        setSessionToDelete(sessionId);
+        setConfirmOpen(true);
+    };
+
+    const deleteSession = async () => {
+        if (!sessionToDelete) return;
+        try {
+            await ensureAuth();
+            await axios.delete(`/api/chat/sessions/${sessionToDelete}`);
+            setConfirmOpen(false);
+            // Refresh sessions
+            await loadChatSessions();
+            // If the deleted session was selected, move selection
+            if (selectedSession === sessionToDelete) {
+                const remaining = sessions.filter(s => s.id !== sessionToDelete);
+                setSelectedSession(remaining[0]?.id || null);
+                setChatMessages([]);
+            }
+            setSessionToDelete(null);
+        } catch (e) {
+            console.error('Failed to delete session', e);
+            setConfirmOpen(false);
+            setSessionToDelete(null);
+            alert('Gagal menghapus sesi.');
         }
     };
 
@@ -147,10 +198,67 @@ export default function Curhat() {
         return () => clearInterval(interval);
     }, []);
 
+    // Load initial data
+    useEffect(() => {
+        const loadInitialData = async () => {
+            setLoading(true);
+            console.log('🔄 Loading initial data...');
+            
+            try {
+                await loadChatSessions();
+                
+                // If still no session selected after loading, create one
+                if (!selectedSession) {
+                    console.log('⚠️ No session selected after loading, creating new one...');
+                    await createNewSession();
+                }
+            } catch (error) {
+                console.error('❌ Error in loadInitialData:', error);
+                // Try to create a session anyway
+                try {
+                    await createNewSession();
+                } catch (createError) {
+                    console.error('❌ Failed to create session:', createError);
+                }
+            }
+            
+            setLoading(false);
+        };
+        loadInitialData();
+    }, []);
+
+    // Debug selectedSession changes
+    useEffect(() => {
+        console.log('🔄 selectedSession changed:', selectedSession);
+    }, [selectedSession]);
+
+    // Fallback: Ensure we always have a session selected
+    useEffect(() => {
+        const ensureSessionSelected = async () => {
+            if (!loading && !selectedSession && sessions.length === 0) {
+                console.log('⚠️ No session selected and no sessions available, creating one...');
+                try {
+                    await createNewSession();
+                } catch (error) {
+                    console.error('❌ Failed to create fallback session:', error);
+                }
+            }
+        };
+        
+        ensureSessionSelected();
+    }, [loading, selectedSession, sessions.length]);
+
+    // Load messages when session changes
+    useEffect(() => {
+        if (selectedSession) {
+            loadChatMessages(selectedSession);
+        }
+    }, [selectedSession]);
+
     // Auto-scroll when new messages are added
     useEffect(() => {
         scrollToBottom();
-    }, [currentChatMessages]);
+    }, [chatMessages]);
 
     // Function to send message to Ollama
     const sendMessageToOllama = async (userMessage) => {
@@ -176,28 +284,21 @@ export default function Curhat() {
                     id: Date.now() + 1,
                     type: 'ai',
                     message: data.response,
-                    timestamp: new Date().toLocaleTimeString('en-US', { 
-                        hour: '2-digit', 
-                        minute: '2-digit',
-                        hour12: true 
-                    })
+                    timestamp: new Date().toISOString()
                 };
                 
-                setChatMessages(prev => [...prev, aiMessage]);
+                // Save AI message to database
+                await saveMessageToDatabase(aiMessage);
             } else {
                 // Add error message
                 const errorMessage = {
                     id: Date.now() + 1,
                     type: 'ai',
                     message: `Maaf, terjadi kesalahan: ${data.error}`,
-                    timestamp: new Date().toLocaleTimeString('en-US', { 
-                        hour: '2-digit', 
-                        minute: '2-digit',
-                        hour12: true 
-                    })
+                    timestamp: new Date().toISOString()
                 };
                 
-                setChatMessages(prev => [...prev, errorMessage]);
+                await saveMessageToDatabase(errorMessage);
             }
         } catch (error) {
             console.error('Error sending message to Ollama:', error);
@@ -207,42 +308,101 @@ export default function Curhat() {
                 id: Date.now() + 1,
                 type: 'ai',
                 message: 'Maaf, tidak dapat terhubung ke AI. Pastikan Ollama sudah berjalan.',
-                timestamp: new Date().toLocaleTimeString('en-US', { 
-                    hour: '2-digit', 
-                    minute: '2-digit',
-                    hour12: true 
-                })
+                timestamp: new Date().toISOString()
             };
             
-            setChatMessages(prev => [...prev, errorMessage]);
+            await saveMessageToDatabase(errorMessage);
         } finally {
             setIsTyping(false);
         }
     };
 
-    // Function to handle send message
+    // Save message to database
+    const saveMessageToDatabase = async (messageData) => {
+        try {
+            await ensureAuth();
+            console.log('Attempting to save message:', messageData);
+            
+            const response = await axios.post(`/api/chat/sessions/${selectedSession}/messages`, {
+                type: messageData.type,
+                message: messageData.message,
+                timestamp: messageData.timestamp
+            });
+            
+            console.log('Database save response:', response.data);
+            
+            if (response.data.success) {
+                console.log('Message saved successfully, reloading messages');
+                // Reload messages to get updated data
+                await loadChatMessages(selectedSession);
+            } else {
+                console.error('Failed to save message:', response.data);
+                throw new Error('Failed to save message to database');
+            }
+        } catch (error) {
+            console.error('Error saving message to database:', error);
+            throw error; // Re-throw to be handled by caller
+        }
+    };
+
+    // --- end helpers ---
+
+    // Function to handle send message - Simplified version for testing
     const handleSendMessage = async () => {
-        if (!message.trim()) return;
+        console.log('=== handleSendMessage START ===');
+        console.log('Current state:', { 
+            message: message.trim(), 
+            selectedSession, 
+            isTyping,
+            sessionsCount: sessions.length 
+        });
         
-        // Add user message
+        if (!message.trim()) {
+            console.log('❌ No message to send');
+            return;
+        }
+        
+        if (!selectedSession) {
+            console.log('❌ No session selected');
+            alert('Tidak ada session yang dipilih. Silakan pilih atau buat session baru.');
+            return;
+        }
+        
+        const messageToSend = message.trim();
+        console.log('✅ Sending message:', messageToSend);
+        
+        // Clear input immediately
+        setMessage('');
+        
+        try {
+            // Create user message object
         const userMessage = {
             id: Date.now(),
             type: 'user',
-            message: message.trim(),
-            timestamp: new Date().toLocaleTimeString('en-US', { 
-                hour: '2-digit', 
-                minute: '2-digit',
-                hour12: true 
-            })
-        };
-        
-        setChatMessages(prev => [...prev, userMessage]);
+                message: messageToSend,
+                timestamp: new Date().toISOString()
+            };
+            
+            console.log('📝 User message created:', userMessage);
+            
+            // Save to database
+            console.log('💾 Saving to database...');
+            await saveMessageToDatabase(userMessage);
+            console.log('✅ Saved to database');
         
         // Send to Ollama
-        await sendMessageToOllama(message.trim());
+            console.log('🤖 Sending to Ollama...');
+            await sendMessageToOllama(messageToSend);
+            console.log('✅ Sent to Ollama');
+            
+        } catch (error) {
+            console.error('❌ Error in handleSendMessage:', error);
+            // Restore message on error
+            setMessage(messageToSend);
+            alert('Terjadi kesalahan saat mengirim pesan: ' + error.message);
+        }
         
-        // Clear input
-        setMessage('');
+        console.log('=== handleSendMessage END ===');
     };
 
     // Handle enter key
@@ -253,7 +413,49 @@ export default function Curhat() {
         }
     };
 
+    // Handle session selection
+    const handleSessionSelect = (sessionId) => {
+        setSelectedSession(sessionId);
+        // Close sidebar on mobile after selection
+        if (window.innerWidth < 1024) {
+            setIsSidebarOpen(false);
+        }
+    };
+
+    // Format date for display
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('id-ID', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    };
+
+    // Format time for display
+    const formatTime = (timestamp) => {
+        const date = new Date(timestamp);
+        return date.toLocaleTimeString('en-US', { 
+            hour: '2-digit', 
+            minute: '2-digit',
+            hour12: true 
+        });
+    };
+
+    if (loading) {
+        return (
+            <LayoutUser>
+                <div className="min-h-screen cursor-gaming mood-tracker-bg pt-20 flex items-center justify-center">
+                    <div className="text-white text-xl">Memuat data chat...</div>
+                </div>
+            </LayoutUser>
+        );
+    }
+
     return (
+        <>
         <LayoutUser>
             <div 
                 className="min-h-screen cursor-gaming mood-tracker-bg pt-20"
@@ -288,7 +490,10 @@ export default function Curhat() {
                     </div>
 
                     {/* New Session Button */}
-                    <button className="w-full border-2 border-dashed border-white/30 hover:border-cyan-400 hover:bg-cyan-400/10 rounded-xl p-4 mb-6 transition-all duration-300 group">
+                    <button 
+                        onClick={createNewSession}
+                        className="w-full border-2 border-dashed border-white/30 hover:border-cyan-400 hover:bg-cyan-400/10 rounded-xl p-4 mb-6 transition-all duration-300 group"
+                    >
                         <div className="flex items-center justify-center space-x-2">
                             <svg className="w-5 h-5 text-white group-hover:text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -305,13 +510,7 @@ export default function Curhat() {
                         {sessions.map((session, index) => (
                             <div 
                                 key={session.id} 
-                                onClick={() => {
-                                    setSelectedSession(session.id);
-                                    // Close sidebar on mobile after selection
-                                    if (window.innerWidth < 1024) {
-                                        setIsSidebarOpen(false);
-                                    }
-                                }}
+                                onClick={() => handleSessionSelect(session.id)}
                                 className={`p-4 rounded-xl cursor-pointer transition-all duration-200 ${
                                     selectedSession === session.id
                                         ? 'bg-gradient-to-r from-cyan-400/20 to-teal-500/20 border border-cyan-400/30' 
@@ -321,17 +520,21 @@ export default function Curhat() {
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <h4 className="text-white font-medium">{session.title}</h4>
-                                        <p className="text-white/60 text-sm">{session.date}</p>
-                                        <span className="text-cyan-400 text-xs font-medium">{session.mood}</span>
+                                        <p className="text-white/60 text-sm">{formatDate(session.created_at)}</p>
+                                        <span className="text-cyan-400 text-xs font-medium">
+                                            {session.mood || 'Belum dimulai'}
+                                        </span>
                                     </div>
                                     <div className="flex items-center space-x-2">
                                         <svg className="w-4 h-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                                         </svg>
-                                        {index > 0 && (
+                                        {(
+                                            <button onClick={(e) => { e.stopPropagation(); requestDeleteSession(session.id); }} title="Hapus sesi" className="p-1 rounded hover:bg-white/10">
                                             <svg className="w-4 h-4 text-red-400 hover:text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                             </svg>
+                                            </button>
                                         )}
                                     </div>
                                 </div>
@@ -365,7 +568,7 @@ export default function Curhat() {
                     </div>
 
 
-                    {/* Chat Messages */}
+                    {/* Header/Indicators can be placed here if needed */}
                     <div className="bg-black/30 backdrop-blur-md rounded-2xl p-4 lg:p-6 mb-6 border border-white/20">
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-white font-semibold text-base lg:text-lg">Chat Terbaru</h3>
@@ -392,7 +595,7 @@ export default function Curhat() {
                             ref={chatContainerRef}
                             className="space-y-3 lg:space-y-4 max-h-80 lg:max-h-96 overflow-y-auto"
                         >
-                            {currentChatMessages.length === 0 ? (
+                            {chatMessages.length === 0 ? (
                                 // Greeting saat chat kosong
                                 <div className="flex flex-col items-center justify-center py-8 text-center">
                                     <div className="text-4xl mb-4">💬</div>
@@ -412,7 +615,7 @@ export default function Curhat() {
                                 </div>
                             ) : (
                                 // Chat messages
-                                currentChatMessages.map((msg) => (
+                                chatMessages.map((msg) => (
                                     <div key={msg.id} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'} chat-message`}>
                                         <div className={`max-w-[85%] sm:max-w-xs lg:max-w-md px-3 lg:px-4 py-2 lg:py-3 rounded-2xl transition-all duration-300 hover:scale-105 ${
                                             msg.type === 'user' 
@@ -423,7 +626,7 @@ export default function Curhat() {
                                             <p className={`text-xs mt-1 font-light ${
                                                 msg.type === 'user' ? 'text-white/70' : 'text-white/50'
                                             }`}>
-                                                {msg.timestamp}
+                                                {formatTime(msg.timestamp)}
                                             </p>
                                         </div>
                                     </div>
@@ -448,9 +651,29 @@ export default function Curhat() {
                             />
                             {/* Send Button */}
                             <button 
-                                onClick={handleSendMessage}
-                                disabled={isTyping || !message.trim()}
+                                onClick={() => {
+                                    console.log('🚀 Send button clicked', { 
+                                        isTyping, 
+                                        message: message.trim(), 
+                                        selectedSession,
+                                        disabled: isTyping || !message.trim() || !selectedSession
+                                    });
+                                    
+                                    if (!selectedSession) {
+                                        alert('Tidak ada session yang dipilih! Klik tombol "Create Session" untuk membuat session baru.');
+                                        return;
+                                    }
+                                    
+                                    if (!message.trim()) {
+                                        alert('Pesan tidak boleh kosong!');
+                                        return;
+                                    }
+                                    
+                                    handleSendMessage();
+                                }}
+                                disabled={isTyping || !message.trim() || !selectedSession}
                                 className="bg-gradient-to-r from-cyan-400 to-teal-500 hover:from-cyan-500 hover:to-teal-600 text-white p-2 lg:p-3 rounded-xl transition-all duration-200 hover:scale-105 flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                                title={!selectedSession ? 'Tidak ada session yang dipilih' : !message.trim() ? 'Pesan tidak boleh kosong' : 'Kirim pesan'}
                             >
                                 {isTyping ? (
                                     <div className="animate-spin rounded-full h-4 w-4 lg:h-5 lg:w-5 border-b-2 border-white"></div>
@@ -481,5 +704,15 @@ export default function Curhat() {
         </div>
     </div>
         </LayoutUser>
+        <ConfirmModal
+            open={confirmOpen}
+            title="Hapus Sesi Curhat?"
+            message={"Tindakan ini akan menghapus seluruh pesan pada sesi ini. Lanjutkan?"}
+            confirmText="Hapus"
+            cancelText="Batal"
+            onConfirm={deleteSession}
+            onCancel={() => { setConfirmOpen(false); setSessionToDelete(null); }}
+        />
+        </>
     );
 }

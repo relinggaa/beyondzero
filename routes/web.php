@@ -10,6 +10,7 @@ use App\Http\Controllers\PsikologUserController;
 use App\Http\Controllers\JournalController;
 use App\Http\Controllers\BookPsikologController;
 use App\Http\Controllers\PsikologAuthController;
+use App\Http\Controllers\ChatController;
 
 // Public routes
 Route::get('/', function () {
@@ -89,6 +90,17 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/predict/batch', [App\Http\Controllers\MLController::class, 'predictBatch']);
         Route::get('/health', [App\Http\Controllers\MLController::class, 'health']);
         Route::get('/model-info', [App\Http\Controllers\MLController::class, 'modelInfo']);
+    });
+
+    // Chat API (session-auth) so SPA can use web session cookies
+    Route::prefix('api/chat')->group(function () {
+        Route::get('/sessions', [ChatController::class, 'index']);
+        Route::post('/sessions', [ChatController::class, 'storeSession']);
+        Route::get('/sessions/active', [ChatController::class, 'getActiveSession']);
+        Route::get('/sessions/{sessionId}', [ChatController::class, 'getMessages']);
+        Route::put('/sessions/{sessionId}', [ChatController::class, 'updateSession']);
+        Route::delete('/sessions/{sessionId}', [ChatController::class, 'destroySession']);
+        Route::post('/sessions/{sessionId}/messages', [ChatController::class, 'storeMessage']);
     });
     // Psikolog routes
     Route::get('/psikolog/login', [PsikologAuthController::class, 'showLogin'])->name('psikolog.login');
