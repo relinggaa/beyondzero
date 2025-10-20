@@ -1,0 +1,121 @@
+import React from "react";
+import MoodTemplates from "./MoodTemplates";
+
+export default function ChatMessages({ 
+    currentChatMessages, 
+    chatContainerRef, 
+    isAnalyzing, 
+    isListening, 
+    isSupported, 
+    voiceStatus, 
+    isConnected, 
+    isTyping,
+    moodTemplates,
+    onUseTemplate 
+}) {
+    const formatTime = (timestamp) => {
+        const date = new Date(timestamp);
+        return date.toLocaleTimeString('en-US', { 
+            hour: '2-digit', 
+            minute: '2-digit',
+            hour12: true 
+        });
+    };
+
+    return (
+        <div className="bg-black/30 backdrop-blur-md rounded-2xl p-4 lg:p-6 mb-6 border border-white/20">
+            <div className="flex items-center justify-between mb-4">
+                <h3 className="text-white font-semibold text-base lg:text-lg">Chat Terbaru</h3>
+                <div className="flex items-center space-x-2">
+                    {isAnalyzing && (
+                        <div className="flex items-center space-x-2 text-cyan-400">
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-cyan-400"></div>
+                            <span className="text-sm">Menganalisis mood...</span>
+                        </div>
+                    )}
+                    {isListening && (
+                        <div className="flex items-center space-x-2 text-red-400">
+                            <div className="animate-pulse rounded-full h-4 w-4 bg-red-400"></div>
+                            <span className="text-sm">Mendengarkan...</span>
+                        </div>
+                    )}
+                    {!isSupported && (
+                        <div className="flex items-center space-x-2 text-yellow-400">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                            </svg>
+                            <span className="text-sm">Voice tidak didukung</span>
+                        </div>
+                    )}
+                    {voiceStatus && (
+                        <div className="flex items-center space-x-2 text-green-400">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span className="text-sm">{voiceStatus}</span>
+                        </div>
+                    )}
+                    {/* WebSocket Connection Status */}
+                    <div className={`flex items-center space-x-2 ${isConnected ? 'text-green-400' : 'text-red-400'}`}>
+                        <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-400' : 'bg-red-400'} ${isConnected ? 'animate-pulse' : ''}`}></div>
+                        <span className="text-sm">{isConnected ? 'WebSocket Connected' : 'WebSocket Disconnected'}</span>
+                    </div>
+                    {/* Typing Indicator */}
+                    {isTyping && (
+                        <div className="flex items-center space-x-2 text-cyan-400 typing-indicator">
+                            <div className="flex space-x-1">
+                                <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce"></div>
+                                <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                                <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                            </div>
+                            <span className="text-sm font-medium">AI sedang menganalisis...</span>
+                        </div>
+                    )}
+                </div>
+            </div>
+            <div 
+                ref={chatContainerRef}
+                className="space-y-3 lg:space-y-4 max-h-80 lg:max-h-96 overflow-y-auto"
+            >
+                {currentChatMessages.length === 0 ? (
+                    // Greeting saat chat kosong dengan cards langsung terlihat
+                    <div className="flex flex-col items-center justify-center py-8 text-center">
+                        <div className="text-4xl mb-4">👋</div>
+                        <h2 className="text-xl lg:text-2xl font-bold text-white mb-2">
+                            Hi! What brings you here today?
+                        </h2>
+                        
+                        {/* Mood Templates Cards - Langsung ditampilkan */}
+                        <MoodTemplates 
+                            moodTemplates={moodTemplates}
+                            onUseTemplate={onUseTemplate}
+                        />
+
+                        {/* Disclaimer */}
+                        <p className="text-white/50 text-xs lg:text-sm text-center">
+                            The responses are generated by AI. They do not represent the views of calmify.ai.
+                        </p>
+                    </div>
+                ) : (
+                    // Chat messages
+                    currentChatMessages.map((msg) => (
+                        <div key={msg.id} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'} chat-message`}>
+                            <div className={`max-w-[85%] sm:max-w-xs lg:max-w-md px-3 lg:px-4 py-2 lg:py-3 rounded-2xl transition-all duration-300 hover:scale-105 ${
+                                msg.type === 'user' 
+                                    ? 'bg-gradient-to-r from-cyan-400 to-teal-500 text-white shadow-lg' 
+                                    : 'bg-black/40 backdrop-blur-md text-white border border-white/20 shadow-lg'
+                            }`}>
+                                <p className="text-xs lg:text-sm break-words font-medium">{msg.message}</p>
+                                <p className={`text-xs mt-1 font-light ${
+                                    msg.type === 'user' ? 'text-white/70' : 'text-white/50'
+                                }`}>
+                                    {msg.timestamp}
+                                </p>
+                            </div>
+                        </div>
+                    ))
+                )}
+            </div>
+        </div>
+    );
+}
