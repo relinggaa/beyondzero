@@ -13,12 +13,7 @@ use App\Http\Controllers\PsikologAuthController;
 
 // Public routes
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
+    return Inertia::render('Landing');
 });
 
 // User Auth routes
