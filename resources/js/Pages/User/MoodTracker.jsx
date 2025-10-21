@@ -142,13 +142,13 @@ export default function MoodTracker() {
             color: 'from-red-500 to-red-600',
             bgColor: 'bg-red-500/10',
             borderColor: 'border-red-500/30',
-            title: 'Unraveling cognitive distortions',
-            description: 'Understanding and challenging negative thought patterns',
+            title: 'Mengurai Distorsi Kognitif',
+            description: 'Memahami dan menantang pola pikir negatif',
             examples: [
+                'Saya sering merasa terjebak dalam pola pikir yang membuat saya merasa tidak mampu. Saya ingin belajar cara mengurai pemikiran negatif itu, tapi saya tidak tahu dari mana harus memulai.',
                 'Hari ini adalah hari terburuk dalam hidupku',
                 'Tidak ada semangat sama sekali, badan lemas',
-                'Menghabiskan sepanjang hari di tempat tidur',
-                'Tidak ada aktivitas positif sama sekali'
+                'Menghabiskan sepanjang hari di tempat tidur'
             ]
         },
         {
@@ -158,13 +158,13 @@ export default function MoodTracker() {
             color: 'from-orange-500 to-orange-600',
             bgColor: 'bg-orange-500/10',
             borderColor: 'border-orange-500/30',
-            title: 'Cognitive restructuring',
-            description: 'Reframing thoughts for better mental health',
+            title: 'Restrukturisasi Kognitif',
+            description: 'Membingkai ulang pikiran untuk kesehatan mental yang lebih baik',
             examples: [
+                'Terkadang saya merasa seperti pikiran saya selalu terfokus pada hal-hal buruk. Saya ingin belajar cara membingkai ulang pikiran saya agar bisa merasa lebih baik.',
                 'Hari ini aku merasa lelah dan stres',
                 'Bangun terlambat, tidak sempat sholat',
-                'Tidak ada waktu untuk aktivitas yang aku sukai',
-                'Mood hari ini tidak terlalu baik'
+                'Tidak ada waktu untuk aktivitas yang aku sukai'
             ]
         },
         {
@@ -174,8 +174,8 @@ export default function MoodTracker() {
             color: 'from-gray-500 to-gray-600',
             bgColor: 'bg-gray-500/10',
             borderColor: 'border-gray-500/30',
-            title: 'Exposure and response prevention',
-            description: 'Facing fears while managing anxiety responses',
+            title: 'Paparan dan Pencegahan Respons',
+            description: 'Menghadapi ketakutan sambil mengelola respons kecemasan',
             examples: [
                 'Hari ini biasa saja',
                 'Bangun pagi, mandi, makan, dan kerja',
@@ -190,8 +190,8 @@ export default function MoodTracker() {
             color: 'from-green-500 to-green-600',
             bgColor: 'bg-green-500/10',
             borderColor: 'border-green-500/30',
-            title: 'Interoceptive exposure',
-            description: 'Building tolerance to internal sensations',
+            title: 'Paparan Interoseptif',
+            description: 'Membangun toleransi terhadap sensasi internal',
             examples: [
                 'Hari ini lumayan baik',
                 'Pagi aku sholat dan jalan-jalan',
@@ -206,8 +206,8 @@ export default function MoodTracker() {
             color: 'from-cyan-500 to-teal-600',
             bgColor: 'bg-cyan-500/10',
             borderColor: 'border-cyan-500/30',
-            title: 'Mindfulness and meditation',
-            description: 'Cultivating present-moment awareness',
+            title: 'Kesadaran Penuh dan Meditasi',
+            description: 'Mengembangkan kesadaran momen saat ini',
             examples: [
                 'Hari ini aku merasa sangat bahagia!',
                 'Bangun pagi dengan energi tinggi',
@@ -673,7 +673,7 @@ export default function MoodTracker() {
                         />
 
                 {/* Main Content */}
-                <div className="flex-1 p-4 lg:p-8">
+                <div className="flex-1 p-4 lg:p-8 max-w-full overflow-hidden">
                     {/* Mobile Header with Hamburger */}
                     <div className="flex items-center justify-between mb-6 lg:mb-8 lg:hidden">
                         <button 

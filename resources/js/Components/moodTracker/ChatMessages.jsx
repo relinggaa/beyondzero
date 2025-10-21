@@ -23,7 +23,7 @@ export default function ChatMessages({
     };
 
     return (
-        <div className="bg-black/30 backdrop-blur-md rounded-2xl p-4 lg:p-6 mb-6 border border-white/20">
+        <div className="bg-black/30 backdrop-blur-md rounded-2xl p-4 lg:p-6 mb-6 border border-white/20 max-w-full overflow-hidden">
             <div className="flex items-center justify-between mb-4">
                 <h3 className="text-white font-semibold text-base lg:text-lg">Chat Terbaru</h3>
                 <div className="flex items-center space-x-2">
@@ -79,17 +79,19 @@ export default function ChatMessages({
             >
                 {currentChatMessages.length === 0 ? (
                     // Greeting saat chat kosong dengan cards langsung terlihat
-                    <div className="flex flex-col items-center justify-center py-8 text-center">
+                    <div className="flex flex-col items-center justify-center py-8 text-center w-full">
                         <div className="text-4xl mb-4">👋</div>
                         <h2 className="text-xl lg:text-2xl font-bold text-white mb-2">
                             Hi! What brings you here today?
                         </h2>
                         
-                        {/* Mood Templates Cards - Langsung ditampilkan */}
-                        <MoodTemplates 
-                            moodTemplates={moodTemplates}
-                            onUseTemplate={onUseTemplate}
-                        />
+                        {/* Mood Templates Cards - Langsung ditampilkan dengan container terbatas */}
+                        <div className="w-full max-w-full overflow-hidden">
+                            <MoodTemplates 
+                                moodTemplates={moodTemplates}
+                                onUseTemplate={onUseTemplate}
+                            />
+                        </div>
 
                         {/* Disclaimer */}
                         <p className="text-white/50 text-xs lg:text-sm text-center">
