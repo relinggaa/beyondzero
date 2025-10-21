@@ -1,0 +1,300 @@
+/* DomeGallery Container */
+.col-span-7 .sphere-root {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 300px;
+  min-height: 300px;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.col-span-7 .sphere-main {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.col-span-7 .stage {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.col-span-7 .sphere {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Reduce spacing for better flow */
+.container {
+  margin-top: 0 !important;
+  padding-top: 1rem !important;
+}
+
+/* GSAP Animation Support */
+.motivation-section {
+  width: 100%;
+  max-width: 400px;
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+  will-change: transform, opacity;
+}
+
+.motivation-icon,
+.motivation-title,
+.motivation-description,
+.community-stats,
+.join-button {
+  will-change: transform, opacity;
+}
+
+.stat-item {
+  will-change: transform, opacity, scale;
+}
+
+.motivation-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: transparent;
+  z-index: -1;
+}
+
+.motivation-content {
+  text-align: center;
+  color: white;
+  z-index: 1;
+  width: 100%;
+}
+
+.motivation-icon {
+  margin-bottom: 1.5rem;
+}
+
+.heart-icon {
+  font-size: 3rem;
+  animation: heartbeat 2s ease-in-out infinite;
+}
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.motivation-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  color: white;
+  line-height: 1.2;
+}
+
+.motivation-description {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  margin-bottom: 1.25rem;
+  opacity: 0.8;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.community-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.stat-item {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.stat-number {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 0.25rem;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  opacity: 0.7;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.motivation-cta {
+  margin-top: 1rem;
+}
+
+.join-button {
+  background: white;
+  color: black;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 0.75rem 1.5rem;
+  border-radius: 1.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.join-button:hover {
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.join-button:active {
+  transform: translateY(0);
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .motivation-section {
+    width: 250px;
+    min-width: 220px;
+  }
+  
+  .motivation-title {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 1024px) {
+  .col-span-7 {
+    grid-column: span 12 / span 12;
+    height: 60vh;
+    min-height: 300px;
+  }
+  
+  .col-span-5 {
+    grid-column: span 12 / span 12;
+    height: 40vh;
+    min-height: 250px;
+  }
+  
+  .col-span-7 .sphere-root {
+    min-width: 250px;
+    min-height: 250px;
+    max-width: 100%;
+    max-height: 100%;
+  }
+  
+  .motivation-section {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 1.5rem;
+  }
+  
+  
+  .community-stats {
+    flex-direction: row;
+    justify-content: space-around;
+    gap: 0.5rem;
+  }
+  
+  .stat-item {
+    flex: 1;
+    padding: 0.5rem;
+  }
+  
+  .stat-number {
+    font-size: 1rem;
+  }
+  
+  .stat-label {
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .col-span-7 {
+    height: 50vh;
+    min-height: 250px;
+  }
+  
+  .col-span-5 {
+    height: 50vh;
+    min-height: 200px;
+  }
+  
+  .col-span-7 .sphere-root {
+    min-width: 200px;
+    min-height: 200px;
+    max-width: 100%;
+    max-height: 100%;
+  }
+  
+  .motivation-section {
+    padding: 1rem;
+    max-width: 400px;
+  }
+  
+  .motivation-title {
+    font-size: 1.125rem;
+  }
+  
+  .motivation-description {
+    font-size: 0.8rem;
+  }
+  
+  .community-stats {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .stat-item {
+    padding: 0.5rem;
+  }
+  
+  .join-button {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .motivation-section {
+    padding: 0.75rem 0.5rem;
+  }
+  
+  .motivation-title {
+    font-size: 1rem;
+  }
+  
+  .motivation-description {
+    font-size: 0.75rem;
+    margin-bottom: 1rem;
+  }
+  
+  .community-stats {
+    margin-bottom: 1rem;
+  }
+  
+  .stat-number {
+    font-size: 1rem;
+  }
+  
+  .stat-label {
+    font-size: 0.65rem;
+  }
+}

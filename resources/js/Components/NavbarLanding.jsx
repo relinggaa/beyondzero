@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-export default function NavbarLanding() {
+export default function NavbarLanding({ showNavbar = true }) {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -12,6 +12,11 @@ export default function NavbarLanding() {
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
+
+    // Don't render navbar if showNavbar is false
+    if (!showNavbar) {
+        return null;
+    }
 
     const navItems = [
         { name: 'Home', href: '/' },

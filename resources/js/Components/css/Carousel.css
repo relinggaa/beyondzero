@@ -1,0 +1,242 @@
+.carousel-container {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #555;
+  border-radius: 24px;
+  padding: 16px;
+  --outer-r: 24px;
+  --p-distance: 12px;
+}
+
+.carousel-track {
+  display: flex;
+}
+
+.carousel-item {
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  border: 1px solid #555;
+  border-radius: calc(var(--outer-r) - var(--p-distance));
+  background-color: #0d0716;
+  overflow: hidden;
+  cursor: grab;
+}
+
+.carousel-item:active {
+  cursor: grabbing;
+}
+
+.carousel-container.round {
+  border: 1px solid #555;
+}
+
+.carousel-item.round {
+  background-color: #0d0716;
+  position: relative;
+  bottom: 0.1em;
+  border: 1px solid #555;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.carousel-item-header.round {
+  padding: 0;
+  margin: 0;
+}
+
+.carousel-indicators-container.round {
+  position: absolute;
+  z-index: 2;
+  bottom: 3em;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.carousel-indicator.active {
+  background-color: #333333;
+}
+
+.carousel-indicator.inactive {
+  background-color: rgba(51, 51, 51, 0.4);
+}
+
+.carousel-item-header {
+  margin-bottom: 16px;
+  padding: 20px;
+  padding-top: 20px;
+}
+
+.carousel-image-container {
+  position: relative;
+  width: 100%;
+  height: 250px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.carousel-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.carousel-icon-fallback {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.carousel-icon-container {
+  display: flex;
+  height: 60px;
+  width: 60px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+.carousel-icon {
+  height: 24px;
+  width: 24px;
+  color: #fff;
+}
+
+.carousel-icon-fallback .carousel-icon {
+  height: 32px;
+  width: 32px;
+  color: #fff;
+}
+
+.carousel-item-content {
+  padding: 20px;
+  padding-bottom: 20px;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 24px;
+  height: 100%;
+}
+
+.carousel-text-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+.carousel-image-section {
+  flex: 0 0 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.carousel-item-title {
+  margin-bottom: 12px;
+  font-weight: 900;
+  font-size: 24px;
+  color: #fff;
+  line-height: 1.2;
+}
+
+.carousel-item-description {
+  font-size: 16px;
+  color: #fff;
+  line-height: 1.6;
+  overflow-y: auto;
+  max-height: 400px;
+}
+
+.carousel-indicators-container {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}
+
+.carousel-indicators {
+  margin-top: 16px;
+  display: flex;
+  width: 150px;
+  justify-content: space-between;
+  padding: 0 32px;
+}
+
+.carousel-indicator {
+  height: 8px;
+  width: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 150ms;
+}
+
+.carousel-indicator.active {
+  background-color: #fff;
+}
+
+.carousel-indicator.inactive {
+  background-color: #555;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .carousel-item-content {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .carousel-image-section {
+    flex: 0 0 200px;
+  }
+  
+  .carousel-image-container {
+    height: 200px;
+  }
+  
+  .carousel-item-title {
+    font-size: 20px;
+  }
+  
+  .carousel-item-description {
+    font-size: 14px;
+    max-height: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  .carousel-item-content {
+    padding: 16px;
+    gap: 12px;
+  }
+  
+  .carousel-image-section {
+    flex: 0 0 150px;
+  }
+  
+  .carousel-image-container {
+    height: 150px;
+  }
+  
+  .carousel-item-title {
+    font-size: 18px;
+  }
+  
+  .carousel-item-description {
+    font-size: 13px;
+    max-height: 250px;
+  }
+}
