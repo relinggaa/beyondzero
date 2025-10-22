@@ -3,8 +3,10 @@ import HeroSection from "./section/HeroSection";
 import ServicesSection from "./section/ServicesSection";
 import QuotesSection from "./section/QuotesSection";
 import DomeGalerySession from "./section/DomeGalerySession";
+import PsikologSection from "./section/PsikologSection";
 import NavbarLanding from "../Components/NavbarLanding";
-
+import TestimoniSection from "./section/TestimoniSection";
+import AboutUsSection from "./section/AboutUsSection";
 export default function Landing() {
     const [showNavbar, setShowNavbar] = useState(false);
     const quotesRef = useRef(null);
@@ -30,11 +32,22 @@ export default function Landing() {
         <>
             <NavbarLanding showNavbar={showNavbar} />
             <div className="landing">
-                <div ref={quotesRef}>
+                <div ref={quotesRef} id="quotes-section">
                     <QuotesSection />
                 </div>
                 <DomeGalerySession />
-                <ServicesSection />
+                <div id="services-section">
+                    <ServicesSection />
+                </div>
+                <div id="psikolog-section">
+                    <PsikologSection />
+                </div>
+                <div id="testimoni-section">
+                    <TestimoniSection />
+                </div>
+                <div id="about-section">
+                    <AboutUsSection />
+                </div>
             </div>
         </>
     );

@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\PsikologController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -21,3 +22,6 @@ Route::middleware('auth:sanctum')->group(function () {
     // Chat Messages
     Route::post('/chat/sessions/{sessionId}/messages', [ChatController::class, 'storeMessage']);
 });
+
+// Public API Routes
+Route::get('/psikologs', [PsikologController::class, 'getPsikologs']);

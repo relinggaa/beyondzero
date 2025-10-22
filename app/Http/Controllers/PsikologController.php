@@ -123,6 +123,34 @@ class PsikologController extends Controller
     }
 
     /**
+     * Get psikologs for frontend display
+     */
+    public function getPsikologs()
+    {
+        $psikologs = Psikolog::orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($psikolog) {
+                return [
+                    'id' => $psikolog->id,
+                    'name' => $psikolog->name,
+                    'username' => $psikolog->username,
+                    'image' => $psikolog->image ? asset('storage/' . $psikolog->image) : null,
+                    'expertise' => $psikolog->expertise,
+                    'description' => $psikolog->description,
+                    'education' => $psikolog->education,
+                    'experience' => $psikolog->experience,
+                    'approach' => $psikolog->approach,
+                    'philosophy' => $psikolog->philosophy,
+                ];
+            });
+
+        return response()->json([
+            'success' => true,
+            'data' => $psikologs
+        ]);
+    }
+
+    /**
      * Remove the specified resource from storage.
      */
     public function destroy(Psikolog $psikolog)

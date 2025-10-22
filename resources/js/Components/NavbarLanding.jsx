@@ -13,17 +13,28 @@ export default function NavbarLanding({ showNavbar = true }) {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
+    const scrollToSection = (sectionId) => {
+        const element = document.getElementById(sectionId);
+        if (element) {
+            element.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+        setIsMobileMenuOpen(false);
+    };
+
     // Don't render navbar if showNavbar is false
     if (!showNavbar) {
         return null;
     }
 
     const navItems = [
-        { name: 'Home', href: '/' },
-        { name: 'Layanan Kami', href: '/layanan' },
-        { name: 'Psikolog', href: '/psikolog' },
-        { name: 'About Us', href: '/about' },
-        { name: 'Testimoni', href: '/testimoni' }
+        { name: 'Home', sectionId: 'quotes-section' },
+        { name: 'Layanan Kami', sectionId: 'services-section' },
+        { name: 'Psikolog', sectionId: 'psikolog-section' },
+        { name: 'Testimoni', sectionId: 'testimoni-section' },
+        { name: 'About Us', sectionId: 'about-section' },
     ];
 
     return (
@@ -43,25 +54,28 @@ export default function NavbarLanding({ showNavbar = true }) {
                 <div className="flex items-center justify-between h-12 gap-8">
                     {/* Logo */}
                     <div className="flex-shrink-0">
-                        <a href="/" className="text-2xl font-bold text-white flex items-center">
+                        <button 
+                            onClick={() => scrollToSection('quotes-section')}
+                            className="text-2xl font-bold text-white flex items-center hover:text-gray-300 transition-colors"
+                        >
                             <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-2">
                                 <div className="w-4 h-4 bg-black rounded-full"></div>
                             </div>
                             <span>BeyondMind</span>
-                        </a>
+                        </button>
                     </div>
 
                     {/* Desktop Navigation */}
                     <div className="hidden md:block">
                         <div className="flex items-center space-x-6">
                             {navItems.map((item) => (
-                                <a
+                                <button
                                     key={item.name}
-                                    href={item.href}
+                                    onClick={() => scrollToSection(item.sectionId)}
                                     className="text-white/90 hover:text-white px-3 py-1 text-sm font-medium transition-colors duration-200"
                                 >
                                     {item.name}
-                                </a>
+                                </button>
                             ))}
                         </div>
                     </div>
@@ -104,14 +118,13 @@ export default function NavbarLanding({ showNavbar = true }) {
                     <div className="md:hidden absolute top-full left-0 right-0 mt-2 z-50">
                         <div className="px-4 py-3 space-y-2 bg-black/80 backdrop-blur-lg border border-white/20 rounded-2xl">
                             {navItems.map((item) => (
-                                <a
+                                <button
                                     key={item.name}
-                                    href={item.href}
-                                    className="text-white/90 hover:text-white block px-3 py-2 text-base font-medium transition-colors duration-200 rounded-lg"
-                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    onClick={() => scrollToSection(item.sectionId)}
+                                    className="text-white/90 hover:text-white block px-3 py-2 text-base font-medium transition-colors duration-200 rounded-lg w-full text-left"
                                 >
                                     {item.name}
-                                </a>
+                                </button>
                             ))}
                             <div className="pt-2 border-t border-white/10">
                                 <div className="flex flex-col space-y-2">
