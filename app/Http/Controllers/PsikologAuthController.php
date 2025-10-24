@@ -42,6 +42,13 @@ class PsikologAuthController extends Controller
         // Store psikolog info in session
         session(['psikolog_id' => $psikolog->id]);
         session(['psikolog_name' => $psikolog->name]);
+        session()->save(); // Force save session before redirect
+        
+        \Log::info('Psikolog logged in', [
+            'psikolog_id' => $psikolog->id,
+            'session_id' => session()->getId(),
+            'session_data' => session()->all()
+        ]);
 
         return redirect('/psikolog/dashboard');
     }
@@ -51,9 +58,15 @@ class PsikologAuthController extends Controller
      */
     public function dashboard()
     {
+        \Log::info('Dashboard accessed', [
+            'session_id' => session()->getId(),
+            'session_data' => session()->all()
+        ]);
+        
         $psikologId = session('psikolog_id');
         
         if (!$psikologId) {
+            \Log::warning('No psikolog_id in session, redirecting to login');
             return redirect('/psikolog/login');
         }
 
@@ -160,6 +173,6 @@ class PsikologAuthController extends Controller
     public function logout()
     {
         session()->forget(['psikolog_id', 'psikolog_name']);
-        return redirect('/');
+        return redirect('/psikolog/login');
     }
 }

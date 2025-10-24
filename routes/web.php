@@ -37,8 +37,19 @@ Route::get('/admin/register', function () {
 })->name('admin.register');
 Route::post('/admin/register', [AuthController::class, 'adminRegister']);
 
+// Psikolog Auth routes
+Route::get('/psikolog/login', [PsikologAuthController::class, 'showLogin'])->name('psikolog.login');
+Route::post('/psikolog/login', [PsikologAuthController::class, 'login']);
+
 // Logout
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// Psikolog protected routes (using session-based auth)
+Route::get('/psikolog/dashboard', [PsikologAuthController::class, 'dashboard'])->name('psikolog.dashboard');
+Route::get('/psikolog/jadwal', [PsikologAuthController::class, 'jadwalKonseling'])->name('psikolog.jadwal');
+Route::get('/psikolog/profil', [PsikologAuthController::class, 'profil'])->name('psikolog.profil');
+Route::post('/psikolog/booking/{booking}/status', [PsikologAuthController::class, 'updateBookingStatus'])->name('psikolog.booking.status');
+Route::post('/psikolog/logout', [PsikologAuthController::class, 'logout'])->name('psikolog.logout');
 
 // Protected routes
 Route::middleware(['auth'])->group(function () {
@@ -97,14 +108,6 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/sessions/{sessionId}', [ChatController::class, 'destroySession']);
         Route::post('/sessions/{sessionId}/messages', [ChatController::class, 'storeMessage']);
     });
-    // Psikolog routes
-    Route::get('/psikolog/login', [PsikologAuthController::class, 'showLogin'])->name('psikolog.login');
-    Route::post('/psikolog/login', [PsikologAuthController::class, 'login']);
-    Route::get('/psikolog/dashboard', [PsikologAuthController::class, 'dashboard'])->name('psikolog.dashboard');
-    Route::get('/psikolog/jadwal', [PsikologAuthController::class, 'jadwalKonseling'])->name('psikolog.jadwal');
-    Route::get('/psikolog/profil', [PsikologAuthController::class, 'profil'])->name('psikolog.profil');
-    Route::post('/psikolog/booking/{booking}/status', [PsikologAuthController::class, 'updateBookingStatus'])->name('psikolog.booking.status');
-    Route::post('/psikolog/logout', [PsikologAuthController::class, 'logout'])->name('psikolog.logout');
 
     // Admin routes
     Route::middleware(['role:admin'])->group(function () {
