@@ -3,7 +3,7 @@ import LayoutUser from "../../Components/Layout/LayoutUser";
 import ConfirmModal from "../../Components/ConfirmModal";
 import axios from "axios";
 
-export default function Curhat() {
+export default function Curhat({ auth }) {
     const [selectedMood, setSelectedMood] = useState(null);
     const [message, setMessage] = useState("");
     const [selectedSession, setSelectedSession] = useState(null);
@@ -13,8 +13,6 @@ export default function Curhat() {
     const [isConnected, setIsConnected] = useState(false);
     const [sessions, setSessions] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [authReady, setAuthReady] = useState(false);
-    const [authUser, setAuthUser] = useState(null);
     const chatContainerRef = useRef(null);
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [sessionToDelete, setSessionToDelete] = useState(null);
@@ -23,27 +21,9 @@ export default function Curhat() {
     axios.defaults.withCredentials = true;
     axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
 
-    // Ensure Sanctum CSRF cookie and (optionally) fetch user
-    const ensureAuth = async () => {
-        if (authReady) return true;
-        try {
-            // Get CSRF cookie
-            await axios.get('/sanctum/csrf-cookie');
-            // Verify session/user (optional but useful for debug)
-            try {
-                const userRes = await axios.get('/api/user');
-                setAuthUser(userRes.data);
-            } catch (e) {
-                // Not strictly required to proceed; API group still needs login
-                console.warn('User not fetched (possibly guest):', e?.response?.status);
-            }
-            setAuthReady(true);
-            return true;
-        } catch (e) {
-            console.error('Failed to init Sanctum/CSRF:', e);
-            setAuthReady(false);
-            return false;
-        }
+    // Check if user is authenticated
+    const isAuthenticated = () => {
+        return auth?.user !== null;
     };
 
     // Auto-scroll function
@@ -56,7 +36,6 @@ export default function Curhat() {
     // Load chat sessions from API
     const loadChatSessions = async () => {
         try {
-            await ensureAuth();
             console.log('📡 Loading chat sessions...');
             const response = await axios.get('/api/chat/sessions');
             console.log('📋 Sessions response:', response.data);
@@ -101,7 +80,6 @@ export default function Curhat() {
     // Load messages for selected session
     const loadChatMessages = async (sessionId) => {
         try {
-            await ensureAuth();
             console.log('Loading messages for session:', sessionId);
             const response = await axios.get(`/api/chat/sessions/${sessionId}`);
             console.log('Messages response:', response.data);
@@ -119,7 +97,6 @@ export default function Curhat() {
     // Create new chat session
     const createNewSession = async () => {
         try {
-            await ensureAuth();
             console.log('🆕 Creating new chat session...');
             const response = await axios.post('/api/chat/sessions', {
                 title: 'Curhat Baru',
@@ -159,7 +136,6 @@ export default function Curhat() {
     const deleteSession = async () => {
         if (!sessionToDelete) return;
         try {
-            await ensureAuth();
             await axios.delete(`/api/chat/sessions/${sessionToDelete}`);
             setConfirmOpen(false);
             // Refresh sessions
@@ -205,6 +181,13 @@ export default function Curhat() {
             console.log('🔄 Loading initial data...');
             
             try {
+                // Check if user is authenticated using Inertia auth data
+                if (!isAuthenticated()) {
+                    console.log('❌ User not authenticated, redirecting to login...');
+                    window.location.href = '/login';
+                    return;
+                }
+                
                 await loadChatSessions();
                 
                 // If still no session selected after loading, create one
@@ -214,11 +197,13 @@ export default function Curhat() {
                 }
             } catch (error) {
                 console.error('❌ Error in loadInitialData:', error);
-                // Try to create a session anyway
-                try {
-                    await createNewSession();
-                } catch (createError) {
-                    console.error('❌ Failed to create session:', createError);
+                // Only try to create session if user is authenticated
+                if (isAuthenticated()) {
+                    try {
+                        await createNewSession();
+                    } catch (createError) {
+                        console.error('❌ Failed to create session:', createError);
+                    }
                 }
             }
             
@@ -235,7 +220,7 @@ export default function Curhat() {
     // Fallback: Ensure we always have a session selected
     useEffect(() => {
         const ensureSessionSelected = async () => {
-            if (!loading && !selectedSession && sessions.length === 0) {
+            if (!loading && !selectedSession && sessions.length === 0 && isAuthenticated()) {
                 console.log('⚠️ No session selected and no sessions available, creating one...');
                 try {
                     await createNewSession();
@@ -320,7 +305,6 @@ export default function Curhat() {
     // Save message to database
     const saveMessageToDatabase = async (messageData) => {
         try {
-            await ensureAuth();
             console.log('Attempting to save message:', messageData);
             
             const response = await axios.post(`/api/chat/sessions/${selectedSession}/messages`, {
@@ -529,13 +513,15 @@ export default function Curhat() {
                                         <svg className="w-4 h-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                                         </svg>
-                                        {(
-                                            <button onClick={(e) => { e.stopPropagation(); requestDeleteSession(session.id); }} title="Hapus sesi" className="p-1 rounded hover:bg-white/10">
+                                        <button 
+                                            onClick={(e) => { e.stopPropagation(); requestDeleteSession(session.id); }} 
+                                            title="Hapus sesi" 
+                                            className="p-1 rounded hover:bg-white/10"
+                                        >
                                             <svg className="w-4 h-4 text-red-400 hover:text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                             </svg>
-                                            </button>
-                                        )}
+                                        </button>
                                     </div>
                                 </div>
                             </div>

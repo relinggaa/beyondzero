@@ -240,11 +240,11 @@ if __name__ == '__main__':
     
     # Check Ollama status on startup
     if chatbot.check_ollama_status():
-        print("✅ Ollama is running")
+        print("[OK] Ollama is running")
         models = chatbot.get_available_models()
         print(f"Available models: {models}")
     else:
-        print("❌ Ollama is not running. Please start Ollama first.")
+        print("[ERROR] Ollama is not running. Please start Ollama first.")
         print("Run: ollama serve")
     
     app.run(debug=True, host='0.0.0.0', port=5004)

@@ -8,10 +8,10 @@ use App\Http\Controllers\StressReliefController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
-})->middleware('auth:sanctum');
+})->middleware('auth');
 
 // Chat API Routes
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware('auth')->group(function () {
     // Chat Sessions
     Route::get('/chat/sessions', [ChatController::class, 'index']);
     Route::post('/chat/sessions', [ChatController::class, 'storeSession']);
