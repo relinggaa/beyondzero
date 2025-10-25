@@ -59,7 +59,7 @@ export default function LoginPsikolog() {
                             <input
                                 id="key"
                                 name="key"
-                                type="text"
+                                type="password"
                                 value={data.key}
                                 onChange={(e) => setData('key', e.target.value)}
                                 required

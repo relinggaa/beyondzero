@@ -238,15 +238,7 @@ export default function JadwalKonseling({ psikolog, bookings }) {
                     )}
                 </div>
 
-                {/* Debug Info */}
-                <div className="mb-4 p-4 bg-yellow-100 border border-yellow-300 rounded-lg">
-                    <h3 className="font-bold text-yellow-800">Debug Info:</h3>
-                    <p>Modal Open: {isModalOpen ? 'Yes' : 'No'}</p>
-                    <p>Selected Booking: {selectedBooking ? 'Yes' : 'No'}</p>
-                    <p>Selected Booking ID: {selectedBooking?.id || 'None'}</p>
-                    <p>Selected Booking Status: {selectedBooking?.status || 'None'}</p>
-                    <p>Processing: {processing ? 'Yes' : 'No'}</p>
-                </div>
+              
 
                 {/* Status Change Modal */}
                 {isModalOpen && selectedBooking && (
