@@ -70,6 +70,14 @@ Route::middleware(['auth'])->group(function () {
         return Inertia::render('User/Healing');
     });
     
+    Route::get('/games', function () {
+        return Inertia::render('User/Games');
+    });
+    
+    Route::get('/games/stress-relief', function () {
+        return Inertia::render('User/StressReliefGame');
+    });
+    
     // Booking routes
     Route::post('/booking-psikolog', [BookPsikologController::class, 'store'])->name('booking.store');
     Route::get('/booking-psikolog', [BookPsikologController::class, 'index'])->name('booking.index');

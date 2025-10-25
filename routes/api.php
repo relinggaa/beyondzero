@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\PsikologController;
+use App\Http\Controllers\StressReliefController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -21,6 +22,13 @@ Route::middleware('auth:sanctum')->group(function () {
     
     // Chat Messages
     Route::post('/chat/sessions/{sessionId}/messages', [ChatController::class, 'storeMessage']);
+    
+    // Stress Relief Game API
+    Route::prefix('games/stress-relief')->group(function () {
+        Route::post('/save-session', [StressReliefController::class, 'saveSession']);
+        Route::get('/history', [StressReliefController::class, 'getHistory']);
+        Route::get('/tips', [StressReliefController::class, 'getTips']);
+    });
 });
 
 // Public API Routes

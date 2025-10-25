@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import LayoutUser from "../../Components/Layout/LayoutUser";
-import AudioWaveIndicator from "../../Components/ui/AudioWaveIndicator";
-import { Heart, Trophy, Mic, RotateCcw, ArrowLeft, Volume2 } from "lucide-react";
+import AudioVisualizer from "../../Components/ui/AudioVisualizer";
+import { Heart, Trophy, Mic, RotateCcw, ArrowLeft, Volume2, Play } from "lucide-react";
 import axios from "axios";
 
 export default function StressReliefGame() {
@@ -17,6 +17,8 @@ export default function StressReliefGame() {
     const [recognition, setRecognition] = useState(null);
     const [isSupported, setIsSupported] = useState(false);
     const [audioLevel, setAudioLevel] = useState(0);
+    const [filteredAudioLevel, setFilteredAudioLevel] = useState(0);
+    const [isVoiceDetected, setIsVoiceDetected] = useState(false);
     
     // Game states
     const [gameStarted, setGameStarted] = useState(false);
@@ -114,10 +116,11 @@ export default function StressReliefGame() {
     };
 
     const updatePlantGrowth = () => {
-        if (isScreaming) {
+        if (isScreaming && isVoiceDetected) {
             setScreamDuration(prev => prev + 0.1);
             setPlantGrowth(prev => {
-                const newGrowth = Math.min(prev + (screamLevel * 0.1), 100);
+                const effectiveLevel = Math.max(screamLevel, filteredAudioLevel);
+                const newGrowth = Math.min(prev + (effectiveLevel * 0.1), 100);
                 
                 // Update plant stage based on growth
                 if (newGrowth >= plantStages.mature.threshold) {
@@ -158,7 +161,7 @@ export default function StressReliefGame() {
             }, 100);
         }
         return () => clearInterval(interval);
-    }, [isScreaming, screamLevel]);
+    }, [isScreaming, screamLevel, isVoiceDetected, filteredAudioLevel]);
 
     const resetGame = () => {
         setGameStarted(false);
@@ -167,6 +170,8 @@ export default function StressReliefGame() {
         setScreamDuration(0);
         setScreamLevel(0);
         setAudioLevel(0);
+        setFilteredAudioLevel(0);
+        setIsVoiceDetected(false);
         setIsScreaming(false);
         setIsListening(false);
         setAchievements([]);
@@ -180,7 +185,7 @@ export default function StressReliefGame() {
         try {
             const sessionData = {
                 duration: screamDuration,
-                max_intensity: Math.max(screamLevel, audioLevel),
+                max_intensity: Math.max(screamLevel, filteredAudioLevel),
                 plant_stage: plantStage,
                 achievements: achievements
             };
@@ -270,123 +275,151 @@ export default function StressReliefGame() {
                         </div>
                     ) : (
                         /* Game Content */
-                        <div className="max-w-6xl mx-auto">
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                                {/* Left Column - Plant Display */}
-                                <div className="bg-slate-700 rounded-2xl p-6 border border-slate-600">
-                                    <div className="space-y-6">
-                                        {/* Plant Visual */}
-                                        <div className="text-center">
-                                            <div className="relative inline-block">
-                                                <div className={`text-8xl transition-all duration-1000 ${
-                                                    isScreaming ? 'scale-110 animate-pulse' : 'scale-100'
-                                                } ${plantStages[plantStage].color}`}>
-                                                    {plantStages[plantStage].emoji}
-                                                </div>
-                                                {isScreaming && (
-                                                    <div className="absolute -top-4 -right-4 text-4xl animate-bounce">
-                                                        🔊
-                                                    </div>
-                                                )}
+                        <div className="max-w-6xl mx-auto space-y-8">
+                            {/* Baris 1: Animasi Tumbuhan */}
+                            <div className="bg-slate-700 rounded-2xl p-8 border border-slate-600">
+                                <div className="text-center">
+                                    <h3 className="text-2xl font-bold text-white mb-6 flex items-center justify-center">
+                                        <Heart className="w-6 h-6 mr-3 text-emerald-400" />
+                                        Tanaman Stress Relief
+                                    </h3>
+                                    
+                                    {/* Plant Visual */}
+                                    <div className="relative inline-block mb-6">
+                                        <div className={`text-9xl transition-all duration-1000 ${
+                                            isScreaming ? 'scale-110 animate-pulse' : 'scale-100'
+                                        } ${plantStages[plantStage].color}`}>
+                                            {plantStages[plantStage].emoji}
+                                        </div>
+                                        {isScreaming && (
+                                            <div className="absolute -top-6 -right-6 text-5xl animate-bounce">
+                                                🔊
                                             </div>
-                                            
-                                            <h3 className="text-2xl font-bold text-white mt-4 mb-2">
-                                                {plantStages[plantStage].name}
-                                            </h3>
-                                            
-                                            <div className="w-full bg-slate-600 rounded-full h-4 mb-2">
-                                                <div 
-                                                    className="bg-gradient-to-r from-emerald-400 to-green-500 h-4 rounded-full transition-all duration-500"
-                                                    style={{ width: `${plantGrowth}%` }}
-                                                ></div>
-                                            </div>
-                                            <p className="text-white/70">Pertumbuhan: {plantGrowth.toFixed(1)}%</p>
-                                        </div>
-
-                                        {/* Scream Controls */}
-                                        <div className="space-y-4">
-                                            {!isSupported ? (
-                                                <p className="text-red-400 text-center">
-                                                    Voice recognition tidak didukung di browser ini
-                                                </p>
-                                            ) : (
-                                                <div className="space-y-3">
-                                                    <button
-                                                        onClick={isScreaming ? stopScreaming : startScreaming}
-                                                        className={`w-full px-8 py-4 rounded-full font-bold text-lg transition-all duration-300 ${
-                                                            isScreaming 
-                                                                ? 'bg-red-500 hover:bg-red-600 animate-pulse' 
-                                                                : 'bg-emerald-500 hover:bg-emerald-600'
-                                                        } text-white flex items-center justify-center space-x-2`}
-                                                    >
-                                                        <Mic className="w-5 h-5" />
-                                                        <span>
-                                                            {isScreaming ? '🛑 Berhenti Berteriak' : '🎤 Mulai Berteriak!'}
-                                                        </span>
-                                                    </button>
-                                                    
-                                                    {isScreaming && (
-                                                        <div className="space-y-2 text-center">
-                                                            <div className="text-white/70">
-                                                                Intensitas: {screamLevel.toFixed(1)}%
-                                                            </div>
-                                                            <div className="text-white/70">
-                                                                Durasi: {screamDuration.toFixed(1)}s
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        {/* Game Controls */}
-                                        <div className="flex space-x-4">
-                                            <button
-                                                onClick={resetGame}
-                                                className="flex-1 flex items-center justify-center space-x-2 px-4 py-2 bg-slate-600 hover:bg-slate-500 text-white rounded-lg transition-colors"
-                                            >
-                                                <RotateCcw className="w-4 h-4" />
-                                                <span>Reset Game</span>
-                                            </button>
-                                            <button
-                                                onClick={saveSession}
-                                                className="flex-1 flex items-center justify-center space-x-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg transition-colors"
-                                            >
-                                                <Trophy className="w-4 h-4" />
-                                                <span>Simpan Sesi</span>
-                                            </button>
-                                        </div>
+                                        )}
                                     </div>
-                                </div>
-
-                                {/* Right Column - Audio Wave Indicator */}
-                                <div className="bg-slate-700 rounded-2xl p-6 border border-slate-600">
-                                    <div className="space-y-4">
-                                        <h3 className="text-xl font-semibold text-white flex items-center">
-                                            <Volume2 className="w-5 h-5 mr-2" />
-                                            Audio Wave Indicator
-                                        </h3>
-                                        
-                                        <AudioWaveIndicator
-                                            intensity={audioLevel}
-                                            duration={screamDuration}
-                                            isActive={isScreaming}
-                                            className="w-full"
-                                        />
-                                        
-                                        <div className="bg-slate-600 rounded-lg p-4">
-                                            <h4 className="text-white font-semibold mb-2">Tips untuk Hasil Terbaik:</h4>
-                                            <ul className="text-white/70 text-sm space-y-1">
-                                                <li>• Berteriak dengan volume yang konsisten</li>
-                                                <li>• Jangan terlalu dekat dengan mikrofon</li>
-                                                <li>• Berteriak dengan emosi yang tulus</li>
-                                                <li>• Istirahat sejenak jika merasa lelah</li>
-                                            </ul>
+                                    
+                                    <h4 className="text-3xl font-bold text-white mb-4">
+                                        {plantStages[plantStage].name}
+                                    </h4>
+                                    
+                                    <div className="max-w-md mx-auto">
+                                        <div className="w-full bg-slate-600 rounded-full h-6 mb-4">
+                                            <div 
+                                                className="bg-gradient-to-r from-emerald-400 to-green-500 h-6 rounded-full transition-all duration-500"
+                                                style={{ width: `${plantGrowth}%` }}
+                                            ></div>
                                         </div>
+                                        <p className="text-white/70 text-lg">Pertumbuhan: {plantGrowth.toFixed(1)}%</p>
                                     </div>
                                 </div>
                             </div>
 
+                            {/* Baris 2: Audio Visualizer */}
+                            <div className="bg-slate-700 rounded-2xl p-6 border border-slate-600">
+                                <div className="space-y-4">
+                                    <h3 className="text-2xl font-semibold text-white flex items-center justify-center">
+                                        <Volume2 className="w-6 h-6 mr-3" />
+                                        Real-Time Audio Visualizer
+                                    </h3>
+                                    
+                                    <AudioVisualizer
+                                        intensity={audioLevel}
+                                        duration={screamDuration}
+                                        isActive={isScreaming}
+                                        className="w-full"
+                                        onFilteredLevelChange={setFilteredAudioLevel}
+                                        onVoiceDetected={setIsVoiceDetected}
+                                    />
+                                    
+                                    <div className="bg-slate-600 rounded-lg p-4">
+                                        <h4 className="text-white font-semibold mb-2">Tips untuk Hasil Terbaik:</h4>
+                                        <ul className="text-white/70 text-sm space-y-1">
+                                            <li>• Berteriak dengan volume yang konsisten</li>
+                                            <li>• Jangan terlalu dekat dengan mikrofon</li>
+                                            <li>• Berteriak dengan emosi yang tulus</li>
+                                            <li>• Sistem akan memfilter noise otomatis</li>
+                                            <li>• Hanya suara yang jelas yang akan terdeteksi</li>
+                                            <li>• Frekuensi tinggi akan menampilkan bar vertikal</li>
+                                            <li>• Istirahat sejenak jika merasa lelah</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Baris 3: Mainkan Sekarang */}
+                            <div className="bg-slate-700 rounded-2xl p-6 border border-slate-600">
+                                <div className="space-y-6">
+                                    <h3 className="text-2xl font-semibold text-white flex items-center justify-center">
+                                        <Play className="w-6 h-6 mr-3" />
+                                        Mainkan Sekarang
+                                    </h3>
+                                    
+                                    {/* Scream Controls */}
+                                    <div className="space-y-4">
+                                        {!isSupported ? (
+                                            <div className="text-center">
+                                                <p className="text-red-400 text-lg mb-4">
+                                                    Voice recognition tidak didukung di browser ini
+                                                </p>
+                                                <p className="text-white/70 text-sm">
+                                                    Silakan gunakan browser modern seperti Chrome atau Edge
+                                                </p>
+                                            </div>
+                                        ) : (
+                                            <div className="space-y-4">
+                                                <button
+                                                    onClick={isScreaming ? stopScreaming : startScreaming}
+                                                    className={`w-full px-8 py-6 rounded-full font-bold text-xl transition-all duration-300 ${
+                                                        isScreaming 
+                                                            ? 'bg-red-500 hover:bg-red-600 animate-pulse' 
+                                                            : 'bg-emerald-500 hover:bg-emerald-600'
+                                                    } text-white flex items-center justify-center space-x-3`}
+                                                >
+                                                    <Mic className="w-6 h-6" />
+                                                    <span>
+                                                        {isScreaming ? '🛑 Berhenti Berteriak' : '🎤 Mulai Berteriak!'}
+                                                    </span>
+                                                </button>
+                                                
+                                                {isScreaming && (
+                                                    <div className="grid grid-cols-2 gap-4 text-center">
+                                                        <div className="bg-slate-600 rounded-lg p-4">
+                                                            <div className="text-white/70 text-sm mb-1">Intensitas</div>
+                                                            <div className="text-white text-lg font-semibold">
+                                                                {screamLevel.toFixed(1)}%
+                                                            </div>
+                                                        </div>
+                                                        <div className="bg-slate-600 rounded-lg p-4">
+                                                            <div className="text-white/70 text-sm mb-1">Durasi</div>
+                                                            <div className="text-white text-lg font-semibold">
+                                                                {screamDuration.toFixed(1)}s
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Game Controls */}
+                                    <div className="flex space-x-4">
+                                        <button
+                                            onClick={resetGame}
+                                            className="flex-1 flex items-center justify-center space-x-2 px-6 py-3 bg-slate-600 hover:bg-slate-500 text-white rounded-lg transition-colors"
+                                        >
+                                            <RotateCcw className="w-5 h-5" />
+                                            <span>Reset Game</span>
+                                        </button>
+                                        <button
+                                            onClick={saveSession}
+                                            className="flex-1 flex items-center justify-center space-x-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg transition-colors"
+                                        >
+                                            <Trophy className="w-5 h-5" />
+                                            <span>Simpan Sesi</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                             {/* Achievements */}
                             {achievements.length > 0 && (
                                 <div className="mt-8">

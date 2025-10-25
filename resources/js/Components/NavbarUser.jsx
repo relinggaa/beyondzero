@@ -66,6 +66,12 @@ export default function NavbarUser() {
                         >
                             Healing
                         </a>
+                        <a 
+                            href="/games" 
+                            className="text-slate-300 hover:text-white hover:bg-slate-700/50 px-3 py-2 rounded-lg transition-all duration-200 text-sm lg:text-base font-medium"
+                        >
+                            Games
+                        </a>
                         
                         {/* Separator */}
                         <div className="w-px h-6 bg-slate-600/50 mx-1"></div>
@@ -123,6 +129,12 @@ export default function NavbarUser() {
                                 className="text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200 py-2 px-4 rounded-lg font-medium"
                             >
                                 Psikolog
+                            </a>
+                            <a 
+                                href="/games" 
+                                className="text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200 py-2 px-4 rounded-lg font-medium"
+                            >
+                                Games
                             </a>
                          
                             <button className="bg-gradient-to-r from-cyan-400 to-teal-500 hover:from-cyan-500 hover:to-teal-600 text-white px-4 py-2 rounded-full transition-all duration-200 font-bold text-sm tracking-wide w-full mt-4">
