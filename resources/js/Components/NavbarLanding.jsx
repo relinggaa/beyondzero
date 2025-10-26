@@ -61,7 +61,7 @@ export default function NavbarLanding({ showNavbar = true }) {
                             <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-2">
                                 <div className="w-4 h-4 bg-black rounded-full"></div>
                             </div>
-                            <span>BeyondMind</span>
+                            <span>FixYou</span>
                         </button>
                     </div>
 

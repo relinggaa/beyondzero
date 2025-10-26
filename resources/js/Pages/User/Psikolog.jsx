@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useForm, Link } from "@inertiajs/react";
 import LayoutUser from "../../Components/Layout/LayoutUser";
 
@@ -9,6 +9,7 @@ export default function Psikolog({ psikologs }) {
     const [isChatbotOpen, setIsChatbotOpen] = useState(false);
     const [chatMessage, setChatMessage] = useState("");
     const [chatMessages, setChatMessages] = useState([]);
+    const [searchQuery, setSearchQuery] = useState("");
 
     const { data, setData, post, processing, errors } = useForm({
         psikolog_id: "",
@@ -136,7 +137,7 @@ export default function Psikolog({ psikologs }) {
             {
                 id: 1,
                 type: "ai",
-                message: "Halo! Saya AI Assistant BeyondMind 🤖. Ada yang bisa saya bantu terkait kesehatan mental Anda?",
+                message: "Halo! Saya AI Assistant FixYou 🤖. Ada yang bisa saya bantu terkait kesehatan mental Anda?",
                 timestamp: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
             }
         ]);
@@ -174,9 +175,29 @@ export default function Psikolog({ psikologs }) {
         }
     };
 
+    // Filter psikologs based on search query
+    const filteredPsikologs = useMemo(() => {
+        if (!searchQuery) return psikologList;
+        
+        const query = searchQuery.toLowerCase();
+        return psikologList.filter(psikolog => {
+            const searchFields = [
+                psikolog.name,
+                psikolog.description,
+                psikolog.education,
+                psikolog.approach,
+                psikolog.philosophy,
+                ...psikolog.expertise
+            ].join(' ').toLowerCase();
+            
+            return searchFields.includes(query);
+        });
+    }, [psikologList, searchQuery]);
+
     return (
         <LayoutUser>
-            <div className="container mx-auto px-4 py-8">
+            <div className="min-h-screen cursor-gaming bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 pt-20">
+                <div className="container mx-auto px-4 py-8">
                 {/* Header */}
                 <div className="text-center mb-8">
                     <h1 className="text-3xl lg:text-4xl font-bold text-white mb-4">
@@ -187,7 +208,7 @@ export default function Psikolog({ psikologs }) {
                     </p>
                     
                     {/* Booking Status Button */}
-                    <div className="flex justify-center">
+                    <div className="flex justify-center mb-8">
                         <Link
                             href="/booking-psikolog"
                             className="bg-gradient-to-r from-cyan-400 to-teal-500 hover:from-cyan-500 hover:to-teal-600 text-white px-8 py-3 rounded-lg transition-all duration-200 hover:scale-105 font-medium flex items-center space-x-2"
@@ -200,44 +221,112 @@ export default function Psikolog({ psikologs }) {
                     </div>
                 </div>
 
-                {/* Psikolog Cards Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {psikologList.map((psikolog) => (
-                        <div key={psikolog.id} className="bg-slate-700 rounded-2xl p-6 border border-slate-600 hover:border-cyan-400/50 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl">
-                            {/* Psikolog Image */}
-                                    <div className="flex justify-center mb-4">
-                                        <img
-                                            src={psikolog.image ? `/storage/${psikolog.image}` : 'https://via.placeholder.com/96x96/06b6d4/ffffff?text=IMG'}
-                                            alt={psikolog.name}
-                                            className="w-24 h-24 rounded-full object-cover border-4 border-cyan-400/30"
-                                        />
-                                    </div>
-
-                            {/* Psikolog Info */}
-                            <div className="text-center mb-4">
-                                <h3 className="text-white font-semibold text-lg mb-2">{psikolog.name}</h3>
-                                <div className="flex flex-wrap justify-center gap-2 mb-3">
-                                    {psikolog.expertise.map((topic, index) => (
-                                        <span
-                                            key={index}
-                                            className="bg-cyan-400/20 text-cyan-300 px-3 py-1 rounded-full text-xs font-medium"
-                                        >
-                                            {topic}
-                                        </span>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Detail Button */}
+                {/* Search Section */}
+                <div className="mb-8 bg-slate-800/60 backdrop-blur-xl rounded-2xl p-6 border border-slate-700/50 shadow-lg">
+                    <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <svg className="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                        <input
+                            type="text"
+                            placeholder="Cari psikolog berdasarkan nama, keahlian, atau pendekatan..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full bg-slate-700/50 backdrop-blur-sm border border-slate-600 rounded-xl pl-12 pr-12 py-3 text-white placeholder-white/50 focus:border-cyan-400 focus:outline-none transition-colors"
+                        />
+                        {searchQuery && (
                             <button
-                                onClick={() => handleDetailClick(psikolog)}
-                                className="w-full bg-gradient-to-r from-cyan-400 to-teal-500 hover:from-cyan-500 hover:to-teal-600 text-white py-3 px-4 rounded-lg transition-all duration-200 hover:scale-105 font-medium"
+                                onClick={() => setSearchQuery("")}
+                                className="absolute inset-y-0 right-0 pr-4 flex items-center"
                             >
-                                📋 Detail Psikolog
+                                <svg className="w-5 h-5 text-white/60 hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        )}
+                    </div>
+
+                    {/* Result Count */}
+                    {searchQuery && (
+                        <div className="mt-4 flex items-center justify-between">
+                            <div className="text-white/70 text-sm flex items-center space-x-2">
+                                <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
+                                <span>
+                                    <span className="text-cyan-400 font-bold">{filteredPsikologs.length}</span> psikolog ditemukan
+                                </span>
+                            </div>
+                            <button
+                                onClick={() => setSearchQuery("")}
+                                className="text-cyan-400 hover:text-cyan-300 text-sm font-medium flex items-center space-x-1"
+                            >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                                <span>Reset</span>
                             </button>
                         </div>
-                    ))}
+                    )}
                 </div>
+
+                {/* Psikolog Cards Grid */}
+                {filteredPsikologs.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {filteredPsikologs.map((psikolog) => (
+                            <div key={psikolog.id} className="bg-slate-700 rounded-2xl p-6 border border-slate-600 hover:border-cyan-400/50 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl">
+                                {/* Psikolog Image */}
+                                <div className="flex justify-center mb-4">
+                                    <img
+                                        src={psikolog.image ? `/storage/${psikolog.image}` : 'https://via.placeholder.com/96x96/06b6d4/ffffff?text=IMG'}
+                                        alt={psikolog.name}
+                                        className="w-24 h-24 rounded-full object-cover border-4 border-cyan-400/30"
+                                    />
+                                </div>
+
+                                {/* Psikolog Info */}
+                                <div className="text-center mb-4">
+                                    <h3 className="text-white font-semibold text-lg mb-2">{psikolog.name}</h3>
+                                    <div className="flex flex-wrap justify-center gap-2 mb-3">
+                                        {psikolog.expertise.map((topic, index) => (
+                                            <span
+                                                key={index}
+                                                className="bg-cyan-400/20 text-cyan-300 px-3 py-1 rounded-full text-xs font-medium"
+                                            >
+                                                {topic}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Detail Button */}
+                                <button
+                                    onClick={() => handleDetailClick(psikolog)}
+                                    className="w-full bg-gradient-to-r from-cyan-400 to-teal-500 hover:from-cyan-500 hover:to-teal-600 text-white py-3 px-4 rounded-lg transition-all duration-200 hover:scale-105 font-medium"
+                                >
+                                    📋 Detail Psikolog
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    /* Empty State */
+                    <div className="text-center py-20">
+                        <div className="inline-block p-6 bg-gradient-to-br from-orange-400/20 to-red-500/20 rounded-full mb-6">
+                            <div className="text-7xl">🔍</div>
+                        </div>
+                        <h3 className="text-2xl font-bold text-white mb-3">Psikolog tidak ditemukan</h3>
+                        <p className="text-white/60 text-lg max-w-md mx-auto mb-8">
+                            Tidak ada psikolog yang sesuai dengan pencarian Anda. Coba gunakan kata kunci lain.
+                        </p>
+                        <button
+                            onClick={() => setSearchQuery("")}
+                            className="bg-gradient-to-r from-cyan-400 to-teal-500 hover:from-cyan-500 hover:to-teal-600 text-white px-8 py-3 rounded-lg transition-all duration-200 hover:scale-105 font-bold shadow-lg shadow-cyan-500/20"
+                        >
+                            Hapus Pencarian
+                        </button>
+                    </div>
+                )}
 
             {/* Modal Detail Psikolog */}
             {isModalOpen && selectedPsikolog && (
@@ -507,7 +596,7 @@ export default function Psikolog({ psikologs }) {
                                 <span className="text-2xl">🤖</span>
                             </div>
                             <div>
-                                <h3 className="text-white font-semibold text-sm">BeyondMind AI</h3>
+                                <h3 className="text-white font-semibold text-sm">FixYou AI</h3>
                                 <p className="text-white/80 text-xs">Online</p>
                             </div>
                         </div>
@@ -573,6 +662,7 @@ export default function Psikolog({ psikologs }) {
                     </div>
                 </div>
             )}
+            </div>
             </div>
         </LayoutUser>
     );

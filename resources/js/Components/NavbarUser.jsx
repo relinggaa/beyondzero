@@ -13,7 +13,7 @@ export default function NavbarUser() {
                     {/* Logo/Brand */}
                     <div className="flex items-center">
                         <h1 className="text-xl sm:text-2xl lg:text-3xl font-cursive bg-gradient-to-r from-cyan-400 to-teal-500 bg-clip-text text-transparent font-bold">
-                           BeyondMind
+                           FixYou
                         </h1>
                     </div>
 
@@ -59,12 +59,6 @@ export default function NavbarUser() {
                             className="text-slate-300 hover:text-white hover:bg-slate-700/50 px-3 py-2 rounded-lg transition-all duration-200 text-sm lg:text-base font-medium"
                         >
                             Psikolog
-                        </a>
-                        <a 
-                            href="/healing" 
-                            className="text-slate-300 hover:text-white hover:bg-slate-700/50 px-3 py-2 rounded-lg transition-all duration-200 text-sm lg:text-base font-medium"
-                        >
-                            Healing
                         </a>
                         <a 
                             href="/games" 
@@ -117,12 +111,6 @@ export default function NavbarUser() {
                                 className="text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200 py-2 px-4 rounded-lg font-medium"
                             >
                                 Journaling
-                            </a>
-                            <a 
-                                href="/healing" 
-                                className="text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all duration-200 py-2 px-4 rounded-lg font-medium"
-                            >
-                                Healing
                             </a>
                             <a 
                                 href="/psikolog" 

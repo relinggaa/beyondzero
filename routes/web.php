@@ -77,10 +77,6 @@ Route::middleware(['auth'])->group(function () {
     
     Route::get('/psikolog', [PsikologUserController::class, 'index']);
     
-    Route::get('/healing', function () {
-        return Inertia::render('User/Healing');
-    });
-    
     Route::get('/games', function () {
         return Inertia::render('User/Games');
     });

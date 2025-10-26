@@ -42,7 +42,7 @@ export default function SidebarPsikolog({ activePage, setActivePage }) {
                         <span className="text-white font-bold text-lg">👨‍⚕️</span>
                     </div>
                     <div>
-                        <h1 className="text-white font-bold text-lg">BeyondMind</h1>
+                        <h1 className="text-white font-bold text-lg">FixYou</h1>
                         <p className="text-slate-400 text-xs">Psikolog Portal</p>
                     </div>
                 </div>

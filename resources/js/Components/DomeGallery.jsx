@@ -8,7 +8,7 @@ const DEFAULT_IMAGES = [
     src: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     alt: 'Ahmad Rahman',
     name: 'Ahmad Rahman',
-    review: 'BeyondMind sangat membantu saya mengatasi kecemasan. Konseling online yang sangat nyaman dan psikolognya sangat profesional.',
+    review: 'FixYou sangat membantu saya mengatasi kecemasan. Konseling online yang sangat nyaman dan psikolognya sangat profesional.',
     rating: 5
   },
   {
@@ -22,35 +22,35 @@ const DEFAULT_IMAGES = [
     src: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     alt: 'Budi Santoso',
     name: 'Budi Santoso',
-    review: 'Sebagai seorang pekerja, BeyondMind memberikan fleksibilitas yang saya butuhkan. Konseling berkualitas tinggi dengan harga terjangkau.',
+    review: 'Sebagai seorang pekerja, FixYou memberikan fleksibilitas yang saya butuhkan. Konseling berkualitas tinggi dengan harga terjangkau.',
     rating: 5
   },
   {
     src: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     alt: 'Maya Putri',
     name: 'Maya Putri',
-    review: 'Psikolog di BeyondMind sangat memahami masalah saya. Sesi konseling yang sangat efektif dan memberikan solusi yang tepat.',
+    review: 'Psikolog di FixYou sangat memahami masalah saya. Sesi konseling yang sangat efektif dan memberikan solusi yang tepat.',
     rating: 5
   },
   {
     src: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     alt: 'Rizki Pratama',
     name: 'Rizki Pratama',
-    review: 'BeyondMind membantu saya mengatasi depresi dengan pendekatan yang sangat profesional. Sangat direkomendasikan!',
+    review: 'FixYou membantu saya mengatasi depresi dengan pendekatan yang sangat profesional. Sangat direkomendasikan!',
     rating: 5
   },
   {
     src: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     alt: 'Dewi Lestari',
     name: 'Dewi Lestari',
-    review: 'Interface yang user-friendly dan psikolog yang sangat berpengalaman. BeyondMind benar-benar mengubah hidup saya.',
+    review: 'Interface yang user-friendly dan psikolog yang sangat berpengalaman. FixYou benar-benar mengubah hidup saya.',
     rating: 5
   },
   {
     src: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     alt: 'Andi Wijaya',
     name: 'Andi Wijaya',
-    review: 'Sebagai mahasiswa, BeyondMind memberikan akses mudah ke konseling profesional. Sangat membantu mengatasi stress akademik.',
+    review: 'Sebagai mahasiswa, FixYou memberikan akses mudah ke konseling profesional. Sangat membantu mengatasi stress akademik.',
     rating: 5
   }
 ];

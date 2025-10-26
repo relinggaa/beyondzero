@@ -24,7 +24,7 @@ export default function RegisterUser() {
                         <span className="text-white font-bold text-2xl">B</span>
                     </div>
                     <h2 className="text-3xl font-bold text-white">Buat Akun Baru</h2>
-                    <p className="mt-2 text-slate-400">Bergabunglah dengan BeyondMind untuk perjalanan kesehatan mental yang lebih baik</p>
+                    <p className="mt-2 text-slate-400">Bergabunglah dengan FixYou untuk perjalanan kesehatan mental yang lebih baik</p>
                 </div>
 
                 {/* Register Form */}

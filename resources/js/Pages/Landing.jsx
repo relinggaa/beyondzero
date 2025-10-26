@@ -7,6 +7,7 @@ import PsikologSection from "./section/PsikologSection";
 import NavbarLanding from "../Components/NavbarLanding";
 import TestimoniSection from "./section/TestimoniSection";
 import AboutUsSection from "./section/AboutUsSection";
+import Footer from "./section/Footer";
 export default function Landing() {
     const [showNavbar, setShowNavbar] = useState(false);
     const quotesRef = useRef(null);
@@ -48,6 +49,7 @@ export default function Landing() {
                 <div id="about-section">
                     <AboutUsSection />
                 </div>
+                <Footer />
             </div>
         </>
     );

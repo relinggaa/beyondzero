@@ -55,7 +55,7 @@ export default function SidebarAdmin({ activePage, setActivePage, admin }) {
                             </div>
                             <div>
                                 <h2 className="text-white font-bold text-lg">Admin Panel</h2>
-                                <p className="text-cyan-400 text-xs">BeyondMind</p>
+                                <p className="text-cyan-400 text-xs">FixYou</p>
                             </div>
                         </div>
                     )}

@@ -24,7 +24,7 @@ export default function RegisterAdmin() {
                         <span className="text-white font-bold text-2xl">A</span>
                     </div>
                     <h2 className="text-3xl font-bold text-white">Daftar Admin</h2>
-                    <p className="mt-2 text-slate-400">Buat akun administrator untuk mengelola sistem BeyondMind</p>
+                    <p className="mt-2 text-slate-400">Buat akun administrator untuk mengelola sistem FixYou</p>
                 </div>
 
                 {/* Register Form */}

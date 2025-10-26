@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link, useForm } from "@inertiajs/react";
 
 export default function LoginUser() {
@@ -18,14 +18,52 @@ export default function LoginUser() {
                 {/* Header */}
                 <div className="text-center">
                     <div className="mx-auto h-16 w-16 bg-gradient-to-r from-cyan-400 to-teal-500 rounded-full flex items-center justify-center mb-4">
-                        <span className="text-white font-bold text-2xl">B</span>
+                        <span className="text-white font-bold text-2xl">F</span>
                     </div>
                     <h2 className="text-3xl font-bold text-white">Masuk ke Akun Anda</h2>
-                    <p className="mt-2 text-slate-400">Selamat datang kembali di BeyondMind</p>
+                    <p className="mt-2 text-slate-400">Selamat datang kembali di FixYou</p>
+                </div>
+
+                {/* Role Selection */}
+                <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50">
+                    <label className="block text-sm font-medium text-slate-300 mb-3">
+                        Login Sebagai
+                    </label>
+                    <div className="grid grid-cols-3 gap-2">
+                        <button
+                            type="button"
+                            disabled
+                            className="py-2 px-4 rounded-lg font-medium bg-gradient-to-r from-cyan-500 to-teal-600 text-white shadow-lg cursor-default"
+                        >
+                            👤 User
+                        </button>
+                        <Link
+                            href="/admin/login"
+                            className="py-2 px-4 rounded-lg font-medium bg-slate-700/50 text-slate-300 border border-slate-600 hover:border-cyan-500/50 transition-all duration-200 text-center"
+                        >
+                            🛡️ Admin
+                        </Link>
+                        <Link
+                            href="/psikolog/login"
+                            className="py-2 px-4 rounded-lg font-medium bg-slate-700/50 text-slate-300 border border-slate-600 hover:border-cyan-500/50 transition-all duration-200 text-center"
+                        >
+                            👨‍⚕️ Psikolog
+                        </Link>
+                    </div>
+                    <div className="mt-3 text-center">
+                        <p className="text-xs text-slate-400">
+                            Kami tampilkan agar mempermudah panitia untuk mencoba fitur yang ada di website kami
+                        </p>
+                    </div>
                 </div>
 
                 {/* Login Form */}
                 <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700/50">
+                    <div className="flex items-center justify-center mb-6">
+                        <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-gradient-to-r from-cyan-500/20 to-teal-600/20 text-cyan-300 border border-cyan-500/30">
+                            👤 Login sebagai User
+                        </span>
+                    </div>
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {/* Username */}
                         <div>

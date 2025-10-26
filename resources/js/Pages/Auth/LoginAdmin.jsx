@@ -21,7 +21,7 @@ export default function LoginAdmin() {
                         <span className="text-white font-bold text-2xl">A</span>
                     </div>
                     <h2 className="text-3xl font-bold text-white">Admin Login</h2>
-                    <p className="mt-2 text-slate-400">Akses panel administrasi BeyondMind</p>
+                    <p className="mt-2 text-slate-400">Akses panel administrasi FixYou</p>
                 </div>
 
                 {/* Login Form */}
@@ -106,26 +106,34 @@ export default function LoginAdmin() {
                     </div>
                 </div>
 
-                {/* Back to Home & User Login */}
-                <div className="text-center space-y-4">
+                {/* Back to Home & Other Login Options */}
+                <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50">
+                    <p className="text-sm font-medium text-slate-300 mb-3">Login sebagai:</p>
+                    <div className="grid grid-cols-2 gap-2 mb-4">
+                        <Link
+                            href="/login"
+                            className="py-2 px-4 rounded-lg bg-slate-700/50 text-slate-300 border border-slate-600 hover:border-cyan-500/50 transition-all duration-200 text-center font-medium flex items-center justify-center space-x-2"
+                        >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                            <span>👤 User</span>
+                        </Link>
+                        <Link
+                            href="/psikolog/login"
+                            className="py-2 px-4 rounded-lg bg-slate-700/50 text-slate-300 border border-slate-600 hover:border-cyan-500/50 transition-all duration-200 text-center font-medium flex items-center justify-center space-x-2"
+                        >
+                            <span>👨‍⚕️ Psikolog</span>
+                        </Link>
+                    </div>
                     <Link
                         href="/"
-                        className="text-slate-400 hover:text-white transition-colors flex items-center justify-center space-x-2"
+                        className="flex items-center justify-center space-x-2 text-center text-slate-400 hover:text-white transition-colors"
                     >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                         </svg>
                         <span>Kembali ke Beranda</span>
-                    </Link>
-                    <div className="text-slate-500">|</div>
-                    <Link
-                        href="/login"
-                        className="text-cyan-400 hover:text-cyan-300 transition-colors flex items-center justify-center space-x-2"
-                    >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
-                        <span>Login sebagai User</span>
                     </Link>
                 </div>
             </div>

@@ -11,7 +11,7 @@ export default function Welcome() {
                         <span className="text-white font-bold text-3xl">B</span>
                     </div>
                     <h1 className="text-4xl font-bold text-white mb-2">
-                        BeyondMind
+                        FixYou
                     </h1>
                     <p className="text-slate-400 text-lg">
                         Platform Kesehatan Mental
