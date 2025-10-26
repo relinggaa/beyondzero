@@ -60,10 +60,10 @@ export default function Footer() {
                         <h3 className="text-white font-semibold mb-4 text-lg">Hubungi Kami</h3>
                         <div className="space-y-3">
                             <p className="text-gray-400 text-sm">
-                                <span className="font-medium text-white">Email:</span> info@fixyou.com
+                                <span className="font-medium text-white">Email:</span> fixyou@example.com
                             </p>
                             <p className="text-gray-400 text-sm">
-                                <span className="font-medium text-white">Phone:</span> +62 123 456 789
+                                <span className="font-medium text-white">Phone:</span> +62 33333333
                             </p>
                             {/* Social Media Links */}
                             <div className="flex space-x-4 pt-2">
@@ -113,10 +113,10 @@ export default function Footer() {
                         &copy; {currentYear} FixYou. All rights reserved.
                     </p>
                     <div className="flex space-x-6 text-sm">
-                        <a href="/terms" className="text-gray-400 hover:text-white transition-colors duration-200">
+                        <a href="#" className="text-gray-400 hover:text-white transition-colors duration-200">
                             Terms of Service
                         </a>
-                        <a href="/privacy" className="text-gray-400 hover:text-white transition-colors duration-200">
+                        <a href="#" className="text-gray-400 hover:text-white transition-colors duration-200">
                             Privacy Policy
                         </a>
                     </div>
