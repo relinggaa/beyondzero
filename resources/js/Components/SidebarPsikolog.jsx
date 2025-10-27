@@ -34,16 +34,16 @@ export default function SidebarPsikolog({ activePage, setActivePage }) {
     ];
 
     return (
-        <div className="w-64 bg-slate-800 min-h-screen flex flex-col">
+        <div className="w-64 bg-black/90 backdrop-blur-xl min-h-screen flex flex-col">
             {/* Logo */}
-            <div className="p-6 border-b border-slate-700">
+            <div className="p-6 border-b border-white/10">
                 <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-gradient-to-r from-cyan-400 to-teal-500 rounded-lg flex items-center justify-center">
-                        <span className="text-white font-bold text-lg">👨‍⚕️</span>
+                    <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
+                        <div className="w-6 h-6 bg-black rounded-full"></div>
                     </div>
                     <div>
                         <h1 className="text-white font-bold text-lg">FixYou</h1>
-                        <p className="text-slate-400 text-xs">Psikolog Portal</p>
+                        <p className="text-white/70 text-xs">Psikolog Portal</p>
                     </div>
                 </div>
             </div>
@@ -61,8 +61,8 @@ export default function SidebarPsikolog({ activePage, setActivePage }) {
                             href={href}
                             className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${
                                 activePage === item.name
-                                    ? 'bg-gradient-to-r from-cyan-400 to-teal-500 text-white shadow-lg'
-                                    : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+                                    ? 'bg-white text-black shadow-lg'
+                                    : 'text-white/70 hover:bg-white/10 hover:text-white'
                             }`}
                         >
                             {item.icon}
@@ -73,11 +73,11 @@ export default function SidebarPsikolog({ activePage, setActivePage }) {
             </nav>
 
             {/* Logout Button */}
-            <div className="p-4 border-t border-slate-700">
+            <div className="p-4 border-t border-white/10">
                 <Link
                     href="/psikolog/logout"
                     method="post"
-                    className="w-full flex items-center space-x-3 px-4 py-3 text-red-400 hover:bg-red-500/20 hover:text-red-300 rounded-lg transition-all duration-200"
+                    className="w-full flex items-center space-x-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg transition-all duration-200"
                 >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />

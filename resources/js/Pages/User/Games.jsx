@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import LayoutUser from "../../Components/Layout/LayoutUser";
-import { Brain, Heart, Zap, Target, Trophy, Play, RotateCcw, Clock, Mic } from "lucide-react";
+import { Brain, Heart, Zap, Target, Trophy, Play, RotateCcw, Clock, Mic, Search, User, Gamepad2, Puzzle, Activity, Sparkles, Star, Crown } from "lucide-react";
 import { Link } from "@inertiajs/react";
 
 export default function Games() {
@@ -9,6 +9,8 @@ export default function Games() {
     const [gameTime, setGameTime] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
     const [gameHistory, setGameHistory] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState('All');
+    const [searchQuery, setSearchQuery] = useState('');
 
     // Game states
     const [memoryCards, setMemoryCards] = useState([]);
@@ -27,45 +29,160 @@ export default function Games() {
     const games = [
         {
             id: 'memory',
-            title: 'Memory Game',
-            description: 'Latih memori Anda dengan mencocokkan kartu',
-            icon: <Brain className="w-8 h-8" />,
+            title: 'Memory Match',
+            description: 'Latih memori dengan mencocokkan kartu',
+            icon: <Brain className="w-12 h-12" />,
             color: 'from-purple-500 to-pink-500',
-            bgColor: 'bg-purple-500/10',
+            bgColor: 'bg-gradient-to-br from-purple-400 to-pink-400',
             borderColor: 'border-purple-500/30',
-            benefits: ['Meningkatkan konsentrasi', 'Melatih memori jangka pendek', 'Mengurangi stres']
+            category: 'Brain Training',
+            difficulty: 'Easy',
+            rating: 4.5,
+            players: '1 Player'
         },
         {
             id: 'reaction',
-            title: 'Reaction Test',
-            description: 'Uji kecepatan reaksi dan fokus Anda',
-            icon: <Zap className="w-8 h-8" />,
+            title: 'Speed Reflex',
+            description: 'Uji kecepatan reaksi Anda',
+            icon: <Zap className="w-12 h-12" />,
             color: 'from-yellow-500 to-orange-500',
-            bgColor: 'bg-yellow-500/10',
+            bgColor: 'bg-gradient-to-br from-yellow-400 to-orange-400',
             borderColor: 'border-yellow-500/30',
-            benefits: ['Meningkatkan refleks', 'Melatih fokus', 'Mengurangi kecemasan']
+            category: 'Action',
+            difficulty: 'Medium',
+            rating: 4.2,
+            players: '1 Player'
         },
         {
             id: 'breathing',
-            title: 'Breathing Exercise',
-            description: 'Latihan pernapasan untuk relaksasi',
-            icon: <Heart className="w-8 h-8" />,
+            title: 'Zen Breathing',
+            description: 'Latihan pernapasan relaksasi',
+            icon: <Heart className="w-12 h-12" />,
             color: 'from-green-500 to-teal-500',
-            bgColor: 'bg-green-500/10',
+            bgColor: 'bg-gradient-to-br from-green-400 to-teal-400',
             borderColor: 'border-green-500/30',
-            benefits: ['Mengurangi stres', 'Meningkatkan fokus', 'Menenangkan pikiran']
+            category: 'Wellness',
+            difficulty: 'Easy',
+            rating: 4.8,
+            players: '1 Player'
         },
         {
             id: 'focus',
-            title: 'Focus Training',
-            description: 'Latihan konsentrasi dengan target bergerak',
-            icon: <Target className="w-8 h-8" />,
+            title: 'Focus Master',
+            description: 'Latihan konsentrasi target',
+            icon: <Target className="w-12 h-12" />,
             color: 'from-blue-500 to-cyan-500',
-            bgColor: 'bg-blue-500/10',
+            bgColor: 'bg-gradient-to-br from-blue-400 to-cyan-400',
             borderColor: 'border-blue-500/30',
-            benefits: ['Meningkatkan konsentrasi', 'Melatih kesabaran', 'Mengurangi distraksi']
+            category: 'Training',
+            difficulty: 'Hard',
+            rating: 4.3,
+            players: '1 Player'
+        },
+        {
+            id: 'puzzle',
+            title: 'Mind Puzzle',
+            description: 'Puzzle logika untuk otak',
+            icon: <Puzzle className="w-12 h-12" />,
+            color: 'from-indigo-500 to-purple-500',
+            bgColor: 'bg-gradient-to-br from-indigo-400 to-purple-400',
+            borderColor: 'border-indigo-500/30',
+            category: 'Puzzle',
+            difficulty: 'Medium',
+            rating: 4.6,
+            players: '1 Player'
+        },
+        {
+            id: 'meditation',
+            title: 'Peace Garden',
+            description: 'Meditasi dan ketenangan',
+            icon: <Sparkles className="w-12 h-12" />,
+            color: 'from-emerald-500 to-green-500',
+            bgColor: 'bg-gradient-to-br from-emerald-400 to-green-400',
+            borderColor: 'border-emerald-500/30',
+            category: 'Meditation',
+            difficulty: 'Easy',
+            rating: 4.9,
+            players: '1 Player'
+        },
+        {
+            id: 'math',
+            title: 'Number Crunch',
+            description: 'Game matematika seru',
+            icon: <Activity className="w-12 h-12" />,
+            color: 'from-red-500 to-pink-500',
+            bgColor: 'bg-gradient-to-br from-red-400 to-pink-400',
+            borderColor: 'border-red-500/30',
+            category: 'Educational',
+            difficulty: 'Medium',
+            rating: 4.1,
+            players: '1 Player'
+        },
+        {
+            id: 'stress-relief',
+            title: 'Stress Relief Garden',
+            description: 'Taman relaksasi interaktif',
+            icon: <Heart className="w-12 h-12" />,
+            color: 'from-emerald-500 to-green-500',
+            bgColor: 'bg-gradient-to-br from-emerald-400 to-green-400',
+            borderColor: 'border-emerald-500/30',
+            category: 'Wellness',
+            difficulty: 'Easy',
+            rating: 4.7,
+            players: '1 Player',
+            isSpecial: true
+        },
+        {
+            id: 'color-therapy',
+            title: 'Color Therapy',
+            description: 'Terapi warna untuk relaksasi',
+            icon: <Sparkles className="w-12 h-12" />,
+            color: 'from-pink-500 to-purple-500',
+            bgColor: 'bg-gradient-to-br from-pink-400 to-purple-400',
+            borderColor: 'border-pink-500/30',
+            category: 'Therapy',
+            difficulty: 'Easy',
+            rating: 4.4,
+            players: '1 Player'
+        },
+        {
+            id: 'sound-healing',
+            title: 'Sound Healing',
+            description: 'Terapi suara untuk ketenangan',
+            icon: <Mic className="w-12 h-12" />,
+            color: 'from-teal-500 to-blue-500',
+            bgColor: 'bg-gradient-to-br from-teal-400 to-blue-400',
+            borderColor: 'border-teal-500/30',
+            category: 'Therapy',
+            difficulty: 'Easy',
+            rating: 4.6,
+            players: '1 Player'
+        },
+        {
+            id: 'mindfulness',
+            title: 'Mindfulness',
+            description: 'Latihan kesadaran penuh',
+            icon: <Brain className="w-12 h-12" />,
+            color: 'from-violet-500 to-purple-500',
+            bgColor: 'bg-gradient-to-br from-violet-400 to-purple-400',
+            borderColor: 'border-violet-500/30',
+            category: 'Meditation',
+            difficulty: 'Medium',
+            rating: 4.8,
+            players: '1 Player'
         },
     ];
+
+    // Filter games berdasarkan kategori dan search
+    const filteredGames = games.filter(game => {
+        const matchesCategory = selectedCategory === 'All' || game.category === selectedCategory;
+        const matchesSearch = game.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            game.description.toLowerCase().includes(searchQuery.toLowerCase());
+        return matchesCategory && matchesSearch;
+    });
+
+    // Get unique categories
+    const categories = ['All', ...new Set(games.map(game => game.category))];
 
     // Memory Game Logic
     const initializeMemoryGame = () => {
@@ -218,6 +335,14 @@ export default function Games() {
             case 'focus':
                 startFocusTraining();
                 break;
+            case 'puzzle':
+            case 'meditation':
+            case 'math':
+            case 'color-therapy':
+            case 'sound-healing':
+            case 'mindfulness':
+                // Game coming soon - tidak perlu inisialisasi khusus
+                break;
         }
     };
 
@@ -251,7 +376,7 @@ export default function Games() {
                 return (
                     <div className="space-y-6">
                         <div className="flex justify-between items-center">
-                            <h3 className="text-xl font-semibold text-white">Memory Game</h3>
+                            <h3 className="text-xl font-semibold text-white">Memory Match</h3>
                             <div className="text-white/70">Moves: {moves}</div>
                         </div>
                         <div className="grid grid-cols-4 gap-4">
@@ -259,16 +384,16 @@ export default function Games() {
                                 <button
                                     key={card.id}
                                     onClick={() => handleCardClick(card.id)}
-                                    className={`aspect-square rounded-lg border-2 transition-all duration-300 ${
+                                    className={`aspect-square rounded-xl border-2 transition-all duration-300 ${
                                         flippedCards.includes(card.id) || matchedCards.includes(card.id)
-                                            ? 'bg-white text-black'
-                                            : 'bg-slate-700 border-slate-600 hover:border-purple-400'
+                                            ? 'bg-gradient-to-br from-purple-400 to-pink-400 text-white shadow-lg'
+                                            : 'bg-slate-700 border-slate-600 hover:border-purple-400 hover:shadow-md'
                                     }`}
                                 >
                                     {flippedCards.includes(card.id) || matchedCards.includes(card.id) ? (
                                         <span className="text-2xl">{card.symbol}</span>
                                     ) : (
-                                        <span className="text-2xl">?</span>
+                                        <span className="text-2xl text-white/60">?</span>
                                     )}
                                 </button>
                             ))}
@@ -286,19 +411,19 @@ export default function Games() {
             case 'reaction':
                 return (
                     <div className="space-y-6 text-center">
-                        <h3 className="text-xl font-semibold text-white">Reaction Test</h3>
-                        <div className="bg-slate-700 rounded-lg p-8">
+                        <h3 className="text-xl font-semibold text-white">Speed Reflex</h3>
+                        <div className="bg-gradient-to-br from-yellow-400 to-orange-400 rounded-xl p-8">
                             {isWaiting ? (
                                 <div className="space-y-4">
-                                    <div className="text-white/70">Tunggu warna hijau...</div>
-                                    <div className="w-32 h-32 bg-red-500 rounded-full mx-auto"></div>
+                                    <div className="text-white font-medium">Tunggu warna hijau...</div>
+                                    <div className="w-32 h-32 bg-red-500 rounded-full mx-auto shadow-lg"></div>
                                 </div>
                             ) : (
                                 <div className="space-y-4">
-                                    <div className="text-white/70">Klik sekarang!</div>
+                                    <div className="text-white font-medium">Klik sekarang!</div>
                                     <button
                                         onClick={handleReactionClick}
-                                        className="w-32 h-32 bg-green-500 hover:bg-green-400 rounded-full mx-auto transition-colors"
+                                        className="w-32 h-32 bg-green-500 hover:bg-green-400 rounded-full mx-auto transition-colors shadow-lg hover:shadow-xl"
                                     ></button>
                                 </div>
                             )}
@@ -319,9 +444,9 @@ export default function Games() {
             case 'breathing':
                 return (
                     <div className="space-y-6 text-center">
-                        <h3 className="text-xl font-semibold text-white">Breathing Exercise</h3>
-                        <div className="bg-slate-700 rounded-lg p-8">
-                            <div className={`w-48 h-48 rounded-full mx-auto transition-all duration-4000 ${
+                        <h3 className="text-xl font-semibold text-white">Zen Breathing</h3>
+                        <div className="bg-gradient-to-br from-green-400 to-teal-400 rounded-xl p-8">
+                            <div className={`w-48 h-48 rounded-full mx-auto transition-all duration-4000 shadow-lg ${
                                 breathingPhase === 'inhale' ? 'bg-green-500 scale-110' :
                                 breathingPhase === 'hold' ? 'bg-blue-500 scale-110' :
                                 'bg-teal-500 scale-100'
@@ -331,7 +456,7 @@ export default function Games() {
                                     {breathingPhase === 'inhale' ? 'Tarik Napas' :
                                      breathingPhase === 'hold' ? 'Tahan' : 'Hembuskan'}
                                 </h4>
-                                <p className="text-white/70">Cycle: {breathingCount}/4</p>
+                                <p className="text-white font-medium">Cycle: {breathingCount}/4</p>
                             </div>
                         </div>
                     </div>
@@ -341,14 +466,14 @@ export default function Games() {
                 return (
                     <div className="space-y-6">
                         <div className="flex justify-between items-center">
-                            <h3 className="text-xl font-semibold text-white">Focus Training</h3>
+                            <h3 className="text-xl font-semibold text-white">Focus Master</h3>
                             <div className="text-white/70">Score: {focusScore}</div>
                         </div>
-                        <div className="relative bg-slate-700 rounded-lg h-96">
+                        <div className="relative bg-gradient-to-br from-blue-400 to-cyan-400 rounded-xl h-96 shadow-lg">
                             {targetVisible && (
                                 <button
                                     onClick={handleTargetClick}
-                                    className="absolute w-8 h-8 bg-yellow-400 rounded-full hover:bg-yellow-300 transition-all duration-200"
+                                    className="absolute w-8 h-8 bg-yellow-400 rounded-full hover:bg-yellow-300 transition-all duration-200 shadow-lg hover:shadow-xl"
                                     style={{
                                         left: `${targetPosition.x}%`,
                                         top: `${targetPosition.y}%`,
@@ -363,72 +488,260 @@ export default function Games() {
                     </div>
                 );
 
+            case 'puzzle':
+                return (
+                    <div className="space-y-6 text-center">
+                        <h3 className="text-xl font-semibold text-white">Mind Puzzle</h3>
+                        <div className="bg-gradient-to-br from-indigo-400 to-purple-400 rounded-xl p-8">
+                            <div className="text-white">
+                                <Puzzle className="w-24 h-24 mx-auto mb-4" />
+                                <h4 className="text-2xl font-bold mb-2">Coming Soon!</h4>
+                                <p className="text-white/80">Game puzzle logika sedang dalam pengembangan</p>
+                            </div>
+                        </div>
+                    </div>
+                );
+
+            case 'meditation':
+                return (
+                    <div className="space-y-6 text-center">
+                        <h3 className="text-xl font-semibold text-white">Peace Garden</h3>
+                        <div className="bg-gradient-to-br from-emerald-400 to-green-400 rounded-xl p-8">
+                            <div className="text-white">
+                                <Sparkles className="w-24 h-24 mx-auto mb-4" />
+                                <h4 className="text-2xl font-bold mb-2">Coming Soon!</h4>
+                                <p className="text-white/80">Garden meditasi interaktif sedang dalam pengembangan</p>
+                            </div>
+                        </div>
+                    </div>
+                );
+
+            case 'math':
+                return (
+                    <div className="space-y-6 text-center">
+                        <h3 className="text-xl font-semibold text-white">Number Crunch</h3>
+                        <div className="bg-gradient-to-br from-red-400 to-pink-400 rounded-xl p-8">
+                            <div className="text-white">
+                                <Activity className="w-24 h-24 mx-auto mb-4" />
+                                <h4 className="text-2xl font-bold mb-2">Coming Soon!</h4>
+                                <p className="text-white/80">Game matematika seru sedang dalam pengembangan</p>
+                            </div>
+                        </div>
+                    </div>
+                );
+
+            case 'color-therapy':
+                return (
+                    <div className="space-y-6 text-center">
+                        <h3 className="text-xl font-semibold text-white">Color Therapy</h3>
+                        <div className="bg-gradient-to-br from-pink-400 to-purple-400 rounded-xl p-8">
+                            <div className="text-white">
+                                <Sparkles className="w-24 h-24 mx-auto mb-4" />
+                                <h4 className="text-2xl font-bold mb-2">Coming Soon!</h4>
+                                <p className="text-white/80">Terapi warna untuk relaksasi sedang dalam pengembangan</p>
+                            </div>
+                        </div>
+                    </div>
+                );
+
+            case 'sound-healing':
+                return (
+                    <div className="space-y-6 text-center">
+                        <h3 className="text-xl font-semibold text-white">Sound Healing</h3>
+                        <div className="bg-gradient-to-br from-teal-400 to-blue-400 rounded-xl p-8">
+                            <div className="text-white">
+                                <Mic className="w-24 h-24 mx-auto mb-4" />
+                                <h4 className="text-2xl font-bold mb-2">Coming Soon!</h4>
+                                <p className="text-white/80">Terapi suara untuk ketenangan sedang dalam pengembangan</p>
+                            </div>
+                        </div>
+                    </div>
+                );
+
+            case 'mindfulness':
+                return (
+                    <div className="space-y-6 text-center">
+                        <h3 className="text-xl font-semibold text-white">Mindfulness</h3>
+                        <div className="bg-gradient-to-br from-violet-400 to-purple-400 rounded-xl p-8">
+                            <div className="text-white">
+                                <Brain className="w-24 h-24 mx-auto mb-4" />
+                                <h4 className="text-2xl font-bold mb-2">Coming Soon!</h4>
+                                <p className="text-white/80">Latihan kesadaran penuh sedang dalam pengembangan</p>
+                            </div>
+                        </div>
+                    </div>
+                );
+
             default:
-                return null;
+                return (
+                    <div className="space-y-6 text-center">
+                        <h3 className="text-xl font-semibold text-white">Game Tidak Ditemukan</h3>
+                        <div className="bg-slate-700 rounded-xl p-8">
+                            <Gamepad2 className="w-24 h-24 mx-auto mb-4 text-white/40" />
+                            <h4 className="text-2xl font-bold mb-2 text-white">Oops!</h4>
+                            <p className="text-white/70">Game yang Anda cari tidak tersedia</p>
+                        </div>
+                    </div>
+                );
         }
     };
 
     return (
         <LayoutUser>
+            <style jsx>{`
+                .line-clamp-1 {
+                    overflow: hidden;
+                    display: -webkit-box;
+                    -webkit-box-orient: vertical;
+                    -webkit-line-clamp: 1;
+                }
+                .line-clamp-2 {
+                    overflow: hidden;
+                    display: -webkit-box;
+                    -webkit-box-orient: vertical;
+                    -webkit-line-clamp: 2;
+                }
+            `}</style>
             <div className="min-h-screen cursor-gaming mood-tracker-bg pt-20">
                 <div className="container mx-auto px-4 py-8">
-                    {/* Header */}
-                    <div className="text-center mb-8">
-                        <h1 className="text-3xl lg:text-4xl font-bold text-white mb-4 flex items-center justify-center">
-                            <Play className="w-8 h-8 mr-3" />
-                            Games Interaktif
-                        </h1>
-                        <p className="text-white/70 text-lg">
-                            Latih kemampuan kognitif dan kesehatan mental Anda dengan game yang menyenangkan
-                        </p>
+                    {/* Header dengan Logo dan Navigation */}
+                    <div className="glassmorphism-card mb-8 p-6">
+                        <div className="flex items-center justify-between mb-6">
+                            {/* Logo */}
+                            <div className="flex items-center space-x-4">
+                                <div className="w-16 h-16 bg-gradient-to-br from-cyan-400 to-teal-500 rounded-xl flex items-center justify-center">
+                                    <Gamepad2 className="w-8 h-8 text-white" />
+                                </div>
+                                <div>
+                                    <h1 className="text-2xl font-bold text-white">BeyondZero Games</h1>
+                                    <p className="text-white/70">Portal Game Kesehatan Mental</p>
+                                </div>
+                            </div>
+                            
+                            {/* Navigation Icons */}
+                            <div className="flex items-center space-x-4">
+                                <button className="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center hover:bg-slate-600 transition-colors">
+                                    <User className="w-5 h-5 text-white" />
+                                </button>
+                                <button className="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center hover:bg-slate-600 transition-colors">
+                                    <Search className="w-5 h-5 text-white" />
+                                </button>
+                            </div>
+                        </div>
                         
-                        {/* Stress Relief Game Link */}
-                        <div className="mt-6">
-                            <Link
-                                href="/games/stress-relief"
-                                className="inline-flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white font-semibold rounded-full transition-all duration-300 hover:scale-105"
-                            >
-                                <Heart className="w-5 h-5" />
-                                <span>Stress Relief Garden</span>
-                            </Link>
+                        {/* Search Bar */}
+                        <div className="relative">
+                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/60" />
+                            <input
+                                type="text"
+                                placeholder="Cari game yang Anda inginkan..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="w-full pl-10 pr-4 py-3 bg-slate-700 border border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent text-white placeholder-white/60"
+                            />
+                        </div>
+                        
+                        {/* Category Filter */}
+                        <div className="flex flex-wrap gap-2 mt-4">
+                            {categories.map((category) => (
+                                <button
+                                    key={category}
+                                    onClick={() => setSelectedCategory(category)}
+                                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                                        selectedCategory === category
+                                            ? 'bg-gradient-to-r from-cyan-400 to-teal-500 text-white shadow-md'
+                                            : 'bg-slate-700 text-white/70 hover:bg-slate-600 hover:text-white'
+                                    }`}
+                                >
+                                    {category}
+                                </button>
+                            ))}
                         </div>
                     </div>
 
                     {!selectedGame ? (
-                        /* Game Selection */
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                            {games.map((game) => (
-                                <div
-                                    key={game.id}
-                                    className="bg-slate-700 rounded-2xl p-6 border border-slate-600 hover:border-cyan-400/50 transition-all duration-300 hover:scale-105 cursor-pointer"
-                                    onClick={() => startGame(game.id)}
-                                >
-                                    <div className="text-center">
-                                        <div className={`w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r ${game.color} flex items-center justify-center text-white`}>
-                                            {game.icon}
+                        <>
+                            {/* Game Selection Grid */}
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-8">
+                                {filteredGames.map((game) => (
+                                    <div
+                                        key={game.id}
+                                        className={`relative group cursor-pointer transform transition-all duration-300 hover:scale-105 ${
+                                            game.isSpecial ? 'ring-2 ring-yellow-400 ring-opacity-50' : ''
+                                        }`}
+                                        onClick={() => game.id === 'stress-relief' ? window.location.href = '/games/stress-relief' : startGame(game.id)}
+                                    >
+                                        {/* Special Badge */}
+                                        {game.isSpecial && (
+                                            <div className="absolute -top-2 -right-2 z-10">
+                                                <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center space-x-1">
+                                                    <Crown className="w-3 h-3" />
+                                                    <span>FEATURED</span>
+                                                </div>
+                                            </div>
+                                        )}
+                                        
+                                        {/* Game Card */}
+                                        <div className={`${game.bgColor} rounded-2xl p-4 h-48 flex flex-col justify-between shadow-lg hover:shadow-xl transition-all duration-300`}>
+                                            {/* Game Icon */}
+                                            <div className="flex justify-center mb-3">
+                                                <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                                                    {game.icon}
+                                                </div>
+                                            </div>
+                                            
+                                            {/* Game Info */}
+                                            <div className="text-center">
+                                                <h3 className="text-white font-bold text-sm mb-1 line-clamp-1">{game.title}</h3>
+                                                <p className="text-white/80 text-xs mb-2 line-clamp-2">{game.description}</p>
+                                                
+                                                {/* Rating */}
+                                                <div className="flex items-center justify-center space-x-1 mb-2">
+                                                    <Star className="w-3 h-3 text-yellow-300 fill-current" />
+                                                    <span className="text-white text-xs font-medium">{game.rating}</span>
+                                                </div>
+                                                
+                                                {/* Category Badge */}
+                                                <div className="bg-white/20 backdrop-blur-sm rounded-full px-2 py-1">
+                                                    <span className="text-white text-xs font-medium">{game.category}</span>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <h3 className="text-white font-semibold text-lg mb-2">{game.title}</h3>
-                                        <p className="text-white/70 text-sm mb-4">{game.description}</p>
-                                        <div className="space-y-1">
-                                            {game.benefits.map((benefit, index) => (
-                                                <div key={index} className="text-cyan-400 text-xs">• {benefit}</div>
-                                            ))}
+                                        
+                                        {/* Difficulty Indicator */}
+                                        <div className="absolute bottom-2 right-2">
+                                            <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                                                game.difficulty === 'Easy' ? 'bg-green-500 text-white' :
+                                                game.difficulty === 'Medium' ? 'bg-yellow-500 text-white' :
+                                                'bg-red-500 text-white'
+                                            }`}>
+                                                {game.difficulty === 'Easy' ? 'E' : game.difficulty === 'Medium' ? 'M' : 'H'}
+                                            </div>
                                         </div>
                                     </div>
+                                ))}
+                            </div>
+                            
+                            {/* No Games Found */}
+                            {filteredGames.length === 0 && (
+                                <div className="text-center py-12">
+                                    <Gamepad2 className="w-16 h-16 text-white/40 mx-auto mb-4" />
+                                    <h3 className="text-xl font-semibold text-white mb-2">Tidak ada game ditemukan</h3>
+                                    <p className="text-white/60">Coba ubah kata kunci pencarian atau kategori filter</p>
                                 </div>
-                            ))}
-                        </div>
+                            )}
+                        </>
                     ) : (
                         /* Game Content */
                         <div className="max-w-4xl mx-auto">
-                            <div className="bg-slate-700 rounded-2xl p-6 border border-slate-600">
+                            <div className="glassmorphism-card p-6">
                                 <div className="flex justify-between items-center mb-6">
                                     <button
                                         onClick={resetGame}
                                         className="flex items-center space-x-2 text-white/70 hover:text-white transition-colors"
                                     >
                                         <RotateCcw className="w-5 h-5" />
-                                        <span>Kembali</span>
+                                        <span>Kembali ke Menu</span>
                                     </button>
                                     <div className="flex items-center space-x-4 text-white/70">
                                         <div className="flex items-center space-x-1">
@@ -449,14 +762,14 @@ export default function Games() {
                     {/* Game History */}
                     {gameHistory.length > 0 && (
                         <div className="max-w-4xl mx-auto mt-8">
-                            <h3 className="text-xl font-semibold text-white mb-4">Riwayat Game</h3>
-                            <div className="bg-slate-700 rounded-2xl p-6 border border-slate-600">
+                            <h3 className="text-xl font-semibold text-white mb-4">Riwayat Game Terbaru</h3>
+                            <div className="glassmorphism-card p-6">
                                 <div className="space-y-3">
                                     {gameHistory.slice(-5).reverse().map((result, index) => (
-                                        <div key={index} className="flex justify-between items-center p-3 bg-slate-600 rounded-lg">
+                                        <div key={index} className="flex justify-between items-center p-4 bg-slate-700 rounded-xl hover:bg-slate-600 transition-colors">
                                             <div>
                                                 <span className="text-white font-medium">{games.find(g => g.id === result.game)?.title}</span>
-                                                <span className="text-white/70 text-sm ml-2">{result.date}</span>
+                                                <span className="text-white/60 text-sm ml-2">{result.date}</span>
                                             </div>
                                             <div className="text-cyan-400 font-semibold">Score: {result.score}</div>
                                         </div>
@@ -466,21 +779,44 @@ export default function Games() {
                         </div>
                     )}
 
+                    {/* Game Statistics */}
+                    <div className="max-w-4xl mx-auto mt-12">
+                        <h3 className="text-xl font-semibold text-white mb-6 text-center">Statistik Game</h3>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                            <div className="glassmorphism-card p-4 text-center">
+                                <div className="text-2xl font-bold text-cyan-400">{games.length}</div>
+                                <div className="text-white/70 text-sm">Total Game</div>
+                            </div>
+                            <div className="glassmorphism-card p-4 text-center">
+                                <div className="text-2xl font-bold text-teal-400">{categories.length - 1}</div>
+                                <div className="text-white/70 text-sm">Kategori</div>
+                            </div>
+                            <div className="glassmorphism-card p-4 text-center">
+                                <div className="text-2xl font-bold text-emerald-400">{games.filter(g => g.difficulty === 'Easy').length}</div>
+                                <div className="text-white/70 text-sm">Game Mudah</div>
+                            </div>
+                            <div className="glassmorphism-card p-4 text-center">
+                                <div className="text-2xl font-bold text-orange-400">{gameHistory.length}</div>
+                                <div className="text-white/70 text-sm">Game Dimainkan</div>
+                            </div>
+                        </div>
+                    </div>
+
                     {/* Benefits Section */}
                     <div className="max-w-4xl mx-auto mt-12">
                         <h3 className="text-xl font-semibold text-white mb-6 text-center">Manfaat Game untuk Kesehatan Mental</h3>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div className="bg-slate-700 rounded-lg p-6 border border-slate-600 text-center">
+                            <div className="glassmorphism-card p-6 text-center hover:shadow-xl transition-shadow">
                                 <Brain className="w-12 h-12 text-cyan-400 mx-auto mb-4" />
                                 <h4 className="text-white font-semibold mb-2">Meningkatkan Kognitif</h4>
                                 <p className="text-white/70 text-sm">Game melatih memori, konsentrasi, dan kemampuan berpikir</p>
                             </div>
-                            <div className="bg-slate-700 rounded-lg p-6 border border-slate-600 text-center">
-                                <Heart className="w-12 h-12 text-green-400 mx-auto mb-4" />
+                            <div className="glassmorphism-card p-6 text-center hover:shadow-xl transition-shadow">
+                                <Heart className="w-12 h-12 text-emerald-400 mx-auto mb-4" />
                                 <h4 className="text-white font-semibold mb-2">Mengurangi Stres</h4>
                                 <p className="text-white/70 text-sm">Aktivitas menyenangkan membantu melepaskan ketegangan</p>
                             </div>
-                            <div className="bg-slate-700 rounded-lg p-6 border border-slate-600 text-center">
+                            <div className="glassmorphism-card p-6 text-center hover:shadow-xl transition-shadow">
                                 <Trophy className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
                                 <h4 className="text-white font-semibold mb-2">Meningkatkan Mood</h4>
                                 <p className="text-white/70 text-sm">Pencapaian dalam game memberikan kepuasan dan kebahagiaan</p>

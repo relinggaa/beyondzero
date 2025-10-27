@@ -24,12 +24,12 @@ export default function MoodPrediction({ mlPrediction }) {
                     <div>
                         <h4 className="text-white font-semibold">AI Mood Analysis</h4>
                         <p className="text-white/70 text-sm">
-                            Prediksi: <span className="text-cyan-400 font-medium">{mlPrediction.mood}</span>
+                            Prediksi: <span className="text-white font-medium">{mlPrediction.mood}</span>
                         </p>
                     </div>
                 </div>
                 <div className="text-right">
-                    <div className="text-cyan-400 font-semibold">
+                    <div className="text-white font-semibold">
                         {(mlPrediction.confidence * 100).toFixed(1)}%
                     </div>
                     <div className="text-white/60 text-xs">Confidence</div>

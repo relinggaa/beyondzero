@@ -38,17 +38,17 @@ export default function Register() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-black flex items-center justify-center p-4">
             <div className="max-w-md w-full">
                 {/* Logo */}
                 <div className="text-center mb-8">
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-cyan-400 to-teal-500 rounded-2xl mb-4">
-                        <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                        </svg>
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-white rounded-full mb-4 p-2">
+                        <div className="w-full h-full bg-black rounded-full flex items-center justify-center">
+                            <div className="w-6 h-6 bg-white rounded-full"></div>
+                        </div>
                     </div>
-                    <h1 className="text-3xl font-bold text-white mb-2">Buat Akun Baru</h1>
-                    <p className="text-slate-400">Bergabunglah dengan komunitas kami</p>
+                    <h1 className="text-4xl font-bold text-white mb-2">Buat Akun Baru</h1>
+                    <p className="text-white/70">Bergabunglah dengan komunitas FixYou</p>
                 </div>
 
                 {/* Register Form */}
@@ -97,8 +97,8 @@ export default function Register() {
                                     onClick={() => setData('role', 'user')}
                                     className={`p-3 rounded-lg border-2 transition-all ${
                                         data.role === 'user'
-                                            ? 'border-cyan-400 bg-cyan-400/20 text-cyan-300'
-                                            : 'border-white/20 bg-white/5 text-slate-300 hover:border-white/40'
+                                            ? 'border-white bg-white/10 text-white'
+                                            : 'border-white/20 bg-white/5 text-white/70 hover:border-white/40 hover:text-white'
                                     }`}
                                 >
                                     <div className="text-center">
@@ -113,8 +113,8 @@ export default function Register() {
                                     onClick={() => setData('role', 'psikolog')}
                                     className={`p-3 rounded-lg border-2 transition-all ${
                                         data.role === 'psikolog'
-                                            ? 'border-cyan-400 bg-cyan-400/20 text-cyan-300'
-                                            : 'border-white/20 bg-white/5 text-slate-300 hover:border-white/40'
+                                            ? 'border-white bg-white/10 text-white'
+                                            : 'border-white/20 bg-white/5 text-white/70 hover:border-white/40 hover:text-white'
                                     }`}
                                 >
                                     <div className="text-center">
@@ -164,7 +164,7 @@ export default function Register() {
                         <button
                             type="submit"
                             disabled={processing}
-                            className="w-full bg-gradient-to-r from-cyan-400 to-teal-500 hover:from-cyan-500 hover:to-teal-600 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                            className="w-full bg-white hover:bg-gray-100 text-black font-semibold py-3 px-4 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
                         >
                             {processing ? (
                                 <>
@@ -186,11 +186,11 @@ export default function Register() {
 
                     {/* Login Link */}
                     <div className="mt-6 text-center">
-                        <p className="text-slate-400">
+                        <p className="text-white/70">
                             Sudah punya akun?{" "}
                             <Link
                                 href="/login"
-                                className="text-cyan-400 hover:text-cyan-300 font-medium transition-colors"
+                                className="text-white hover:text-gray-300 font-medium transition-colors"
                             >
                                 Masuk di sini
                             </Link>
@@ -200,8 +200,8 @@ export default function Register() {
 
                 {/* Footer */}
                 <div className="text-center mt-8">
-                    <p className="text-slate-500 text-sm">
-                        © 2024 Intelecta. Semua hak dilindungi.
+                    <p className="text-white/50 text-sm">
+                        © 2024 FixYou. Semua hak dilindungi.
                     </p>
                 </div>
             </div>

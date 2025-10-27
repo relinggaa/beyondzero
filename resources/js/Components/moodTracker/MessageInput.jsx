@@ -28,10 +28,10 @@ export default function MessageInput({
                 <button 
                     onClick={onSendMessage}
                     disabled={isAnalyzing || !message.trim()}
-                    className="bg-gradient-to-r from-cyan-400 to-teal-500 hover:from-cyan-500 hover:to-teal-600 text-white p-2 lg:p-3 rounded-xl transition-all duration-200 hover:scale-105 flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="bg-white hover:bg-white/90 text-black p-2 lg:p-3 rounded-xl transition-all duration-200 hover:scale-105 flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     {isAnalyzing ? (
-                        <div className="animate-spin rounded-full h-4 w-4 lg:h-5 lg:w-5 border-b-2 border-white"></div>
+                        <div className="animate-spin rounded-full h-4 w-4 lg:h-5 lg:w-5 border-b-2 border-black"></div>
                     ) : (
                     <svg className="w-4 h-4 lg:w-5 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
@@ -44,10 +44,10 @@ export default function MessageInput({
                     disabled={!isSupported || isAnalyzing}
                     className={`p-2 lg:p-3 rounded-xl transition-all duration-200 hover:scale-105 flex-shrink-0 ${
                         isListening 
-                            ? 'bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white' 
+                            ? 'bg-white hover:bg-white/90 text-black' 
                             : isSupported 
-                                ? 'bg-gradient-to-r from-cyan-400 to-teal-500 hover:from-cyan-500 hover:to-teal-600 text-white'
-                                : 'bg-gray-500 text-gray-300 cursor-not-allowed'
+                                ? 'bg-white/10 hover:bg-white/20 text-white border border-white/20'
+                                : 'bg-white/30 text-white/50 cursor-not-allowed'
                     } ${isAnalyzing ? 'opacity-50 cursor-not-allowed' : ''}`}
                     title={isSupported ? (isListening ? 'Stop listening' : 'Start voice input') : 'Voice recognition not supported'}
                 >

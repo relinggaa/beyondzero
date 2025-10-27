@@ -30,6 +30,7 @@ class JournalController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
+            'title' => 'required|string|max:255',
             'date' => 'required|date',
             'mood' => 'required|string|max:255',
             'gratitude' => 'nullable|string',
@@ -55,6 +56,7 @@ class JournalController extends Controller
 
         $journal = Journal::create([
             'user_id' => Auth::id(),
+            'title' => $request->title,
             'date' => $request->date,
             'mood' => $request->mood,
             'gratitude' => $request->gratitude,
@@ -79,6 +81,7 @@ class JournalController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
+            'title' => 'required|string|max:255',
             'date' => 'required|date',
             'mood' => 'required|string|max:255',
             'gratitude' => 'nullable|string',
@@ -104,6 +107,7 @@ class JournalController extends Controller
         }
 
         $journal->update([
+            'title' => $request->title,
             'date' => $request->date,
             'mood' => $request->mood,
             'gratitude' => $request->gratitude,

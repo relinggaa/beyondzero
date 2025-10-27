@@ -44,24 +44,24 @@ export default function SidebarAdmin({ activePage, setActivePage, admin }) {
     ];
 
     return (
-        <div className={`bg-slate-800 min-h-screen transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'}`}>
+        <div className={`bg-black/90 backdrop-blur-xl min-h-screen transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'}`}>
             {/* Header */}
-            <div className="p-6 border-b border-slate-700">
+            <div className="p-6 border-b border-white/10">
                 <div className="flex items-center justify-between">
                     {!isCollapsed && (
                         <div className="flex items-center space-x-3">
-                            <div className="w-8 h-8 bg-gradient-to-r from-cyan-400 to-teal-500 rounded-lg flex items-center justify-center">
-                                <span className="text-white font-bold text-sm">A</span>
+                            <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
+                                <span className="text-black font-bold text-sm">A</span>
                             </div>
                             <div>
                                 <h2 className="text-white font-bold text-lg">Admin Panel</h2>
-                                <p className="text-cyan-400 text-xs">FixYou</p>
+                                <p className="text-white/70 text-xs">FixYou</p>
                             </div>
                         </div>
                     )}
                     <button
                         onClick={() => setIsCollapsed(!isCollapsed)}
-                        className="p-2 rounded-lg hover:bg-slate-700 transition-colors"
+                        className="p-2 rounded-lg hover:bg-white/10 transition-colors"
                     >
                         <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -71,17 +71,17 @@ export default function SidebarAdmin({ activePage, setActivePage, admin }) {
             </div>
 
             {/* User Profile */}
-            <div className="p-6 border-b border-slate-700">
+            <div className="p-6 border-b border-white/10">
                 <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-gradient-to-r from-cyan-400 to-teal-500 rounded-full flex items-center justify-center">
-                        <span className="text-white font-semibold text-sm">
+                    <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+                        <span className="text-black font-semibold text-sm">
                             {admin?.username ? admin.username.charAt(0).toUpperCase() : 'A'}
                         </span>
                     </div>
                     {!isCollapsed && (
                         <div>
                             <h3 className="text-white font-semibold">{admin?.username || 'Admin'}</h3>
-                            <p className="text-slate-400 text-sm">Administrator</p>
+                            <p className="text-white/70 text-sm">Administrator</p>
                         </div>
                     )}
                 </div>
@@ -96,11 +96,11 @@ export default function SidebarAdmin({ activePage, setActivePage, admin }) {
                             href={item.href}
                             className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${
                                 activePage === item.id
-                                    ? 'bg-gradient-to-r from-cyan-400/20 to-teal-500/20 border-l-4 border-cyan-400 text-cyan-400'
-                                    : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+                                    ? 'bg-white/10 border-l-4 border-white text-white'
+                                    : 'text-white/70 hover:bg-white/10 hover:text-white'
                             }`}
                         >
-                            <span className={`${activePage === item.id ? 'text-cyan-400' : 'text-slate-400'}`}>
+                            <span className={`${activePage === item.id ? 'text-white' : 'text-white/70'}`}>
                                 {item.icon}
                             </span>
                             {!isCollapsed && (
@@ -112,10 +112,10 @@ export default function SidebarAdmin({ activePage, setActivePage, admin }) {
             </nav>
 
             {/* Logout Button */}
-            <div className="p-4 border-t border-slate-700">
+            <div className="p-4 border-t border-white/10">
                 <button
                     onClick={handleLogout}
-                    className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 text-red-400 hover:bg-red-500/10 hover:text-red-300"
+                    className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 text-white/70 hover:bg-white/10 hover:text-white"
                 >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />

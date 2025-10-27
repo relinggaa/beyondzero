@@ -476,13 +476,13 @@ export default function Curhat({ auth }) {
                     {/* New Session Button */}
                     <button 
                         onClick={createNewSession}
-                        className="w-full border-2 border-dashed border-white/30 hover:border-cyan-400 hover:bg-cyan-400/10 rounded-xl p-4 mb-6 transition-all duration-300 group"
+                        className="w-full border-2 border-dashed border-white/30 hover:border-white hover:bg-white/10 rounded-xl p-4 mb-6 transition-all duration-300 group"
                     >
                         <div className="flex items-center justify-center space-x-2">
-                            <svg className="w-5 h-5 text-white group-hover:text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-5 h-5 text-white group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                             </svg>
-                            <span className="text-white font-semibold uppercase tracking-wide group-hover:text-cyan-400">
+                            <span className="text-white font-semibold uppercase tracking-wide group-hover:text-white">
                                 Curhat Baru
                             </span>
                         </div>
@@ -497,15 +497,15 @@ export default function Curhat({ auth }) {
                                 onClick={() => handleSessionSelect(session.id)}
                                 className={`p-4 rounded-xl cursor-pointer transition-all duration-200 ${
                                     selectedSession === session.id
-                                        ? 'bg-gradient-to-r from-cyan-400/20 to-teal-500/20 border border-cyan-400/30' 
-                                        : 'bg-slate-700 hover:bg-slate-600 border border-slate-600 hover:border-cyan-400/50'
+                                        ? 'bg-white/10 border border-white/30' 
+                                        : 'bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/30'
                                 }`}
                             >
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <h4 className="text-white font-medium">{session.title}</h4>
                                         <p className="text-white/60 text-sm">{formatDate(session.created_at)}</p>
-                                        <span className="text-cyan-400 text-xs font-medium">
+                                        <span className="text-white text-xs font-medium">
                                             {session.mood || 'Belum dimulai'}
                                         </span>
                                     </div>
@@ -560,17 +560,17 @@ export default function Curhat({ auth }) {
                             <h3 className="text-white font-semibold text-base lg:text-lg">Chat Terbaru</h3>
                             <div className="flex items-center space-x-2">
                                 {/* Ollama Connection Status */}
-                                <div className={`flex items-center space-x-2 ${isConnected ? 'text-green-400' : 'text-red-400'}`}>
-                                    <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-400' : 'bg-red-400'} ${isConnected ? 'animate-pulse' : ''}`}></div>
+                                <div className={`flex items-center space-x-2 ${isConnected ? 'text-white' : 'text-white/50'}`}>
+                                    <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-white' : 'bg-white/30'} ${isConnected ? 'animate-pulse' : ''}`}></div>
                                     <span className="text-sm">{isConnected ? 'Ollama Connected' : 'Ollama Disconnected'}</span>
                                 </div>
                                 {/* Typing Indicator */}
                                 {isTyping && (
-                                    <div className="flex items-center space-x-2 text-cyan-400">
+                                    <div className="flex items-center space-x-2 text-white">
                                         <div className="flex space-x-1">
-                                            <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce"></div>
-                                            <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                                            <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                                            <div className="w-2 h-2 bg-white rounded-full animate-bounce"></div>
+                                            <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                                            <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
                                         </div>
                                         <span className="text-sm">AI sedang mengetik...</span>
                                     </div>
@@ -592,8 +592,8 @@ export default function Curhat({ auth }) {
                                         Ceritakan apa yang mengganggu pikiranmu atau hal-hal yang ingin dibagikan. Mulai curhat dengan mengetik pesan di bawah ini.
                                     </p>
                                     {!isConnected && (
-                                        <div className="mt-4 p-3 bg-red-500/20 border border-red-500/30 rounded-lg">
-                                            <p className="text-red-400 text-sm">
+                                        <div className="mt-4 p-3 bg-white/10 border border-white/20 rounded-lg">
+                                            <p className="text-white/70 text-sm">
                                                 ⚠️ Ollama tidak terhubung. Pastikan Ollama sudah berjalan untuk menggunakan AI chatbot.
                                             </p>
                                         </div>
@@ -605,12 +605,12 @@ export default function Curhat({ auth }) {
                                     <div key={msg.id} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'} chat-message`}>
                                         <div className={`max-w-[85%] sm:max-w-xs lg:max-w-md px-3 lg:px-4 py-2 lg:py-3 rounded-2xl transition-all duration-300 hover:scale-105 ${
                                             msg.type === 'user' 
-                                                ? 'bg-gradient-to-r from-cyan-400 to-teal-500 text-white shadow-lg' 
-                                                : 'bg-black/40 backdrop-blur-md text-white border border-white/20 shadow-lg'
+                                                ? 'bg-white text-black shadow-lg' 
+                                                : 'bg-white/10 backdrop-blur-md text-white border border-white/20 shadow-lg'
                                         }`}>
                                             <p className="text-xs lg:text-sm break-words font-medium">{msg.message}</p>
                                             <p className={`text-xs mt-1 font-light ${
-                                                msg.type === 'user' ? 'text-white/70' : 'text-white/50'
+                                                msg.type === 'user' ? 'text-black/70' : 'text-white/50'
                                             }`}>
                                                 {formatTime(msg.timestamp)}
                                             </p>
@@ -658,7 +658,7 @@ export default function Curhat({ auth }) {
                                     handleSendMessage();
                                 }}
                                 disabled={isTyping || !message.trim() || !selectedSession}
-                                className="bg-gradient-to-r from-cyan-400 to-teal-500 hover:from-cyan-500 hover:to-teal-600 text-white p-2 lg:p-3 rounded-xl transition-all duration-200 hover:scale-105 flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="bg-white hover:bg-white/90 text-black p-2 lg:p-3 rounded-xl transition-all duration-200 hover:scale-105 flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
                                 title={!selectedSession ? 'Tidak ada session yang dipilih' : !message.trim() ? 'Pesan tidak boleh kosong' : 'Kirim pesan'}
                             >
                                 {isTyping ? (
@@ -672,7 +672,7 @@ export default function Curhat({ auth }) {
                             {/* Voice Recording Button */}
                             <button 
                                 disabled={isTyping}
-                                className="bg-gradient-to-r from-cyan-400 to-teal-500 hover:from-cyan-500 hover:to-teal-600 text-white p-2 lg:p-3 rounded-xl transition-all duration-200 hover:scale-105 flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="bg-white hover:bg-white/90 text-black p-2 lg:p-3 rounded-xl transition-all duration-200 hover:scale-105 flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 <svg className="w-4 h-4 lg:w-5 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
