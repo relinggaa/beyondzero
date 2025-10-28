@@ -173,6 +173,33 @@ export default function Games() {
         },
     ];
 
+    const getThumbnail = (gameId) => {
+        switch (gameId) {
+            case 'memory':
+                return 'https://images.unsplash.com/photo-1520975916090-3105956dac38?q=80&w=1200&auto=format&fit=crop';
+            case 'reaction':
+                return 'https://images.unsplash.com/photo-1520974735194-7d4b9a83ae2d?q=80&w=1200&auto=format&fit=crop';
+            case 'breathing':
+                return 'https://images.unsplash.com/photo-1520975652208-92b9631f57b7?q=80&w=1200&auto=format&fit=crop';
+            case 'focus':
+                return 'https://images.unsplash.com/photo-1520974735194-2e6b2f5edf74?q=80&w=1200&auto=format&fit=crop';
+            case 'puzzle':
+                return 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=1200&auto=format&fit=crop';
+            case 'meditation':
+                return 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?q=80&w=1200&auto=format&fit=crop';
+            case 'math':
+                return 'https://images.unsplash.com/photo-1509223197845-458d87318791?q=80&w=1200&auto=format&fit=crop';
+            case 'color-therapy':
+                return 'https://images.unsplash.com/photo-1526318472351-c75fcf070305?q=80&w=1200&auto=format&fit=crop';
+            case 'sound-healing':
+                return 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?q=80&w=1200&auto=format&fit=crop';
+            case 'mindfulness':
+                return 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?q=80&w=1200&auto=format&fit=crop';
+            default:
+                return 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=1200&auto=format&fit=crop';
+        }
+    };
+
     // Filter games berdasarkan kategori dan search
     const filteredGames = games.filter(game => {
         const matchesCategory = selectedCategory === 'All' || game.category === selectedCategory;
@@ -602,28 +629,29 @@ export default function Games() {
                     -webkit-line-clamp: 2;
                 }
             `}</style>
-            <div className="min-h-screen cursor-gaming mood-tracker-bg pt-20">
-                <div className="container mx-auto px-4 py-8">
-                    {/* Header dengan Logo dan Navigation */}
-                    <div className="glassmorphism-card mb-8 p-6">
+            <div className="min-h-screen pt-20 pb-12 relative bg-gradient-to-br from-slate-900 via-blue-900 to-black">
+                <div className="absolute inset-0 bg-gradient-to-br from-slate-900/60 via-blue-900/50 to-black/80"></div>
+                <div className="container mx-auto px-4 py-8 relative z-10">
+                    {/* Header */}
+                    <div className="mb-8 p-6 rounded-3xl bg-gradient-to-br from-slate-900/90 via-blue-900/80 to-black/90 border border-blue-800/30 shadow-2xl backdrop-blur-sm">
                         <div className="flex items-center justify-between mb-6">
                             {/* Logo */}
                             <div className="flex items-center space-x-4">
-                                <div className="w-16 h-16 bg-gradient-to-br from-cyan-400 to-teal-500 rounded-xl flex items-center justify-center">
-                                    <Gamepad2 className="w-8 h-8 text-white" />
+                                <div className="w-14 h-14 bg-white/10 border border-blue-700/40 rounded-xl flex items-center justify-center">
+                                    <Gamepad2 className="w-7 h-7 text-white" />
                                 </div>
                                 <div>
-                                    <h1 className="text-2xl font-bold text-white">BeyondZero Games</h1>
-                                    <p className="text-white/70">Portal Game Kesehatan Mental</p>
+                                    <h1 className="text-2xl font-bold bg-gradient-to-r from-white via-blue-200 to-white bg-clip-text text-transparent">BeyondZero Games</h1>
+                                    <p className="text-blue-100">Portal Game Kesehatan Mental</p>
                                 </div>
                             </div>
                             
                             {/* Navigation Icons */}
                             <div className="flex items-center space-x-4">
-                                <button className="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center hover:bg-slate-600 transition-colors">
+                                <button className="w-10 h-10 bg-slate-800/60 border border-blue-700/40 rounded-full flex items-center justify-center hover:bg-slate-700 transition-colors">
                                     <User className="w-5 h-5 text-white" />
                                 </button>
-                                <button className="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center hover:bg-slate-600 transition-colors">
+                                <button className="w-10 h-10 bg-slate-800/60 border border-blue-700/40 rounded-full flex items-center justify-center hover:bg-slate-700 transition-colors">
                                     <Search className="w-5 h-5 text-white" />
                                 </button>
                             </div>
@@ -631,13 +659,13 @@ export default function Games() {
                         
                         {/* Search Bar */}
                         <div className="relative">
-                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/60" />
+                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-blue-200/70" />
                             <input
                                 type="text"
                                 placeholder="Cari game yang Anda inginkan..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full pl-10 pr-4 py-3 bg-slate-700 border border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent text-white placeholder-white/60"
+                                className="w-full pl-10 pr-4 py-3 bg-slate-800/60 border border-blue-700/40 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-blue-200/60"
                             />
                         </div>
                         
@@ -649,8 +677,8 @@ export default function Games() {
                                     onClick={() => setSelectedCategory(category)}
                                     className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                                         selectedCategory === category
-                                            ? 'bg-gradient-to-r from-cyan-400 to-teal-500 text-white shadow-md'
-                                            : 'bg-slate-700 text-white/70 hover:bg-slate-600 hover:text-white'
+                                            ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md border border-blue-500/30'
+                                            : 'bg-slate-800/60 text-blue-100 border border-blue-700/30 hover:bg-slate-700 hover:text-white'
                                     }`}
                                 >
                                     {category}
@@ -662,14 +690,13 @@ export default function Games() {
                     {!selectedGame ? (
                         <>
                             {/* Game Selection Grid */}
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mb-8">
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5 mb-8">
                                 {filteredGames.map((game) => (
                                     <div
                                         key={game.id}
-                                        className={`relative group cursor-pointer transform transition-all duration-300 hover:scale-105 ${
+                                        className={`relative group transform transition-all duration-300 hover:-translate-y-1 ${
                                             game.isSpecial ? 'ring-2 ring-yellow-400 ring-opacity-50' : ''
                                         }`}
-                                        onClick={() => game.id === 'stress-relief' ? window.location.href = '/games/stress-relief' : startGame(game.id)}
                                     >
                                         {/* Special Badge */}
                                         {game.isSpecial && (
@@ -681,29 +708,27 @@ export default function Games() {
                                             </div>
                                         )}
                                         
-                                        {/* Game Card */}
-                                        <div className={`${game.bgColor} rounded-2xl p-4 h-48 flex flex-col justify-between shadow-lg hover:shadow-xl transition-all duration-300`}>
-                                            {/* Game Icon */}
-                                            <div className="flex justify-center mb-3">
-                                                <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                                                    {game.icon}
-                                                </div>
+                                        {/* Game Card - image + bottom panel */}
+                                        <div className="rounded-2xl overflow-hidden bg-slate-900/80 border border-blue-800/30 shadow-xl">
+                                            {/* Image */}
+                                            <div className="h-32 w-full bg-slate-800">
+                                                <img src={getThumbnail(game.id)} alt={game.title} className="w-full h-full object-cover" />
                                             </div>
-                                            
-                                            {/* Game Info */}
-                                            <div className="text-center">
-                                                <h3 className="text-white font-bold text-sm mb-1 line-clamp-1">{game.title}</h3>
-                                                <p className="text-white/80 text-xs mb-2 line-clamp-2">{game.description}</p>
-                                                
-                                                {/* Rating */}
-                                                <div className="flex items-center justify-center space-x-1 mb-2">
-                                                    <Star className="w-3 h-3 text-yellow-300 fill-current" />
-                                                    <span className="text-white text-xs font-medium">{game.rating}</span>
-                                                </div>
-                                                
-                                                {/* Category Badge */}
-                                                <div className="bg-white/20 backdrop-blur-sm rounded-full px-2 py-1">
-                                                    <span className="text-white text-xs font-medium">{game.category}</span>
+                                            {/* Bottom content */}
+                                            <div className="p-4">
+                                                <h3 className="text-white font-semibold text-sm mb-1 line-clamp-1">{game.title}</h3>
+                                                <p className="text-blue-100 text-xs mb-3 line-clamp-2">{game.description}</p>
+                                                <div className="flex items-center justify-between">
+                                                    <div className="text-blue-200 text-xs flex items-center space-x-2">
+                                                        <User className="w-3.5 h-3.5" />
+                                                        <span>{game.players}</span>
+                                                    </div>
+                                                    <button
+                                                        onClick={() => game.id === 'stress-relief' ? window.location.href = '/games/stress-relief' : startGame(game.id)}
+                                                        className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-md border border-blue-500/40"
+                                                    >
+                                                        Join
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
@@ -734,16 +759,16 @@ export default function Games() {
                     ) : (
                         /* Game Content */
                         <div className="max-w-4xl mx-auto">
-                            <div className="glassmorphism-card p-6">
+                            <div className="p-6 rounded-3xl bg-gradient-to-br from-slate-900/90 via-blue-900/80 to-black/90 border border-blue-800/30 shadow-2xl backdrop-blur-sm">
                                 <div className="flex justify-between items-center mb-6">
                                     <button
                                         onClick={resetGame}
-                                        className="flex items-center space-x-2 text-white/70 hover:text-white transition-colors"
+                                        className="flex items-center space-x-2 text-blue-100 hover:text-white transition-colors"
                                     >
                                         <RotateCcw className="w-5 h-5" />
                                         <span>Kembali ke Menu</span>
                                     </button>
-                                    <div className="flex items-center space-x-4 text-white/70">
+                                    <div className="flex items-center space-x-4 text-blue-100">
                                         <div className="flex items-center space-x-1">
                                             <Clock className="w-4 h-4" />
                                             <span>{gameTime}s</span>
@@ -763,15 +788,15 @@ export default function Games() {
                     {gameHistory.length > 0 && (
                         <div className="max-w-4xl mx-auto mt-8">
                             <h3 className="text-xl font-semibold text-white mb-4">Riwayat Game Terbaru</h3>
-                            <div className="glassmorphism-card p-6">
+                            <div className="p-6 rounded-3xl bg-gradient-to-br from-slate-900/90 via-blue-900/80 to-black/90 border border-blue-800/30 shadow-2xl backdrop-blur-sm">
                                 <div className="space-y-3">
                                     {gameHistory.slice(-5).reverse().map((result, index) => (
-                                        <div key={index} className="flex justify-between items-center p-4 bg-slate-700 rounded-xl hover:bg-slate-600 transition-colors">
+                                        <div key={index} className="flex justify-between items-center p-4 bg-slate-800/60 border border-blue-700/30 rounded-xl hover:bg-slate-800 transition-colors">
                                             <div>
                                                 <span className="text-white font-medium">{games.find(g => g.id === result.game)?.title}</span>
                                                 <span className="text-white/60 text-sm ml-2">{result.date}</span>
                                             </div>
-                                            <div className="text-cyan-400 font-semibold">Score: {result.score}</div>
+                                            <div className="text-blue-300 font-semibold">Score: {result.score}</div>
                                         </div>
                                     ))}
                                 </div>
@@ -783,19 +808,19 @@ export default function Games() {
                     <div className="max-w-4xl mx-auto mt-12">
                         <h3 className="text-xl font-semibold text-white mb-6 text-center">Statistik Game</h3>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                            <div className="glassmorphism-card p-4 text-center">
+                            <div className="p-4 text-center rounded-2xl bg-slate-900/80 border border-blue-800/30">
                                 <div className="text-2xl font-bold text-cyan-400">{games.length}</div>
                                 <div className="text-white/70 text-sm">Total Game</div>
                             </div>
-                            <div className="glassmorphism-card p-4 text-center">
-                                <div className="text-2xl font-bold text-teal-400">{categories.length - 1}</div>
+                            <div className="p-4 text-center rounded-2xl bg-slate-900/80 border border-blue-800/30">
+                                <div className="text-2xl font-bold text-blue-300">{categories.length - 1}</div>
                                 <div className="text-white/70 text-sm">Kategori</div>
                             </div>
-                            <div className="glassmorphism-card p-4 text-center">
+                            <div className="p-4 text-center rounded-2xl bg-slate-900/80 border border-blue-800/30">
                                 <div className="text-2xl font-bold text-emerald-400">{games.filter(g => g.difficulty === 'Easy').length}</div>
                                 <div className="text-white/70 text-sm">Game Mudah</div>
                             </div>
-                            <div className="glassmorphism-card p-4 text-center">
+                            <div className="p-4 text-center rounded-2xl bg-slate-900/80 border border-blue-800/30">
                                 <div className="text-2xl font-bold text-orange-400">{gameHistory.length}</div>
                                 <div className="text-white/70 text-sm">Game Dimainkan</div>
                             </div>
@@ -806,17 +831,17 @@ export default function Games() {
                     <div className="max-w-4xl mx-auto mt-12">
                         <h3 className="text-xl font-semibold text-white mb-6 text-center">Manfaat Game untuk Kesehatan Mental</h3>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div className="glassmorphism-card p-6 text-center hover:shadow-xl transition-shadow">
-                                <Brain className="w-12 h-12 text-cyan-400 mx-auto mb-4" />
+                            <div className="p-6 text-center rounded-2xl bg-slate-900/80 border border-blue-800/30 hover:shadow-xl transition-shadow">
+                                <Brain className="w-12 h-12 text-blue-300 mx-auto mb-4" />
                                 <h4 className="text-white font-semibold mb-2">Meningkatkan Kognitif</h4>
                                 <p className="text-white/70 text-sm">Game melatih memori, konsentrasi, dan kemampuan berpikir</p>
                             </div>
-                            <div className="glassmorphism-card p-6 text-center hover:shadow-xl transition-shadow">
+                            <div className="p-6 text-center rounded-2xl bg-slate-900/80 border border-blue-800/30 hover:shadow-xl transition-shadow">
                                 <Heart className="w-12 h-12 text-emerald-400 mx-auto mb-4" />
                                 <h4 className="text-white font-semibold mb-2">Mengurangi Stres</h4>
                                 <p className="text-white/70 text-sm">Aktivitas menyenangkan membantu melepaskan ketegangan</p>
                             </div>
-                            <div className="glassmorphism-card p-6 text-center hover:shadow-xl transition-shadow">
+                            <div className="p-6 text-center rounded-2xl bg-slate-900/80 border border-blue-800/30 hover:shadow-xl transition-shadow">
                                 <Trophy className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
                                 <h4 className="text-white font-semibold mb-2">Meningkatkan Mood</h4>
                                 <p className="text-white/70 text-sm">Pencapaian dalam game memberikan kepuasan dan kebahagiaan</p>

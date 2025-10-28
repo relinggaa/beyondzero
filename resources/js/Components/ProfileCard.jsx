@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useCallback, useMemo } from 'react';
 import './css/ProfileCard.css';
 

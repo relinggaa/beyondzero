@@ -1,6 +1,9 @@
 import React, { useState, useMemo } from "react";
 import { useForm, Link } from "@inertiajs/react";
 import LayoutUser from "../../Components/Layout/LayoutUser";
+import backgroundPsikologImage from "../../../img/background_psikolog.png";
+import { Card, Badge, Button, Avatar } from 'flowbite-react';
+import PsikologCard from "../../Components/PsikologCard";
 
 export default function Psikolog({ psikologs }) {
     const [selectedPsikolog, setSelectedPsikolog] = useState(null);
@@ -196,36 +199,51 @@ export default function Psikolog({ psikologs }) {
 
     return (
         <LayoutUser>
-            <div className="min-h-screen cursor-gaming bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 pt-20">
-                <div className="container mx-auto px-4 py-8">
-                {/* Header */}
-                <div className="text-center mb-8">
-                    <h1 className="text-3xl lg:text-4xl font-bold text-white mb-4">
-                        👨‍⚕️ Tim Psikolog Kami
-                    </h1>
-                    <p className="text-white/70 text-lg mb-6">
-                        Temukan psikolog yang tepat untuk kebutuhan kesehatan mental Anda
-                    </p>
+            <div 
+                className="min-h-screen cursor-gaming pt-20 pb-12 relative"
+                style={{
+                    backgroundImage: `url(${backgroundPsikologImage})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat',
+                    filter: 'brightness(1.4) contrast(1.2)',
+                }}
+            >
+                {/* Navy Blue Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-br from-slate-900/70 via-blue-900/60 to-black/80"></div>
+                
+                {/* Single Container for All Elements */}
+                <div className="container mx-auto px-4 py-8 relative z-10">
+                    <div className="bg-gradient-to-br from-slate-900/90 via-blue-900/80 to-black/90 backdrop-blur-sm rounded-3xl p-8 border border-blue-800/30 shadow-2xl">
+                {/* Header - Flex Horizontal Container */}
+                <div className="flex flex-col lg:flex-row items-center lg:items-start justify-between gap-4 lg:gap-6 mb-8">
+                    <div className="flex-1 text-center lg:text-left">
+                        <h1 className="text-2xl lg:text-3xl xl:text-4xl font-bold bg-gradient-to-r from-white via-blue-200 to-white bg-clip-text text-transparent mb-2">
+                            Tim Psikolog Kami
+                        </h1>
+                        <p className="text-blue-100 text-base lg:text-lg">
+                            Temukan psikolog yang tepat untuk kebutuhan kesehatan mental Anda
+                        </p>
+                    </div>
                     
                     {/* Booking Status Button */}
-                    <div className="flex justify-center mb-8">
-                        <Link
-                            href="/booking-psikolog"
-                            className="bg-gradient-to-r from-cyan-400 to-teal-500 hover:from-cyan-500 hover:to-teal-600 text-white px-8 py-3 rounded-lg transition-all duration-200 hover:scale-105 font-medium flex items-center space-x-2"
-                        >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                            </svg>
-                            <span>📋 Lihat Status Booking</span>
-                        </Link>
-                    </div>
+                    <Link
+                        href="/booking-psikolog"
+                        className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 lg:px-8 py-3 rounded-lg transition-all duration-200 hover:scale-105 font-medium flex items-center space-x-2 whitespace-nowrap shadow-lg border border-blue-500/30"
+                    >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                        </svg>
+                        <span className="hidden sm:inline">Lihat Status Booking</span>
+                        <span className="sm:hidden">Status</span>
+                    </Link>
                 </div>
 
                 {/* Search Section */}
-                <div className="mb-8 bg-slate-800/60 backdrop-blur-xl rounded-2xl p-6 border border-slate-700/50 shadow-lg">
+                <div className="mb-8 bg-gradient-to-r from-slate-800/80 to-blue-900/80 rounded-2xl p-6 border border-blue-700/30 shadow-lg backdrop-blur-sm">
                     <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <svg className="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                         </div>
@@ -234,7 +252,7 @@ export default function Psikolog({ psikologs }) {
                             placeholder="Cari psikolog berdasarkan nama, keahlian, atau pendekatan..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full bg-slate-700/50 backdrop-blur-sm border border-slate-600 rounded-xl pl-12 pr-12 py-3 text-white placeholder-white/50 focus:border-cyan-400 focus:outline-none transition-colors"
+                            className="w-full bg-slate-800/60 backdrop-blur-sm border border-blue-600/40 rounded-xl pl-12 pr-12 py-3 text-white placeholder-blue-200/60 focus:border-blue-500 focus:outline-none transition-colors"
                         />
                         {searchQuery && (
                             <button
@@ -251,15 +269,15 @@ export default function Psikolog({ psikologs }) {
                     {/* Result Count */}
                     {searchQuery && (
                         <div className="mt-4 flex items-center justify-between">
-                            <div className="text-white/70 text-sm flex items-center space-x-2">
-                                <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
+                            <div className="text-blue-200 text-sm flex items-center space-x-2">
+                                <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
                                 <span>
-                                    <span className="text-cyan-400 font-bold">{filteredPsikologs.length}</span> psikolog ditemukan
+                                    <span className="text-white font-bold">{filteredPsikologs.length}</span> psikolog ditemukan
                                 </span>
                             </div>
                             <button
                                 onClick={() => setSearchQuery("")}
-                                className="text-cyan-400 hover:text-cyan-300 text-sm font-medium flex items-center space-x-1"
+                                className="text-white hover:text-white/80 text-sm font-medium flex items-center space-x-1"
                             >
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -272,66 +290,39 @@ export default function Psikolog({ psikologs }) {
 
                 {/* Psikolog Cards Grid */}
                 {filteredPsikologs.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {filteredPsikologs.map((psikolog) => (
-                            <div key={psikolog.id} className="bg-slate-700 rounded-2xl p-6 border border-slate-600 hover:border-cyan-400/50 transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl">
-                                {/* Psikolog Image */}
-                                <div className="flex justify-center mb-4">
-                                    <img
-                                        src={psikolog.image ? `/storage/${psikolog.image}` : 'https://via.placeholder.com/96x96/06b6d4/ffffff?text=IMG'}
-                                        alt={psikolog.name}
-                                        className="w-24 h-24 rounded-full object-cover border-4 border-cyan-400/30"
-                                    />
-                                </div>
-
-                                {/* Psikolog Info */}
-                                <div className="text-center mb-4">
-                                    <h3 className="text-white font-semibold text-lg mb-2">{psikolog.name}</h3>
-                                    <div className="flex flex-wrap justify-center gap-2 mb-3">
-                                        {psikolog.expertise.map((topic, index) => (
-                                            <span
-                                                key={index}
-                                                className="bg-cyan-400/20 text-cyan-300 px-3 py-1 rounded-full text-xs font-medium"
-                                            >
-                                                {topic}
-                                            </span>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {/* Detail Button */}
-                                <button
-                                    onClick={() => handleDetailClick(psikolog)}
-                                    className="w-full bg-gradient-to-r from-cyan-400 to-teal-500 hover:from-cyan-500 hover:to-teal-600 text-white py-3 px-4 rounded-lg transition-all duration-200 hover:scale-105 font-medium"
-                                >
-                                    📋 Detail Psikolog
-                                </button>
-                            </div>
+                            <PsikologCard 
+                                key={psikolog.id}
+                                psikolog={psikolog}
+                                onClick={() => handleDetailClick(psikolog)}
+                            />
                         ))}
                     </div>
                 ) : (
-                    /* Empty State */
                     <div className="text-center py-20">
-                        <div className="inline-block p-6 bg-gradient-to-br from-orange-400/20 to-red-500/20 rounded-full mb-6">
+                        <div className="inline-block p-6 bg-gradient-to-br from-slate-800 to-blue-900 rounded-full mb-6 border border-blue-600/30">
                             <div className="text-7xl">🔍</div>
                         </div>
-                        <h3 className="text-2xl font-bold text-white mb-3">Psikolog tidak ditemukan</h3>
-                        <p className="text-white/60 text-lg max-w-md mx-auto mb-8">
+                        <h3 className="text-2xl font-bold bg-gradient-to-r from-white via-blue-200 to-white bg-clip-text text-transparent mb-3">Psikolog tidak ditemukan</h3>
+                        <p className="text-blue-200 text-lg max-w-md mx-auto mb-8">
                             Tidak ada psikolog yang sesuai dengan pencarian Anda. Coba gunakan kata kunci lain.
                         </p>
                         <button
                             onClick={() => setSearchQuery("")}
-                            className="bg-gradient-to-r from-cyan-400 to-teal-500 hover:from-cyan-500 hover:to-teal-600 text-white px-8 py-3 rounded-lg transition-all duration-200 hover:scale-105 font-bold shadow-lg shadow-cyan-500/20"
+                            className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-3 rounded-lg transition-all duration-200 hover:scale-105 font-bold shadow-lg border border-blue-500/30"
                         >
                             Hapus Pencarian
                         </button>
                     </div>
                 )}
+                    </div>
+                </div>
 
             {/* Modal Detail Psikolog */}
             {isModalOpen && selectedPsikolog && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                    <div className="bg-slate-800 rounded-2xl p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto border border-slate-600">
+                    <div className="bg-gradient-to-br from-slate-900/95 to-blue-900/95 backdrop-blur-sm rounded-2xl p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto border border-blue-700/40 shadow-2xl">
                         {/* Modal Header */}
                         <div className="flex items-start justify-between mb-6">
                                         <div className="flex items-center space-x-4">
@@ -662,8 +653,7 @@ export default function Psikolog({ psikologs }) {
                     </div>
                 </div>
             )}
-            </div>
-            </div>
+                </div>
         </LayoutUser>
     );
 }

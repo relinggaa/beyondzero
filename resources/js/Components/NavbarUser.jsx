@@ -6,7 +6,7 @@ export default function NavbarUser() {
     const { auth } = usePage().props;
 
     return (
-        <div className="fixed top-0 left-0 right-0 z-50 flex justify-center pt-4 pb-2">
+        <div className="fixed top-0 left-0 right-0 z-10 flex justify-center pt-4 pb-2">
             {/* Navbar Container */}
             <nav className="bg-black/80 backdrop-blur-xl border border-white/20 rounded-3xl w-full max-w-6xl mx-4 px-4 sm:px-6 py-4 shadow-2xl">
                 <div className="flex items-center justify-between">

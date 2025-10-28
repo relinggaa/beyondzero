@@ -193,48 +193,49 @@ export default function Journaling({ journals = [] }) {
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                     backgroundRepeat: 'no-repeat',
+                    filter: 'brightness(1.2) contrast(1.15)'
                 }}
             >
-                {/* Dark Overlay untuk mengurangi brightness background */}
-                {/*<div className="absolute inset-0 bg-black/50"></div>*/}
+                {/* Navy Overlay untuk konsistensi tema */}
+                <div className="absolute inset-0 bg-gradient-to-br from-slate-900/70 via-blue-900/60 to-black/80"></div>
                 
-                {/* Main Container dengan background hitam opacity 90% */}
+                {/* Main Container dengan tema hitam–navy–putih */}
                 <div className="w-full px-4 lg:px-8 py-8 relative z-10">
-                    <div className="bg-black/90 rounded-3xl p-6 lg:p-8 border border-white/10 shadow-2xl max-w-full">
+                    <div className="bg-gradient-to-br from-slate-900/90 via-blue-900/80 to-black/90 rounded-3xl p-6 lg:p-8 border border-blue-800/30 shadow-2xl max-w-full backdrop-blur-sm">
                 {/* Header - Combined Container */}
                 <div className="mb-10">
-                    <div className="bg-black rounded-3xl p-6 border border-white/20 shadow-2xl flex flex-col lg:flex-row items-center gap-4">
+                    <div className="bg-gradient-to-r from-slate-800/90 to-blue-900/90 rounded-3xl p-6 border border-blue-700/30 shadow-2xl flex flex-col lg:flex-row items-center gap-4 backdrop-blur-sm">
                         {/* Title */}
                         <div className="flex items-center space-x-3">
                             <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center">
                                 <div className="w-8 h-8 bg-black rounded-full"></div>
                             </div>
-                            <h1 className="text-3xl lg:text-4xl font-bold text-white">
+                            <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-white via-blue-200 to-white bg-clip-text text-transparent">
                                 Journaling
-                            </h1>
+                    </h1>
                         </div>
                         
                         {/* Divider */}
                         <div className="hidden lg:block w-px h-12 bg-white/20"></div>
                         
                         {/* Description */}
-                        <p className="flex-1 text-white/90 text-base lg:text-lg text-center lg:text-left max-w-md">
-                            Catat perjalanan harian Anda dan refleksikan pengalaman hidup Anda dengan cara yang bermakna
-                        </p>
-                        
-                        {/* Create Journal Button */}
-                        <button
-                            onClick={() => setIsModalOpen(true)}
-                            className="bg-white hover:bg-white/90 text-black px-6 py-3 rounded-2xl font-bold text-base transition-all duration-300 hover:scale-105 shadow-xl hover:shadow-2xl whitespace-nowrap"
-                        >
+                        <p className="flex-1 text-blue-100 text-base lg:text-lg text-center lg:text-left max-w-md">
+                        Catat perjalanan harian Anda dan refleksikan pengalaman hidup Anda dengan cara yang bermakna
+                    </p>
+
+                {/* Create Journal Button */}
+                    <button
+                        onClick={() => setIsModalOpen(true)}
+                            className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-2xl font-bold text-base transition-all duration-300 hover:scale-105 shadow-xl hover:shadow-2xl whitespace-nowrap border border-blue-500/30"
+                    >
                             Buat Jurnal Baru
-                        </button>
+                    </button>
                     </div>
                 </div>
 
                 {/* Search and Filter Section */}
                 {journals.length > 0 && (
-                    <div className="mb-8 bg-black rounded-2xl p-6 border border-white/20 shadow-2xl">
+                    <div className="mb-8 bg-gradient-to-r from-slate-800/80 to-blue-900/80 rounded-2xl p-6 border border-blue-700/30 shadow-2xl backdrop-blur-sm">
                         <div className="flex flex-col md:flex-row gap-4">
                             {/* Search Input */}
                             <div className="flex-1">
@@ -249,7 +250,7 @@ export default function Journaling({ journals = [] }) {
                                         placeholder="Cari jurnal (gratitude, achievement, reflection, dll)..."
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="w-full bg-black/40 backdrop-blur-sm border border-white/20 rounded-xl pl-12 pr-4 py-3 text-white placeholder-white/50 focus:border-white/50 focus:outline-none transition-colors"
+                                        className="w-full bg-slate-800/60 backdrop-blur-sm border border-blue-600/40 rounded-xl pl-12 pr-4 py-3 text-white placeholder-blue-200/60 focus:border-blue-500 focus:outline-none transition-colors"
                                     />
                                     {searchQuery && (
                                         <button
@@ -269,7 +270,7 @@ export default function Journaling({ journals = [] }) {
                                 <select
                                     value={filterMonth}
                                     onChange={(e) => setFilterMonth(e.target.value)}
-                                    className="w-full bg-black/40 backdrop-blur-sm border border-white/20 rounded-xl px-4 py-3 text-white focus:border-white/50 focus:outline-none transition-colors"
+                                    className="w-full bg-slate-800/60 backdrop-blur-sm border border-blue-600/40 rounded-xl px-4 py-3 text-white focus:border-blue-500 focus:outline-none transition-colors"
                                 >
                                     <option value="">Semua Bulan</option>
                                     {availableMonths.map((month) => (
@@ -285,7 +286,7 @@ export default function Journaling({ journals = [] }) {
                                 <select
                                     value={filterYear}
                                     onChange={(e) => setFilterYear(e.target.value)}
-                                    className="w-full bg-black/40 backdrop-blur-sm border border-white/20 rounded-xl px-4 py-3 text-white focus:border-white/50 focus:outline-none transition-colors"
+                                    className="w-full bg-slate-800/60 backdrop-blur-sm border border-blue-600/40 rounded-xl px-4 py-3 text-white focus:border-blue-500 focus:outline-none transition-colors"
                                 >
                                     <option value="">Semua Tahun</option>
                                     {availableYears.map((year) => (
@@ -301,8 +302,8 @@ export default function Journaling({ journals = [] }) {
                         {/* Result Count */}
                         {(searchQuery || filterMonth || filterYear) && (
                             <div className="mt-4 flex items-center justify-between">
-                                <div className="text-white text-sm flex items-center space-x-2">
-                                    <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                                <div className="text-blue-200 text-sm flex items-center space-x-2">
+                                    <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
                                     <span>
                                         <span className="text-white font-bold">{filteredJournals.length}</span> jurnal ditemukan
                                     </span>
@@ -332,19 +333,19 @@ export default function Journaling({ journals = [] }) {
                             journals={filteredJournals} 
                             onJournalClick={setSelectedJournal}
                         />
-                    </div>
-                )}
+                                    </div>
+                                )}
 
                 {/* Empty State */}
                 {filteredJournals.length === 0 && journals.length > 0 && (searchQuery || filterMonth || filterYear) && (
                     <div className="text-center py-20">
-                        <div className="inline-block p-6 bg-black rounded-full mb-6 border border-white/20 shadow-2xl">
+                        <div className="inline-block p-6 bg-gradient-to-br from-slate-800 to-blue-900 rounded-full mb-6 border border-blue-600/30 shadow-2xl">
                             <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto">
                                 <div className="w-10 h-10 bg-black rounded-full"></div>
                             </div>
                         </div>
-                        <h3 className="text-2xl font-bold text-white mb-3">Jurnal tidak ditemukan</h3>
-                        <p className="text-white text-lg max-w-md mx-auto mb-8 bg-black/40 backdrop-blur-md px-6 py-3 rounded-2xl border border-white/10">
+                        <h3 className="text-2xl font-bold bg-gradient-to-r from-white via-blue-200 to-white bg-clip-text text-transparent mb-3">Jurnal tidak ditemukan</h3>
+                        <p className="text-blue-200 text-lg max-w-md mx-auto mb-8 bg-slate-900/40 backdrop-blur-md px-6 py-3 rounded-2xl border border-blue-700/30">
                             Tidak ada jurnal yang sesuai dengan filter Anda. Coba ubah kata kunci atau filter tanggal Anda.
                         </p>
                         <button
@@ -353,7 +354,7 @@ export default function Journaling({ journals = [] }) {
                                 setFilterMonth("");
                                 setFilterYear("");
                             }}
-                            className="bg-white hover:bg-white/90 text-black px-8 py-3 rounded-lg transition-all duration-200 hover:scale-105 font-bold shadow-lg"
+                            className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-3 rounded-lg transition-all duration-200 hover:scale-105 font-bold shadow-lg border border-blue-500/30"
                         >
                             Hapus Filter
                         </button>
@@ -363,16 +364,16 @@ export default function Journaling({ journals = [] }) {
                 {/* Empty State */}
                 {journals.length === 0 && !searchQuery && !filterMonth && !filterYear && (
                     <div className="text-center py-20">
-                        <div className="inline-block p-6 bg-black rounded-full mb-6 border border-white/20 shadow-2xl">
+                        <div className="inline-block p-6 bg-gradient-to-br from-slate-800 to-blue-900 rounded-full mb-6 border border-blue-600/30 shadow-2xl">
                             <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto">
                                 <div className="w-10 h-10 bg-black rounded-full"></div>
                             </div>
                         </div>
-                        <h3 className="text-2xl font-bold text-white mb-3">Belum ada jurnal</h3>
-                        <p className="text-white text-lg max-w-md mx-auto mb-8 bg-black/40 backdrop-blur-md px-6 py-3 rounded-2xl border border-white/10">Mulai menulis jurnal pertama Anda untuk merefleksikan perjalanan hidup Anda</p>
+                        <h3 className="text-2xl font-bold bg-gradient-to-r from-white via-blue-200 to-white bg-clip-text text-transparent mb-3">Belum ada jurnal</h3>
+                        <p className="text-blue-200 text-lg max-w-md mx-auto mb-8 bg-slate-900/40 backdrop-blur-md px-6 py-3 rounded-2xl border border-blue-700/30">Mulai menulis jurnal pertama Anda untuk merefleksikan perjalanan hidup Anda</p>
                         <button
                             onClick={() => setIsModalOpen(true)}
-                            className="bg-white hover:bg-white/90 text-black px-8 py-3 rounded-lg transition-all duration-200 hover:scale-105 font-bold shadow-lg"
+                            className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-3 rounded-lg transition-all duration-200 hover:scale-105 font-bold shadow-lg border border-blue-500/30"
                         >
                             Mulai Menulis
                         </button>
@@ -394,33 +395,33 @@ export default function Journaling({ journals = [] }) {
 
             {/* Modal Form - Book Style */}
             {isModalOpen && (
-                <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 z-[9999]">
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-[9999]">
                     {/* Book Container */}
                     <div className="relative w-full max-w-5xl">
                         {/* Book Shadow */}
                         <div className="absolute -inset-4 bg-black/40 rounded-3xl blur-2xl"></div>
                         
                         {/* Book */}
-                        <div className="relative bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900 rounded-2xl shadow-2xl overflow-hidden border-4 border-slate-600" style={{
+                        <div className="relative bg-gradient-to-br from-slate-800/70 via-slate-700/60 to-slate-900/70 rounded-2xl shadow-2xl overflow-hidden border-4 border-slate-500/40 backdrop-blur-md" style={{
                             transform: 'perspective(1000px) rotateY(-2deg)',
                             transformStyle: 'preserve-3d'
                         }}>
                             {/* Book Pages */}
-                            <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 min-h-[80vh] max-h-[90vh] overflow-y-auto">
+                            <div className="bg-gradient-to-r from-slate-900/60 via-slate-800/50 to-slate-900/60 min-h-[80vh] max-h-[90vh] overflow-y-auto">
                                 {/* Book Binding Indicator */}
                                 <div className="absolute left-0 top-0 bottom-0 w-2 bg-gradient-to-r from-slate-600 via-slate-700 to-transparent"></div>
                                 
                                 {/* Page Content */}
                                 <div className="relative p-8 lg:p-12">
                                     {/* Close Button */}
-                                    <button
-                                        onClick={handleCloseModal}
+                            <button
+                                onClick={handleCloseModal}
                                         className="absolute top-4 right-4 text-slate-200 hover:text-white hover:bg-slate-700 p-2 rounded-full transition-all duration-200"
-                                    >
-                                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                        </svg>
-                                    </button>
+                            >
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
 
                                     {/* Book Header */}
                                     <div className="mb-8 text-center border-b-2 border-slate-600 pb-6">
@@ -428,9 +429,9 @@ export default function Journaling({ journals = [] }) {
                                             {editingJournal ? 'Edit Jurnal' : 'My Journal'}
                                         </h2>
                                         <p className="text-slate-300 italic text-sm">Bagikan perjalanan Anda hari ini</p>
-                                    </div>
+                        </div>
 
-                                    <form onSubmit={handleSubmit} className="space-y-6">
+                        <form onSubmit={handleSubmit} className="space-y-6">
                                         {/* Title */}
                                         <div className="mb-6">
                                             <label className="block text-slate-300 font-serif font-bold mb-2 text-sm uppercase tracking-wide">Nama Jurnal</label>
@@ -447,152 +448,152 @@ export default function Journaling({ journals = [] }) {
 
                                         {/* Date & Mood Row */}
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                                            {/* Date */}
-                                            <div>
+                            {/* Date */}
+                            <div>
                                                 <label className="block text-slate-300 font-serif font-bold mb-2 text-sm uppercase tracking-wide">Tanggal</label>
-                                                <input
-                                                    type="date"
-                                                    name="date"
-                                                    value={data.date}
-                                                    onChange={handleInputChange}
+                                <input
+                                    type="date"
+                                    name="date"
+                                    value={data.date}
+                                    onChange={handleInputChange}
                                                     className="w-full bg-transparent border-b-2 border-slate-500 focus:border-blue-400 px-1 py-2 text-white focus:outline-none font-serif text-base transition-colors"
-                                                    required
-                                                />
-                                            </div>
+                                    required
+                                />
+                            </div>
 
-                                            {/* Mood */}
-                                            <div>
+                            {/* Mood */}
+                            <div>
                                                 <label className="block text-slate-300 font-serif font-bold mb-2 text-sm uppercase tracking-wide">Mood</label>
                                                 <div className="flex flex-wrap gap-2">
-                                                    {moods.map((mood) => (
-                                                        <button
-                                                            key={mood.emoji}
-                                                            type="button"
-                                                            onClick={() => handleMoodSelect(mood)}
+                                    {moods.map((mood) => (
+                                        <button
+                                            key={mood.emoji}
+                                            type="button"
+                                            onClick={() => handleMoodSelect(mood)}
                                                             className={`p-2 rounded border-2 transition-all duration-200 ${
-                                                                data.mood === mood.emoji
+                                                data.mood === mood.emoji
                                                                     ? 'border-blue-400 bg-slate-700 scale-110 shadow-md'
                                                                     : 'border-slate-600 hover:border-slate-400 hover:bg-slate-700 bg-transparent'
-                                                            }`}
-                                                        >
+                                            }`}
+                                        >
                                                             <div className="text-xl">{mood.emoji}</div>
-                                                        </button>
-                                                    ))}
-                                                </div>
-                                            </div>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
                                         </div>
 
                                         {/* Divider */}
                                         <div className="border-t border-slate-600 my-8"></div>
 
-                                        {/* Gratitude */}
+                            {/* Gratitude */}
                                         <div className="mb-6">
                                             <label className="block text-slate-300 font-serif font-bold mb-3 text-sm uppercase tracking-wide">Rasa Syukur</label>
                                             <div className="relative bg-slate-800/50 border-l-4 border-blue-500 p-4 rounded-r shadow-sm">
-                                                <textarea
-                                                    name="gratitude"
-                                                    value={data.gratitude}
-                                                    onChange={handleInputChange}
-                                                    placeholder="Apa yang Anda syukuri hari ini?"
+                                <textarea
+                                    name="gratitude"
+                                    value={data.gratitude}
+                                    onChange={handleInputChange}
+                                    placeholder="Apa yang Anda syukuri hari ini?"
                                                     rows={4}
                                                     className="w-full bg-transparent border-none focus:outline-none text-slate-200 placeholder-slate-400 font-serif resize-none leading-6"
-                                                />
+                                />
                                             </div>
-                                        </div>
+                            </div>
 
-                                        {/* Achievement */}
+                            {/* Achievement */}
                                         <div className="mb-6">
                                             <label className="block text-slate-300 font-serif font-bold mb-3 text-sm uppercase tracking-wide">Pencapaian</label>
                                             <div className="relative bg-slate-800/50 border-l-4 border-blue-500 p-4 rounded-r shadow-sm">
-                                                <textarea
-                                                    name="achievement"
-                                                    value={data.achievement}
-                                                    onChange={handleInputChange}
-                                                    placeholder="Apa yang Anda capai hari ini?"
+                                <textarea
+                                    name="achievement"
+                                    value={data.achievement}
+                                    onChange={handleInputChange}
+                                    placeholder="Apa yang Anda capai hari ini?"
                                                     rows={4}
                                                     className="w-full bg-transparent border-none focus:outline-none text-slate-200 placeholder-slate-400 font-serif resize-none leading-6"
-                                                />
+                                />
                                             </div>
-                                        </div>
+                            </div>
 
-                                        {/* Challenge */}
+                            {/* Challenge */}
                                         <div className="mb-6">
                                             <label className="block text-slate-300 font-serif font-bold mb-3 text-sm uppercase tracking-wide">Tantangan</label>
                                             <div className="relative bg-slate-800/50 border-l-4 border-blue-500 p-4 rounded-r shadow-sm">
-                                                <textarea
-                                                    name="challenge"
-                                                    value={data.challenge}
-                                                    onChange={handleInputChange}
-                                                    placeholder="Tantangan terbesar hari ini adalah..."
+                                <textarea
+                                    name="challenge"
+                                    value={data.challenge}
+                                    onChange={handleInputChange}
+                                    placeholder="Tantangan terbesar hari ini adalah..."
                                                     rows={4}
                                                     className="w-full bg-transparent border-none focus:outline-none text-slate-200 placeholder-slate-400 font-serif resize-none leading-6"
-                                                />
+                                />
                                             </div>
-                                        </div>
+                            </div>
 
-                                        {/* Reflection */}
+                            {/* Reflection */}
                                         <div className="mb-6">
                                             <label className="block text-slate-300 font-serif font-bold mb-3 text-sm uppercase tracking-wide">Refleksi</label>
                                             <div className="relative bg-slate-800/50 border-l-4 border-blue-500 p-4 rounded-r shadow-sm">
-                                                <textarea
-                                                    name="reflection"
-                                                    value={data.reflection}
-                                                    onChange={handleInputChange}
-                                                    placeholder="Apa yang Anda pelajari hari ini?"
+                                <textarea
+                                    name="reflection"
+                                    value={data.reflection}
+                                    onChange={handleInputChange}
+                                    placeholder="Apa yang Anda pelajari hari ini?"
                                                     rows={4}
                                                     className="w-full bg-transparent border-none focus:outline-none text-slate-200 placeholder-slate-400 font-serif resize-none leading-6"
-                                                />
+                                />
                                             </div>
-                                        </div>
+                            </div>
 
-                                        {/* Tomorrow Goal */}
+                            {/* Tomorrow Goal */}
                                         <div className="mb-6">
                                             <label className="block text-slate-300 font-serif font-bold mb-3 text-sm uppercase tracking-wide">Tujuan untuk Besok</label>
                                             <div className="relative bg-slate-800/50 border-l-4 border-blue-500 p-4 rounded-r shadow-sm">
-                                                <textarea
-                                                    name="tomorrow_goal"
-                                                    value={data.tomorrow_goal}
-                                                    onChange={handleInputChange}
-                                                    placeholder="Apa tujuan Anda untuk besok?"
+                                <textarea
+                                    name="tomorrow_goal"
+                                    value={data.tomorrow_goal}
+                                    onChange={handleInputChange}
+                                    placeholder="Apa tujuan Anda untuk besok?"
                                                     rows={4}
                                                     className="w-full bg-transparent border-none focus:outline-none text-slate-200 placeholder-slate-400 font-serif resize-none leading-6"
-                                                />
+                                />
                                             </div>
-                                        </div>
+                            </div>
 
-                                        {/* Affirmation */}
+                            {/* Affirmation */}
                                         <div className="mb-8">
                                             <label className="block text-slate-300 font-serif font-bold mb-3 text-sm uppercase tracking-wide">Afirmasi Pribadi</label>
                                             <div className="relative bg-slate-800/50 border-l-4 border-blue-500 p-4 rounded-r shadow-sm">
-                                                <textarea
-                                                    name="affirmation"
-                                                    value={data.affirmation}
-                                                    onChange={handleInputChange}
+                                <textarea
+                                    name="affirmation"
+                                    value={data.affirmation}
+                                    onChange={handleInputChange}
                                                     placeholder="Tuliskan afirmasi positif Anda..."
                                                     rows={4}
                                                     className="w-full bg-transparent border-none focus:outline-none text-slate-200 placeholder-slate-400 font-serif resize-none leading-6 italic"
                                                 />
                                             </div>
-                                        </div>
+                            </div>
 
-                                        {/* Submit Buttons */}
+                            {/* Submit Buttons */}
                                         <div className="flex space-x-4 pt-6 border-t-2 border-slate-600">
-                                            <button
-                                                type="button"
-                                                onClick={handleCloseModal}
+                                <button
+                                    type="button"
+                                    onClick={handleCloseModal}
                                                 className="flex-1 bg-transparent hover:bg-slate-700 border-2 border-slate-600 hover:border-slate-400 text-slate-300 py-3 px-6 rounded-lg transition-all duration-200 font-serif font-semibold shadow-sm hover:shadow-md"
-                                            >
-                                                Batal
-                                            </button>
-                                            <button
-                                                type="submit"
-                                                disabled={processing}
+                                >
+                                    Batal
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={processing}
                                                 className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg transition-all duration-200 hover:scale-105 font-serif font-bold disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
-                                            >
+                                >
                                                 {processing ? 'Menyimpan...' : (editingJournal ? 'Perbarui Jurnal' : 'Simpan Jurnal')}
-                                            </button>
-                                        </div>
-                                    </form>
+                                </button>
+                            </div>
+                        </form>
                                 </div>
                             </div>
                         </div>
@@ -600,7 +601,7 @@ export default function Journaling({ journals = [] }) {
                 </div>
             )}
                     </div>
-                </div>
+            </div>
             </div>
         </LayoutUser>
     );
