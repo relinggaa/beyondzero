@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('image')->nullable();
-            $table->json('expertise'); // Array of expertise areas
+            $table->json('expertise'); 
             $table->text('description');
             $table->text('education');
             $table->string('experience');
