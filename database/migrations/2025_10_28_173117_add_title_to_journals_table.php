@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('journals', function (Blueprint $table) {
-            $table->string('title')->after('user_id');
+            $table->string('title')->nullable()->after('user_id');
         });
     }
 
@@ -26,4 +26,3 @@ return new class extends Migration
         });
     }
 };
-

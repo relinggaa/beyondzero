@@ -155,7 +155,7 @@
   position: absolute;
   left: 50%;
   transform: translateX(-50%) scale(1);
-  bottom: 130px;
+  bottom: 0px;
   opacity: calc(1.45 - var(--pointer-from-center));
   filter: brightness(0.72) contrast(0.9) saturate(0.85); /* darker matte */
 }
