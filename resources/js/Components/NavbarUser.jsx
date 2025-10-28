@@ -12,9 +12,6 @@ export default function NavbarUser() {
                 <div className="flex items-center justify-between">
                     {/* Logo/Brand */}
                     <div className="flex items-center">
-                        <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center mr-2">
-                            <div className="w-5 h-5 bg-black rounded-full"></div>
-                        </div>
                         <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">
                            FixYou
                         </h1>
@@ -67,7 +64,7 @@ export default function NavbarUser() {
                             href="/games" 
                             className="text-white/90 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg transition-all duration-200 text-sm lg:text-base font-medium"
                         >
-                            Games
+                            Healing
                         </a>
                         
                         {/* Separator */}
@@ -125,7 +122,7 @@ export default function NavbarUser() {
                                 href="/games" 
                                 className="text-white/90 hover:text-white hover:bg-white/10 transition-all duration-200 py-2 px-4 rounded-lg font-medium"
                             >
-                                Games
+                                Healing
                             </a>
                          
                             <button className="bg-white hover:bg-white/90 text-black px-4 py-2 rounded-full transition-all duration-200 font-bold text-sm tracking-wide w-full mt-4">

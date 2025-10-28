@@ -18,6 +18,8 @@ export default function MoodTracker() {
     const [isSupported, setIsSupported] = useState(false);
     const [recognition, setRecognition] = useState(null);
     const [voiceStatus, setVoiceStatus] = useState('');
+    const [isSpeaking, setIsSpeaking] = useState(false);
+    const [speechSynthesis, setSpeechSynthesis] = useState(null);
     const [showMoodTemplates, setShowMoodTemplates] = useState(false);
     const [socket, setSocket] = useState(null);
     const [isConnected, setIsConnected] = useState(false);
@@ -202,6 +204,11 @@ export default function MoodTracker() {
                 
                 // Auto-scroll after AI response
                 setTimeout(scrollToBottom, 100);
+                
+                // Speak AI response
+                setTimeout(() => {
+                    speakText(aiResponse);
+                }, 500);
             }
         });
 
@@ -234,9 +241,10 @@ export default function MoodTracker() {
         scrollToBottom();
     }, [currentChatMessages]);
 
-    // Initialize voice recognition
+    // Initialize voice recognition and speech synthesis
     useEffect(() => {
         if (typeof window !== 'undefined') {
+            // Initialize Speech Recognition
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             
             if (SpeechRecognition) {
@@ -282,6 +290,11 @@ export default function MoodTracker() {
                 setIsSupported(true);
             } else {
                 setIsSupported(false);
+            }
+
+            // Initialize Speech Synthesis
+            if ('speechSynthesis' in window) {
+                setSpeechSynthesis(window.speechSynthesis);
             }
         }
     }, []);
@@ -398,6 +411,35 @@ export default function MoodTracker() {
         return [...new Set(activities)]; // Remove duplicates
     };
 
+    // Fungsi untuk text-to-speech
+    const speakText = (text) => {
+        if (speechSynthesis && text) {
+            // Stop any ongoing speech
+            speechSynthesis.cancel();
+            
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'id-ID'; // Indonesian language
+            utterance.rate = 0.9; // Slightly slower for better understanding
+            utterance.pitch = 1;
+            utterance.volume = 0.8;
+            
+            utterance.onstart = () => {
+                setIsSpeaking(true);
+            };
+            
+            utterance.onend = () => {
+                setIsSpeaking(false);
+            };
+            
+            utterance.onerror = (event) => {
+                console.error('Speech synthesis error:', event.error);
+                setIsSpeaking(false);
+            };
+            
+            speechSynthesis.speak(utterance);
+        }
+    };
+
     // Fungsi untuk generate AI response berdasarkan ML prediction
     const generateAIResponse = (mlResult, userMessage) => {
         if (!mlResult) {
@@ -501,6 +543,11 @@ export default function MoodTracker() {
             
             // Auto-scroll after AI response
             setTimeout(scrollToBottom, 100);
+            
+            // Speak AI response
+            setTimeout(() => {
+                speakText(aiResponse);
+            }, 500);
         }
         
         // Clear input
@@ -533,6 +580,13 @@ export default function MoodTracker() {
             stopListening();
         } else {
             startListening();
+        }
+    };
+
+    const stopSpeaking = () => {
+        if (speechSynthesis) {
+            speechSynthesis.cancel();
+            setIsSpeaking(false);
         }
     };
 
@@ -617,8 +671,10 @@ export default function MoodTracker() {
                                 onSendMessage={handleSendMessage}
                                 onKeyPress={handleKeyPress}
                                 onToggleListening={toggleListening}
+                                onStopSpeaking={stopSpeaking}
                                 isAnalyzing={isAnalyzing}
                                 isListening={isListening}
+                                isSpeaking={isSpeaking}
                                 isSupported={isSupported}
                             />
 

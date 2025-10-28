@@ -6,8 +6,10 @@ export default function MessageInput({
     onSendMessage, 
     onKeyPress, 
     onToggleListening,
+    onStopSpeaking,
     isAnalyzing, 
     isListening, 
+    isSpeaking,
     isSupported 
 }) {
     return (
@@ -61,6 +63,19 @@ export default function MessageInput({
                     </svg>
                     )}
                 </button>
+                {/* Stop Speaking Button */}
+                {isSpeaking && (
+                    <button 
+                        onClick={onStopSpeaking}
+                        className="p-2 lg:p-3 rounded-xl transition-all duration-200 hover:scale-105 flex-shrink-0 bg-red-500 hover:bg-red-600 text-white"
+                        title="Stop speaking"
+                    >
+                        <svg className="w-4 h-4 lg:w-5 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 9h6v6H9z" />
+                        </svg>
+                    </button>
+                )}
             </div>
         </div>
     );
