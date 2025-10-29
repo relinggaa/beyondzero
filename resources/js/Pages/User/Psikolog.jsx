@@ -372,6 +372,7 @@ export default function Psikolog({ psikologs }) {
                 )}
                     </div>
                 </div>
+            </div>
 
             {/* Modal Detail Psikolog */}
             {isModalOpen && selectedPsikolog && (
@@ -619,12 +620,12 @@ export default function Psikolog({ psikologs }) {
                 </div>
             )}
 
-            {/* Floating Chatbot Button */}
+            {/* Floating Chatbot Button - Outside relative container */}
             {!isChatbotOpen && (
                 <button
                     onClick={handleOpenChatbot}
-                    className="fixed bottom-6 right-6 bg-gradient-to-br from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 z-[9999] border border-blue-400/40"
-                    style={{ position: 'fixed' }}
+                    className="fixed bottom-6 right-6 bg-gradient-to-br from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 z-[99999] border border-blue-400/40"
+                    aria-label="Buka Chatbot"
                 >
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
@@ -632,15 +633,10 @@ export default function Psikolog({ psikologs }) {
                 </button>
             )}
 
-            {/* Floating Chatbot Window */}
+            {/* Floating Chatbot Window - Outside relative container */}
             {isChatbotOpen && (
                 <div 
-                    className="fixed bottom-6 right-6 w-[22rem] h-[28rem] md:w-[28rem] md:h-[36rem] bg-gradient-to-br from-slate-950/95 via-blue-950/95 to-black/95 rounded-2xl shadow-2xl border border-blue-800/50 flex flex-col z-[9999] backdrop-blur-sm animate-in slide-in-from-bottom-right duration-300"
-                    style={{ 
-                        position: 'fixed',
-                        bottom: '24px',
-                        right: '24px'
-                    }}
+                    className="fixed bottom-6 right-6 w-[22rem] h-[28rem] md:w-[28rem] md:h-[36rem] bg-gradient-to-br from-slate-950/95 via-blue-950/95 to-black/95 rounded-2xl shadow-2xl border border-blue-800/50 flex flex-col z-[99999] backdrop-blur-sm animate-in slide-in-from-bottom-right duration-300"
                 >
                     {/* Chatbot Header */}
                     <div className="flex items-center justify-between p-4 border-b border-blue-800/50 bg-gradient-to-r from-blue-700 to-blue-900 rounded-t-2xl">
@@ -662,6 +658,7 @@ export default function Psikolog({ psikologs }) {
                             <button
                                 onClick={handleCloseChatbot}
                                 className="text-white/60 hover:text-white p-1"
+                                aria-label="Tutup Chatbot"
                             >
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -703,6 +700,7 @@ export default function Psikolog({ psikologs }) {
                             <button
                                 type="submit"
                                 className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white p-2 rounded-full transition-all duration-200 hover:scale-105 border border-blue-400/40"
+                                aria-label="Kirim Pesan"
                             >
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
@@ -715,7 +713,6 @@ export default function Psikolog({ psikologs }) {
                     </div>
                 </div>
             )}
-                </div>
         </LayoutUser>
     );
 }
