@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useCallback, useMemo } from 'react';
-import './css/ProfileCard.css';
+import '../Components/css/ProfileCard.css';
 
 const DEFAULT_BEHIND_GRADIENT =
   'radial-gradient(farthest-side circle at var(--pointer-x) var(--pointer-y),hsla(266,100%,90%,var(--card-opacity)) 4%,hsla(266,50%,80%,calc(var(--card-opacity)*0.75)) 10%,hsla(266,25%,70%,calc(var(--card-opacity)*0.5)) 50%,hsla(266,0%,60%,0) 100%),radial-gradient(35% 52% at 55% 20%,#00ffaac4 0%,#073aff00 100%),radial-gradient(100% 100% at 50% 50%,#00c1ffff 1%,#073aff00 76%),conic-gradient(from 124deg at 50% 50%,#c137ffff 0%,#07c6ffff 40%,#07c6ffff 60%,#c137ffff 100%)';
@@ -113,15 +113,18 @@ const ProfileCardComponent = ({
     };
   }, [enableTilt]);
 
-  const handlePointerMove = useCallback(event => {
-    const card = cardRef.current;
-    const wrap = wrapRef.current;
+  const handlePointerMove = useCallback(
+    event => {
+      const card = cardRef.current;
+      const wrap = wrapRef.current;
 
-    if (!card || !wrap || !animationHandlers) return;
+      if (!card || !wrap || !animationHandlers) return;
 
-    const rect = card.getBoundingClientRect();
-    animationHandlers.updateCardTransform(event.clientX - rect.left, event.clientY - rect.top, card, wrap);
-  }, [animationHandlers]);
+      const rect = card.getBoundingClientRect();
+      animationHandlers.updateCardTransform(event.clientX - rect.left, event.clientY - rect.top, card, wrap);
+    },
+    [animationHandlers]
+  );
 
   const handlePointerEnter = useCallback(() => {
     const card = cardRef.current;
@@ -134,33 +137,45 @@ const ProfileCardComponent = ({
     card.classList.add('active');
   }, [animationHandlers]);
 
-  const handlePointerLeave = useCallback(event => {
-    const card = cardRef.current;
-    const wrap = wrapRef.current;
+  const handlePointerLeave = useCallback(
+    event => {
+      const card = cardRef.current;
+      const wrap = wrapRef.current;
 
-    if (!card || !wrap || !animationHandlers) return;
+      if (!card || !wrap || !animationHandlers) return;
 
-    animationHandlers.createSmoothAnimation(ANIMATION_CONFIG.SMOOTH_DURATION, event.offsetX, event.offsetY, card, wrap);
-    wrap.classList.remove('active');
-    card.classList.remove('active');
-  }, [animationHandlers]);
+      animationHandlers.createSmoothAnimation(
+        ANIMATION_CONFIG.SMOOTH_DURATION,
+        event.offsetX,
+        event.offsetY,
+        card,
+        wrap
+      );
+      wrap.classList.remove('active');
+      card.classList.remove('active');
+    },
+    [animationHandlers]
+  );
 
-  const handleDeviceOrientation = useCallback(event => {
-    const card = cardRef.current;
-    const wrap = wrapRef.current;
+  const handleDeviceOrientation = useCallback(
+    event => {
+      const card = cardRef.current;
+      const wrap = wrapRef.current;
 
-    if (!card || !wrap || !animationHandlers) return;
+      if (!card || !wrap || !animationHandlers) return;
 
-    const { beta, gamma } = event;
-    if (!beta || !gamma) return;
+      const { beta, gamma } = event;
+      if (!beta || !gamma) return;
 
-    animationHandlers.updateCardTransform(
-      card.clientHeight / 2 + gamma * mobileTiltSensitivity,
-      card.clientWidth / 2 + (beta - ANIMATION_CONFIG.DEVICE_BETA_OFFSET) * mobileTiltSensitivity,
-      card,
-      wrap
-    );
-  }, [animationHandlers, mobileTiltSensitivity]);
+      animationHandlers.updateCardTransform(
+        card.clientHeight / 2 + gamma * mobileTiltSensitivity,
+        card.clientWidth / 2 + (beta - ANIMATION_CONFIG.DEVICE_BETA_OFFSET) * mobileTiltSensitivity,
+        card,
+        wrap
+      );
+    },
+    [animationHandlers, mobileTiltSensitivity]
+  );
 
   useEffect(() => {
     if (!enableTilt || !animationHandlers) return;
@@ -219,22 +234,22 @@ const ProfileCardComponent = ({
     handleDeviceOrientation
   ]);
 
-  const cardStyle = useMemo(() => ({
-    '--icon': iconUrl ? `url(${iconUrl})` : 'none',
-    '--grain': grainUrl ? `url(${grainUrl})` : 'none',
-    '--behind-gradient': showBehindGradient ? (behindGradient ?? DEFAULT_BEHIND_GRADIENT) : 'none',
-    '--inner-gradient': innerGradient ?? DEFAULT_INNER_GRADIENT
-  }), [iconUrl, grainUrl, showBehindGradient, behindGradient, innerGradient]);
+  const cardStyle = useMemo(
+    () => ({
+      '--icon': iconUrl ? `url(${iconUrl})` : 'none',
+      '--grain': grainUrl ? `url(${grainUrl})` : 'none',
+      '--behind-gradient': showBehindGradient ? (behindGradient ?? DEFAULT_BEHIND_GRADIENT) : 'none',
+      '--inner-gradient': innerGradient ?? DEFAULT_INNER_GRADIENT
+    }),
+    [iconUrl, grainUrl, showBehindGradient, behindGradient, innerGradient]
+  );
 
   const handleContactClick = useCallback(() => {
     onContactClick?.();
   }, [onContactClick]);
 
   return (
-    <div
-      ref={wrapRef}
-      className={`pc-card-wrapper ${className}`.trim()}
-      style={cardStyle}>
+    <div ref={wrapRef} className={`pc-card-wrapper ${className}`.trim()} style={cardStyle}>
       <section ref={cardRef} className="pc-card">
         <div className="pc-inside">
           <div className="pc-shine" />
@@ -248,7 +263,8 @@ const ProfileCardComponent = ({
               onError={e => {
                 const target = e.target;
                 target.style.display = 'none';
-              }} />
+              }}
+            />
             {showUserInfo && (
               <div className="pc-user-info">
                 <div className="pc-user-details">
@@ -261,7 +277,8 @@ const ProfileCardComponent = ({
                         const target = e.target;
                         target.style.opacity = '0.5';
                         target.src = avatarUrl;
-                      }} />
+                      }}
+                    />
                   </div>
                   <div className="pc-user-text">
                     <div className="pc-handle">@{handle}</div>
@@ -273,7 +290,8 @@ const ProfileCardComponent = ({
                   onClick={handleContactClick}
                   style={{ pointerEvents: 'auto' }}
                   type="button"
-                  aria-label={`Contact ${name || 'user'}`}>
+                  aria-label={`Contact ${name || 'user'}`}
+                >
                   {contactText}
                 </button>
               </div>

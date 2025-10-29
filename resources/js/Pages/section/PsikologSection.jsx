@@ -34,15 +34,26 @@ const PsikologSection = () => {
     fetchPsikologs();
   }, []);
 
+  // Calculate number of slides (3 cards per slide)
+  const cardsPerSlide = 3;
+  const totalSlides = Math.ceil(psikologs.length / cardsPerSlide);
+
+  // Group psikologs into slides
+  const getPsikologsForSlide = (slideIndex) => {
+    const start = slideIndex * cardsPerSlide;
+    const end = start + cardsPerSlide;
+    return psikologs.slice(start, end);
+  };
+
   const nextSlide = () => {
     setCurrentIndex((prev) => 
-      prev === psikologs.length - 1 ? 0 : prev + 1
+      prev === totalSlides - 1 ? 0 : prev + 1
     );
   };
 
   const prevSlide = () => {
     setCurrentIndex((prev) => 
-      prev === 0 ? psikologs.length - 1 : prev - 1
+      prev === 0 ? totalSlides - 1 : prev - 1
     );
   };
 
@@ -155,9 +166,13 @@ const PsikologSection = () => {
               animate={{ x: `-${currentIndex * 100}%` }}
               transition={{ duration: 0.5, ease: "easeInOut" }}
             >
-              {psikologs.map((psikolog, index) => (
-                <div key={psikolog.id} className="carousel-slide">
-                  <PsikologCard psikolog={psikolog} />
+              {Array.from({ length: totalSlides }).map((_, slideIndex) => (
+                <div key={slideIndex} className="carousel-slide">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {getPsikologsForSlide(slideIndex).map((psikolog) => (
+                      <PsikologCard key={psikolog.id} psikolog={psikolog} />
+                    ))}
+                  </div>
                 </div>
               ))}
             </motion.div>
@@ -165,7 +180,7 @@ const PsikologSection = () => {
 
           {/* Indicators */}
           <div className="carousel-indicators">
-            {psikologs.map((_, index) => (
+            {Array.from({ length: totalSlides }).map((_, index) => (
               <button
                 key={index}
                 onClick={() => goToSlide(index)}
