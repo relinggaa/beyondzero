@@ -632,33 +632,9 @@ export default function Games() {
             <div className="min-h-screen pt-20 pb-12 relative bg-gradient-to-br from-slate-900 via-blue-900 to-black">
                 <div className="absolute inset-0 bg-gradient-to-br from-slate-900/60 via-blue-900/50 to-black/80"></div>
                 <div className="container mx-auto px-4 py-8 relative z-10">
-                    {/* Header */}
+                    {/* Search & Filter */}
                     <div className="mb-8 p-6 rounded-3xl bg-gradient-to-br from-slate-900/90 via-blue-900/80 to-black/90 border border-blue-800/30 shadow-2xl backdrop-blur-sm">
-                        <div className="flex items-center justify-between mb-6">
-                            {/* Logo */}
-                            <div className="flex items-center space-x-4">
-                                <div className="w-14 h-14 bg-white/10 border border-blue-700/40 rounded-xl flex items-center justify-center">
-                                    <Gamepad2 className="w-7 h-7 text-white" />
-                                </div>
-                                <div>
-                                    <h1 className="text-2xl font-bold bg-gradient-to-r from-white via-blue-200 to-white bg-clip-text text-transparent">BeyondZero Games</h1>
-                                    <p className="text-blue-100">Portal Game Kesehatan Mental</p>
-                                </div>
-                            </div>
-                            
-                            {/* Navigation Icons */}
-                            <div className="flex items-center space-x-4">
-                                <button className="w-10 h-10 bg-slate-800/60 border border-blue-700/40 rounded-full flex items-center justify-center hover:bg-slate-700 transition-colors">
-                                    <User className="w-5 h-5 text-white" />
-                                </button>
-                                <button className="w-10 h-10 bg-slate-800/60 border border-blue-700/40 rounded-full flex items-center justify-center hover:bg-slate-700 transition-colors">
-                                    <Search className="w-5 h-5 text-white" />
-                                </button>
-                            </div>
-                        </div>
-                        
-                        {/* Search Bar */}
-                        <div className="relative">
+                        <div className="relative mb-4">
                             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-blue-200/70" />
                             <input
                                 type="text"
@@ -668,9 +644,7 @@ export default function Games() {
                                 className="w-full pl-10 pr-4 py-3 bg-slate-800/60 border border-blue-700/40 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-blue-200/60"
                             />
                         </div>
-                        
-                        {/* Category Filter */}
-                        <div className="flex flex-wrap gap-2 mt-4">
+                        <div className="flex flex-wrap gap-2">
                             {categories.map((category) => (
                                 <button
                                     key={category}

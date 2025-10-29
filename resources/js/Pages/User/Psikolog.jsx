@@ -10,6 +10,7 @@ export default function Psikolog({ psikologs }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
     const [isChatbotOpen, setIsChatbotOpen] = useState(false);
+    const [isChatbotLoading, setIsChatbotLoading] = useState(false);
     const [chatMessage, setChatMessage] = useState("");
     const [chatMessages, setChatMessages] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
@@ -133,6 +134,8 @@ export default function Psikolog({ psikologs }) {
         });
     };
 
+    const OLLAMA_API_BASE = 'http://localhost:5004';
+
     const handleOpenChatbot = () => {
         setIsChatbotOpen(true);
         // Initialize chat with welcome message
@@ -140,7 +143,7 @@ export default function Psikolog({ psikologs }) {
             {
                 id: 1,
                 type: "ai",
-                message: "Halo! Saya AI Assistant FixYou 🤖. Ada yang bisa saya bantu terkait kesehatan mental Anda?",
+                message: "Halo! Saya FixYou AI yang didukung Open-Source LLM (Ollama). Ceritakan apa yang sedang kamu rasakan, ya. Saya akan berusaha membantu dengan empati.",
                 timestamp: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
             }
         ]);
@@ -152,7 +155,21 @@ export default function Psikolog({ psikologs }) {
         setChatMessage("");
     };
 
-    const handleSendMessage = (e) => {
+    // Bangun konteks halaman untuk AI (ringkas, tetap akurat)
+    const buildPageContext = () => {
+        const totalCards = (psikologList || []).length;
+        const names = (psikologList || []).slice(0, 6).map(p => p.name).join(', ');
+        return [
+            'HALAMAN: Psikolog FixYou',
+            'FITUR: pencarian psikolog, lihat detail, booking konseling (online/offline), chatbot AI.',
+            `TOTAL PSIKOLOG TERLIHAT: ${totalCards}. Contoh nama: ${names}.`,
+            'DETAIL MODAL: menampilkan deskripsi, topik keahlian, pendekatan, pendidikan, pengalaman, filosofi.',
+            'BOOKING: pilih tanggal, waktu, tipe sesi, dan catatan. Aksi: buat jadwal.',
+            'GAYA: tema gelap (hitam, biru navy, putih).'
+        ].join('\n');
+    };
+
+    const handleSendMessage = async (e) => {
         e.preventDefault();
         if (chatMessage.trim()) {
             const newMessage = {
@@ -164,17 +181,54 @@ export default function Psikolog({ psikologs }) {
             
             setChatMessages(prev => [...prev, newMessage]);
             setChatMessage("");
-            
-            // Simulate AI response
-            setTimeout(() => {
-                const aiResponse = {
-                    id: Date.now() + 1,
-                    type: "ai",
-                    message: "Terima kasih atas pertanyaan Anda. Saya di sini untuk membantu Anda dengan konsultasi kesehatan mental. Apakah ada hal lain yang ingin Anda tanyakan?",
+
+            // Tampilkan placeholder loading
+            const loadingId = Date.now() + 2;
+            setIsChatbotLoading(true);
+            setChatMessages(prev => [...prev, { id: loadingId, type: 'ai', message: 'Mengetik...', timestamp: '' }]);
+
+            try {
+                const res = await fetch(`${OLLAMA_API_BASE}/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        message: newMessage.message, 
+                        timestamp: newMessage.timestamp,
+                        context: buildPageContext()
+                    })
+                });
+                const data = await res.json();
+
+                // Hapus placeholder loading
+                setChatMessages(prev => prev.filter(m => m.id !== loadingId));
+                setIsChatbotLoading(false);
+
+                if (data.success) {
+                    setChatMessages(prev => [...prev, {
+                        id: Date.now() + 3,
+                        type: 'ai',
+                        message: data.response,
+                        timestamp: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+                    }]);
+                } else {
+                    setChatMessages(prev => [...prev, {
+                        id: Date.now() + 4,
+                        type: 'ai',
+                        message: `Maaf, saya tidak bisa merespons saat ini: ${data.error || 'Unknown error'}`,
+                        timestamp: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+                    }]);
+                }
+            } catch (err) {
+                // Hapus placeholder loading dan tampilkan error
+                setChatMessages(prev => prev.filter(m => m.id !== loadingId));
+                setIsChatbotLoading(false);
+                setChatMessages(prev => [...prev, {
+                    id: Date.now() + 5,
+                    type: 'ai',
+                    message: `Gagal terhubung ke AI. Pastikan layanan Ollama API berjalan di ${OLLAMA_API_BASE}.`,
                     timestamp: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
-                };
-                setChatMessages(prev => [...prev, aiResponse]);
-            }, 1000);
+                }]);
+            }
         }
     };
 
@@ -569,7 +623,8 @@ export default function Psikolog({ psikologs }) {
             {!isChatbotOpen && (
                 <button
                     onClick={handleOpenChatbot}
-                    className="fixed bottom-6 right-6 bg-gradient-to-r from-cyan-400 to-teal-500 hover:from-cyan-500 hover:to-teal-600 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 z-40"
+                    className="fixed bottom-6 right-6 bg-gradient-to-br from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 z-[9999] border border-blue-400/40"
+                    style={{ position: 'fixed' }}
                 >
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
@@ -579,16 +634,23 @@ export default function Psikolog({ psikologs }) {
 
             {/* Floating Chatbot Window */}
             {isChatbotOpen && (
-                <div className="fixed bottom-6 right-6 w-80 h-96 bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col z-50">
+                <div 
+                    className="fixed bottom-6 right-6 w-[22rem] h-[28rem] md:w-[28rem] md:h-[36rem] bg-gradient-to-br from-slate-950/95 via-blue-950/95 to-black/95 rounded-2xl shadow-2xl border border-blue-800/50 flex flex-col z-[9999] backdrop-blur-sm animate-in slide-in-from-bottom-right duration-300"
+                    style={{ 
+                        position: 'fixed',
+                        bottom: '24px',
+                        right: '24px'
+                    }}
+                >
                     {/* Chatbot Header */}
-                    <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-cyan-400 to-teal-500 rounded-t-2xl">
+                    <div className="flex items-center justify-between p-4 border-b border-blue-800/50 bg-gradient-to-r from-blue-700 to-blue-900 rounded-t-2xl">
                         <div className="flex items-center space-x-3">
-                            <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+                            <div className="w-10 h-10 bg-white/10 border border-blue-300/30 rounded-full flex items-center justify-center text-white">
                                 <span className="text-2xl">🤖</span>
                             </div>
                             <div>
-                                <h3 className="text-white font-semibold text-sm">FixYou AI</h3>
-                                <p className="text-white/80 text-xs">Online</p>
+                                <h3 className="text-white font-semibold text-sm">FixYou AI (Ollama)</h3>
+                                <p className="text-blue-200/90 text-xs">{isChatbotLoading ? 'Mengetik...' : 'Siap membantu'}</p>
                             </div>
                         </div>
                         <div className="flex items-center space-x-2">
@@ -614,12 +676,12 @@ export default function Psikolog({ psikologs }) {
                             <div key={msg.id} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}>
                                 <div className={`max-w-[80%] px-3 py-2 rounded-2xl text-sm ${
                                     msg.type === 'user' 
-                                        ? 'bg-gradient-to-r from-cyan-400 to-teal-500 text-white' 
-                                        : 'bg-gray-100 text-gray-800'
+                                        ? 'bg-gradient-to-r from-blue-600 to-blue-800 text-white border border-blue-400/40' 
+                                        : 'bg-slate-800/70 text-blue-100 border border-blue-800/40'
                                 }`}>
                                     <p>{msg.message}</p>
                                     <p className={`text-xs mt-1 ${
-                                        msg.type === 'user' ? 'text-white/70' : 'text-gray-500'
+                                        msg.type === 'user' ? 'text-white/70' : 'text-blue-300/70'
                                     }`}>
                                         {msg.timestamp}
                                     </p>
@@ -629,26 +691,26 @@ export default function Psikolog({ psikologs }) {
                     </div>
 
                     {/* Chat Input */}
-                    <div className="p-4 border-t border-gray-200">
+                    <div className="p-4 border-t border-blue-800/50">
                         <form onSubmit={handleSendMessage} className="flex space-x-2">
                             <input
                                 type="text"
                                 value={chatMessage}
                                 onChange={(e) => setChatMessage(e.target.value)}
                                 placeholder="Tulis pertanyaan Anda..."
-                                className="flex-1 bg-gray-50 border border-gray-200 rounded-full px-4 py-2 text-sm text-gray-800 placeholder-gray-500 focus:border-cyan-400 focus:outline-none transition-colors"
+                                className="flex-1 bg-slate-900/70 border border-blue-800/50 rounded-full px-4 py-2 text-sm text-white placeholder-blue-200/60 focus:border-blue-400 focus:outline-none transition-colors"
                             />
                             <button
                                 type="submit"
-                                className="bg-gradient-to-r from-cyan-400 to-teal-500 hover:from-cyan-500 hover:to-teal-600 text-white p-2 rounded-full transition-all duration-200 hover:scale-105"
+                                className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white p-2 rounded-full transition-all duration-200 hover:scale-105 border border-blue-400/40"
                             >
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                                 </svg>
                             </button>
                         </form>
-                        <p className="text-xs text-gray-500 mt-2 text-center">
-                            Informasi dari AI mungkin tidak akurat
+                        <p className="text-xs text-blue-300/70 mt-2 text-center">
+                            Powered by Ollama (open-source LLM). Respon AI dapat tidak selalu akurat.
                         </p>
                     </div>
                 </div>

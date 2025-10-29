@@ -16,6 +16,12 @@ export default function Curhat({ auth }) {
     const chatContainerRef = useRef(null);
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [sessionToDelete, setSessionToDelete] = useState(null);
+    const [isListening, setIsListening] = useState(false);
+    const [isSupported, setIsSupported] = useState(false);
+    const [recognition, setRecognition] = useState(null);
+    const [voiceStatus, setVoiceStatus] = useState('');
+    const [isSpeaking, setIsSpeaking] = useState(false);
+    const [speechSynthesis, setSpeechSynthesis] = useState(null);
 
     // Axios defaults for Sanctum/session auth
     axios.defaults.withCredentials = true;
@@ -174,6 +180,64 @@ export default function Curhat({ auth }) {
         return () => clearInterval(interval);
     }, []);
 
+    // Initialize voice recognition and speech synthesis
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            // Initialize Speech Recognition
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            
+            if (SpeechRecognition) {
+                const recognitionInstance = new SpeechRecognition();
+                recognitionInstance.continuous = false;
+                recognitionInstance.interimResults = false;
+                recognitionInstance.lang = 'id-ID'; // Indonesian language
+                
+                recognitionInstance.onstart = () => {
+                    setIsListening(true);
+                    setVoiceStatus('Mendengarkan...');
+                };
+                
+                recognitionInstance.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript;
+                    setMessage(transcript);
+                    setVoiceStatus(`Diterjemahkan: "${transcript}"`);
+                    
+                    // Auto-send message after voice recognition
+                    setTimeout(() => {
+                        if (transcript && typeof transcript === 'string' && transcript.trim()) {
+                            handleSendMessage();
+                            setVoiceStatus('');
+                        }
+                    }, 500);
+                };
+                
+                recognitionInstance.onerror = (event) => {
+                    console.error('Speech recognition error:', event.error);
+                    setIsListening(false);
+                    setVoiceStatus(`Error: ${event.error}`);
+                    setTimeout(() => setVoiceStatus(''), 3000);
+                };
+                
+                recognitionInstance.onend = () => {
+                    setIsListening(false);
+                    if (!voiceStatus.includes('Error')) {
+                        setVoiceStatus('');
+                    }
+                };
+                
+                setRecognition(recognitionInstance);
+                setIsSupported(true);
+            } else {
+                setIsSupported(false);
+            }
+
+            // Initialize Speech Synthesis
+            if ('speechSynthesis' in window) {
+                setSpeechSynthesis(window.speechSynthesis);
+            }
+        }
+    }, []);
+
     // Load initial data
     useEffect(() => {
         const loadInitialData = async () => {
@@ -274,6 +338,11 @@ export default function Curhat({ auth }) {
                 
                 // Save AI message to database
                 await saveMessageToDatabase(aiMessage);
+                
+                // Speak AI response
+                setTimeout(() => {
+                    speakText(data.response);
+                }, 500);
             } else {
                 // Add error message
                 const errorMessage = {
@@ -326,6 +395,64 @@ export default function Curhat({ auth }) {
         } catch (error) {
             console.error('Error saving message to database:', error);
             throw error; // Re-throw to be handled by caller
+        }
+    };
+
+    // Voice recognition functions
+    const startListening = () => {
+        if (recognition && !isListening) {
+            setMessage(''); // Clear current message
+            recognition.start();
+        }
+    };
+
+    const stopListening = () => {
+        if (recognition && isListening) {
+            recognition.stop();
+        }
+    };
+
+    const toggleListening = () => {
+        if (isListening) {
+            stopListening();
+        } else {
+            startListening();
+        }
+    };
+
+    // Text-to-speech function
+    const speakText = (text) => {
+        if (speechSynthesis && text) {
+            // Stop any ongoing speech
+            speechSynthesis.cancel();
+            
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'id-ID'; // Indonesian language
+            utterance.rate = 0.9; // Slightly slower for better understanding
+            utterance.pitch = 1;
+            utterance.volume = 0.8;
+            
+            utterance.onstart = () => {
+                setIsSpeaking(true);
+            };
+            
+            utterance.onend = () => {
+                setIsSpeaking(false);
+            };
+            
+            utterance.onerror = (event) => {
+                console.error('Speech synthesis error:', event.error);
+                setIsSpeaking(false);
+            };
+            
+            speechSynthesis.speak(utterance);
+        }
+    };
+
+    const stopSpeaking = () => {
+        if (speechSynthesis) {
+            speechSynthesis.cancel();
+            setIsSpeaking(false);
         }
     };
 
@@ -575,6 +702,24 @@ export default function Curhat({ auth }) {
                                         <span className="text-sm">AI sedang mengetik...</span>
                                     </div>
                                 )}
+                                {/* Voice Status */}
+                                {voiceStatus && (
+                                    <div className="flex items-center space-x-2 text-white">
+                                        <div className="w-2 h-2 bg-red-400 rounded-full animate-pulse"></div>
+                                        <span className="text-sm">{voiceStatus}</span>
+                                    </div>
+                                )}
+                                {/* Speaking Indicator */}
+                                {isSpeaking && (
+                                    <div className="flex items-center space-x-2 text-white">
+                                        <div className="flex space-x-1">
+                                            <div className="w-2 h-2 bg-green-400 rounded-full animate-bounce"></div>
+                                            <div className="w-2 h-2 bg-green-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                                            <div className="w-2 h-2 bg-green-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                                        </div>
+                                        <span className="text-sm">AI sedang berbicara...</span>
+                                    </div>
+                                )}
                             </div>
                         </div>
                         <div 
@@ -629,11 +774,11 @@ export default function Curhat({ auth }) {
                                 value={message}
                                 onChange={(e) => setMessage(e.target.value)}
                                 onKeyPress={handleKeyPress}
-                                placeholder={isTyping ? "AI sedang mengetik..." : "Ceritakan apa yang mengganggu pikiranmu..."}
+                                placeholder={isListening ? "Mendengarkan..." : isTyping ? "AI sedang mengetik..." : "Ceritakan apa yang mengganggu pikiranmu..."}
                                 className={`flex-1 bg-transparent text-white placeholder-white/50 border-none outline-none text-sm lg:text-lg ${
-                                    isTyping ? 'placeholder-cyan-400' : ''
+                                    isListening ? 'placeholder-red-400' : isTyping ? 'placeholder-cyan-400' : ''
                                 }`}
-                                disabled={isTyping}
+                                disabled={isTyping || isListening}
                             />
                             {/* Send Button */}
                             <button 
@@ -671,13 +816,40 @@ export default function Curhat({ auth }) {
                             </button>
                             {/* Voice Recording Button */}
                             <button 
-                                disabled={isTyping}
-                                className="bg-white hover:bg-white/90 text-black p-2 lg:p-3 rounded-xl transition-all duration-200 hover:scale-105 flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                                onClick={toggleListening}
+                                disabled={!isSupported || isTyping}
+                                className={`p-2 lg:p-3 rounded-xl transition-all duration-200 hover:scale-105 flex-shrink-0 ${
+                                    isListening 
+                                        ? 'bg-white hover:bg-white/90 text-black' 
+                                        : isSupported 
+                                            ? 'bg-white/10 hover:bg-white/20 text-white border border-white/20'
+                                            : 'bg-white/30 text-white/50 cursor-not-allowed'
+                                } ${isTyping ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                title={isSupported ? (isListening ? 'Stop listening' : 'Start voice input') : 'Voice recognition not supported'}
                             >
+                                {isListening ? (
+                                    <svg className="w-4 h-4 lg:w-5 lg:h-5" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M6 6h12v12H6z" />
+                                    </svg>
+                                ) : (
                                 <svg className="w-4 h-4 lg:w-5 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
                                 </svg>
+                                )}
                             </button>
+                            {/* Stop Speaking Button */}
+                            {isSpeaking && (
+                                <button 
+                                    onClick={stopSpeaking}
+                                    className="p-2 lg:p-3 rounded-xl transition-all duration-200 hover:scale-105 flex-shrink-0 bg-red-500 hover:bg-red-600 text-white"
+                                    title="Stop speaking"
+                                >
+                                    <svg className="w-4 h-4 lg:w-5 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 9h6v6H9z" />
+                                    </svg>
+                                </button>
+                            )}
                         </div>
                     </div>
 

@@ -8,7 +8,7 @@ CORS(app, resources={r"/*": {"origins": "*"}})  # Allow all origins for developm
 
 # Ollama API configuration
 OLLAMA_BASE_URL = "http://localhost:11434"
-OLLAMA_MODEL = "llama3.2:latest"  # Default model, bisa diganti dengan model lain
+OLLAMA_MODEL = "llama3.2:3b"  # Model lebih kecil untuk menghindari masalah memori
 
 class OllamaChatBot:
     def __init__(self):
@@ -35,8 +35,12 @@ class OllamaChatBot:
             return []
     
     def generate_response(self, message, context=""):
-        """Generate response using Ollama"""
+        """Generate response using Ollama with fallback"""
         try:
+            # Cek apakah Ollama bisa digunakan
+            if not self.check_ollama_status():
+                return self._generate_fallback_response(message, context)
+            
             # Prepare the prompt for curhat/chatbot
             system_prompt = """Anda adalah AI assistant yang ramah dan empatik untuk membantu orang yang ingin curhat. 
             Tugas Anda adalah:
@@ -48,8 +52,10 @@ class OllamaChatBot:
             6. Menjaga privasi dan kerahasiaan percakapan
             
             Respons Anda harus hangat, mendukung, dan membantu orang merasa didengar."""
-            
-            full_prompt = f"{system_prompt}\n\nUser: {message}\n\nAssistant:"
+            # Sisipkan konteks halaman (bila ada) agar jawaban kontekstual
+            page_context = f"\n\n[CONTEXT HALAMAN]\n{context}\n\n" if context else "\n"
+
+            full_prompt = f"{system_prompt}{page_context}User: {message}\n\nAssistant:"
             
             payload = {
                 "model": self.model,
@@ -68,7 +74,7 @@ class OllamaChatBot:
             response = requests.post(
                 f"{self.base_url}/api/generate",
                 json=payload,
-                timeout=60
+                timeout=30
             )
             
             print(f"Ollama response status: {response.status_code}")
@@ -84,31 +90,84 @@ class OllamaChatBot:
                         "model": self.model
                     }
                 else:
-                    return {
-                        "success": False,
-                        "error": "Ollama tidak mengembalikan respons"
-                    }
+                    return self._generate_fallback_response(message, context)
             else:
-                return {
-                    "success": False,
-                    "error": f"Ollama API error: {response.status_code} - {response.text}"
-                }
+                return self._generate_fallback_response(message, context)
                 
         except requests.exceptions.Timeout:
-            return {
-                "success": False,
-                "error": "Request timeout - Ollama mungkin sedang memproses model"
-            }
+            return self._generate_fallback_response(message, context)
         except requests.exceptions.ConnectionError:
-            return {
-                "success": False,
-                "error": "Tidak dapat terhubung ke Ollama. Pastikan Ollama sudah berjalan."
-            }
+            return self._generate_fallback_response(message, context)
         except Exception as e:
+            print(f"Ollama error: {str(e)}")
+            return self._generate_fallback_response(message, context)
+    
+    def _generate_fallback_response(self, message, context=""):
+        """Generate fallback response when Ollama is not available"""
+        message_lower = message.lower()
+        context_lower = context.lower()
+        
+        # Respons spesifik berdasarkan kata kunci dalam pesan
+        if any(keyword in message_lower for keyword in ["career", "karier", "pekerjaan", "job", "profesi"]):
             return {
-                "success": False,
-                "error": f"Error: {str(e)}"
+                "success": True,
+                "response": "Untuk konseling karier, kami memiliki beberapa psikolog yang ahli di bidang tersebut:\n\n• Dr. Sarah Wijaya, M.Psi., Psikolog - Spesialisasi: Career Development & Leadership\n• Dr. Michael Chen, M.Psi., Psikolog - Spesialisasi: Organizational Psychology\n• Dr. Lisa Park, M.Psi., Psikolog - Spesialisasi: Career Transition & Change Management\n\nAnda bisa klik 'Selengkapnya' pada profil psikolog untuk melihat detail lengkap dan melakukan booking konseling.",
+                "model": "fallback"
             }
+        
+        elif any(keyword in message_lower for keyword in ["booking", "jadwal", "konsultasi", "appointment"]):
+            return {
+                "success": True,
+                "response": "Untuk melakukan booking konseling:\n\n1. Pilih psikolog yang sesuai dengan kebutuhan Anda\n2. Klik tombol 'Selengkapnya' untuk melihat detail\n3. Klik 'Book Now' untuk membuat jadwal\n4. Pilih tanggal, waktu, dan tipe sesi (online/offline)\n5. Tambahkan catatan khusus jika diperlukan\n6. Konfirmasi booking\n\nSemua psikolog kami tersedia untuk konseling online maupun offline.",
+                "model": "fallback"
+            }
+        
+        elif any(keyword in message_lower for keyword in ["psikolog", "terapis", "konselor"]):
+            return {
+                "success": True,
+                "response": "Kami memiliki 6 psikolog berpengalaman yang siap membantu Anda:\n\n• Dr. Sarah Wijaya, M.Psi., Psikolog\n• Dr. Michael Chen, M.Psi., Psikolog\n• Dr. Aisha Rahman, M.Psi., Psikolog\n• Dr. James Rodriguez, M.Psi., Psikolog\n• Dr. Lisa Park, M.Psi., Psikolog\n• Dr. Ahmad Hassan, M.Psi., Psikolog\n\nSetiap psikolog memiliki keahlian dan pendekatan yang berbeda. Anda bisa melihat detail lengkap dengan klik 'Selengkapnya' pada profil masing-masing.",
+                "model": "fallback"
+            }
+        
+        elif any(keyword in message_lower for keyword in ["harga", "biaya", "tarif", "cost"]):
+            return {
+                "success": True,
+                "response": "Untuk informasi detail mengenai biaya konseling, silakan hubungi psikolog yang Anda pilih melalui tombol 'Selengkapnya'. Setiap psikolog memiliki tarif yang berbeda sesuai dengan pengalaman dan keahlian mereka. Kami juga menyediakan paket konseling yang bisa disesuaikan dengan kebutuhan dan budget Anda.",
+                "model": "fallback"
+            }
+        
+        elif any(keyword in message_lower for keyword in ["online", "offline", "tatap muka"]):
+            return {
+                "success": True,
+                "response": "Kami menyediakan kedua jenis konseling:\n\n📱 **Konseling Online**:\n- Lebih fleksibel dan nyaman\n- Bisa dilakukan dari rumah\n- Menggunakan platform video call\n\n🏢 **Konseling Offline**:\n- Konseling tatap muka langsung\n- Lebih personal dan mendalam\n- Dilakukan di klinik psikolog\n\nAnda bisa memilih jenis konseling saat melakukan booking. Semua psikolog kami tersedia untuk kedua jenis konseling.",
+                "model": "fallback"
+            }
+        
+        # Respons umum untuk curhat
+        general_responses = [
+            "Terima kasih sudah berbagi dengan saya. Saya di sini untuk mendengarkan dan mendukung Anda. Apakah ada hal lain yang ingin Anda ceritakan?",
+            "Saya memahami perasaan Anda. Setiap orang memiliki tantangan yang berbeda. Yang penting adalah Anda tidak sendirian dalam menghadapi ini.",
+            "Cerita Anda sangat berarti. Terkadang dengan berbagi, kita bisa merasa lebih lega. Ada yang ingin Anda diskusikan lebih lanjut?",
+            "Saya menghargai kepercayaan Anda untuk berbagi cerita ini. Jika Anda merasa perlu bantuan lebih lanjut, jangan ragu untuk berkonsultasi dengan psikolog profesional.",
+            "Setiap perasaan yang Anda rasakan adalah valid. Terima kasih sudah mempercayai saya untuk mendengarkan cerita Anda."
+        ]
+        
+        # Jika ada konteks halaman psikolog, berikan respons yang lebih spesifik
+        if "psikolog" in context_lower:
+            general_responses.extend([
+                "Saya melihat Anda sedang di halaman psikolog. Jika Anda merasa perlu konsultasi profesional, tim psikolog kami siap membantu Anda.",
+                "Halaman ini memiliki berbagai psikolog berpengalaman yang bisa Anda pilih sesuai kebutuhan. Apakah ada yang ingin Anda tanyakan tentang layanan konseling?",
+                "Anda bisa mencari psikolog berdasarkan keahlian atau menggunakan fitur pencarian. Semua psikolog kami memiliki pengalaman dan pendekatan yang berbeda-beda."
+            ])
+        
+        import random
+        selected_response = random.choice(general_responses)
+        
+        return {
+            "success": True,
+            "response": selected_response,
+            "model": "fallback"
+        }
 
 # Initialize chatbot
 chatbot = OllamaChatBot()
@@ -175,8 +234,10 @@ def chat():
                 "error": "Ollama tidak berjalan. Silakan jalankan Ollama terlebih dahulu."
             }), 503
         
+        # Optional context from client
+        context = data.get('context', '')
         # Generate response
-        result = chatbot.generate_response(message)
+        result = chatbot.generate_response(message, context)
         
         if result['success']:
             return jsonify({
