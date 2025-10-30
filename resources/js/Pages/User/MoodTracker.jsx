@@ -5,6 +5,7 @@ import MoodPrediction from "../../Components/moodTracker/MoodPrediction";
 import ChatMessages from "../../Components/moodTracker/ChatMessages";
 import MessageInput from "../../Components/moodTracker/MessageInput";
 import io from 'socket.io-client';
+import { geminiGenerate } from "@/lib/gemini";
 
 export default function MoodTracker() {
     const [selectedMood, setSelectedMood] = useState(null);
@@ -179,14 +180,26 @@ export default function MoodTracker() {
             console.log('📝 Joined session:', data.session_id);
         });
 
-        newSocket.on('mood_result', (data) => {
+        newSocket.on('mood_result', async (data) => {
             console.log('🎯 Mood analysis result received:', data);
             if (data.success) {
                 setMlPrediction(data);
                 setIsAnalyzing(false);
                 
-                // Generate AI response
-                const aiResponse = generateAIResponse(data, '');
+                // Generate AI response (prefer Gemini, fallback ke lokal)
+                let aiResponse = '';
+                try {
+                    const prompt = [
+                        'Anda adalah AI pendengar curhat yang empatik. Gunakan konteks mood untuk merespon singkat (2-5 kalimat).',
+                        'Hindari diagnosis medis. Boleh beri saran praktis ringan.',
+                        `Mood: ${data.mood} (confidence ${(data.confidence * 100).toFixed(1)}%)`,
+                        `Saran internal: ${data.suggestion || '-'}`,
+                        'Buatkan respons yang mendukung dan actionable.',
+                    ].join('\n');
+                    aiResponse = await geminiGenerate(prompt);
+                } catch (e) {
+                    aiResponse = generateAIResponse(data, '');
+                }
                 
                 // Add AI message
                 const aiMessage = {
@@ -524,8 +537,20 @@ export default function MoodTracker() {
             // Fallback to HTTP API if WebSocket not available
             const mlResult = await analyzeMoodWithML(messageToSend);
             
-            // Generate AI response
-            const aiResponse = generateAIResponse(mlResult, messageToSend);
+            // Generate AI response (prefer Gemini)
+            let aiResponse = '';
+            try {
+                const prompt = [
+                    'Anda adalah AI pendengar curhat yang empatik. Gunakan konteks mood untuk merespon singkat (2-5 kalimat).',
+                    'Hindari diagnosis medis. Boleh beri saran praktis ringan.',
+                    `Mood: ${mlResult?.mood || 'Unknown'} (confidence ${(mlResult?.confidence || 0) * 100}%)`,
+                    `Saran internal: ${mlResult?.suggestion || '-'}`,
+                    `Pesan pengguna: "${messageToSend}"`,
+                ].join('\n');
+                aiResponse = await geminiGenerate(prompt);
+            } catch (e) {
+                aiResponse = generateAIResponse(mlResult, messageToSend);
+            }
             
             // Add AI message
             const aiMessage = {

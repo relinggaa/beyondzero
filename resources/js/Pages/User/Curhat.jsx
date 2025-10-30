@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import LayoutUser from "../../Components/Layout/LayoutUser";
 import ConfirmModal from "../../Components/ConfirmModal";
 import axios from "axios";
+import { geminiGenerate } from "@/lib/gemini";
 
 export default function Curhat({ auth }) {
     const [selectedMood, setSelectedMood] = useState(null);
@@ -309,51 +310,35 @@ export default function Curhat({ auth }) {
         scrollToBottom();
     }, [chatMessages]);
 
-    // Function to send message to Ollama
+    // Function to send message to Gemini (replaces Ollama)
     const sendMessageToOllama = async (userMessage) => {
         setIsTyping(true);
         
         try {
-            const response = await fetch('http://localhost:5004/chat', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    message: userMessage,
-                    timestamp: new Date().toISOString()
-                })
-            });
+            // Build prompt for empathetic response
+            const prompt = [
+                'Anda adalah AI pendengar curhat yang empatik. Balas singkat (2-5 kalimat), hangat, tidak menghakimi, dan berbahasa Indonesia yang natural.',
+                'Hindari diagnosis medis. Boleh memberi saran praktis ringan.',
+                `Pesan pengguna: "${userMessage}"`,
+            ].join('\n');
 
-            const data = await response.json();
+            const aiText = await geminiGenerate(prompt);
 
-            if (data.success) {
-                // Add AI response to chat
-                const aiMessage = {
-                    id: Date.now() + 1,
-                    type: 'ai',
-                    message: data.response,
-                    timestamp: new Date().toISOString()
-                };
+            // Add AI response to chat
+            const aiMessage = {
+                id: Date.now() + 1,
+                type: 'ai',
+                message: aiText,
+                timestamp: new Date().toISOString()
+            };
                 
                 // Save AI message to database
                 await saveMessageToDatabase(aiMessage);
                 
                 // Speak AI response
                 setTimeout(() => {
-                    speakText(data.response);
+                    speakText(aiText);
                 }, 500);
-            } else {
-                // Add error message
-                const errorMessage = {
-                    id: Date.now() + 1,
-                    type: 'ai',
-                    message: `Maaf, terjadi kesalahan: ${data.error}`,
-                    timestamp: new Date().toISOString()
-                };
-                
-                await saveMessageToDatabase(errorMessage);
-            }
         } catch (error) {
             console.error('Error sending message to Ollama:', error);
             
@@ -361,7 +346,7 @@ export default function Curhat({ auth }) {
             const errorMessage = {
                 id: Date.now() + 1,
                 type: 'ai',
-                message: 'Maaf, tidak dapat terhubung ke AI. Pastikan Ollama sudah berjalan.',
+                message: 'Maaf, AI sementara tidak tersedia. Coba lagi sebentar ya.',
                 timestamp: new Date().toISOString()
             };
             

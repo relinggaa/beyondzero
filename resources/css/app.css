@@ -561,7 +561,7 @@ body {
 }
 
 .mood-tracker-bg {
-    background-image: url('/storage/img/background_chat.jpg') !important;
+    background-image: url('../img/background_chat.jpg') !important;
     background-attachment: fixed !important;
     background-size: cover !important;
     background-position: center !important;

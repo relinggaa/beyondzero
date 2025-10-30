@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\GeminiController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\PsikologController;
 use App\Http\Controllers\StressReliefController;
@@ -33,3 +34,6 @@ Route::middleware('auth')->group(function () {
 
 // Public API Routes
 Route::get('/psikologs', [PsikologController::class, 'getPsikologs']);
+
+// Proxy endpoint for Gemini (server-side)
+Route::post('/ai/chat', [GeminiController::class, 'chat']);
