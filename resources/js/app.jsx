@@ -5,7 +5,14 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "../css/app.css";
 import { Ziggy } from "./ziggy";
-import "./lib/preloadAssets";
+// Ensure these images are emitted to build/assets
+import meguns from "./img/meguns.png";
+import Opung from "./img/Opung.png";
+import relinggaa from "./img/relinggaa.png";
+
+if (typeof window !== "undefined") {
+    window.__BUILD_ASSETS = { meguns, Opung, relinggaa };
+}
 
 createInertiaApp({
     resolve: (name) => {
