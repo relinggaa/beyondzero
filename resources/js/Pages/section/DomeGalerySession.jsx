@@ -8,7 +8,6 @@ gsap.registerPlugin(ScrollTrigger);
 
 const MotivationSection = () => {
   const sectionRef = useRef(null);
-  const iconRef = useRef(null);
   const titleRef = useRef(null);
   const descriptionRef = useRef(null);
   const statsRef = useRef(null);
@@ -16,7 +15,6 @@ const MotivationSection = () => {
 
   useEffect(() => {
     const section = sectionRef.current;
-    const icon = iconRef.current;
     const title = titleRef.current;
     const description = descriptionRef.current;
     const stats = statsRef.current;
@@ -25,7 +23,7 @@ const MotivationSection = () => {
     if (!section) return;
 
     // Set initial states
-    gsap.set([icon, title, description, stats, button], {
+    gsap.set([title, description, stats, button], {
       opacity: 0,
       y: 50
     });
@@ -41,18 +39,12 @@ const MotivationSection = () => {
     });
 
     // Animate elements in sequence
-    tl.to(icon, {
-      opacity: 1,
-      y: 0,
-      duration: 0.8,
-      ease: "back.out(1.7)"
-    })
-    .to(title, {
+    tl.to(title, {
       opacity: 1,
       y: 0,
       duration: 0.6,
       ease: "power2.out"
-    }, "-=0.4")
+    })
     .to(description, {
       opacity: 1,
       y: 0,
@@ -116,16 +108,7 @@ const MotivationSection = () => {
       });
     }
 
-    // Icon pulse animation
-    if (icon) {
-      gsap.to(icon, {
-        scale: 1.1,
-        duration: 2,
-        ease: "power2.inOut",
-        yoyo: true,
-        repeat: -1
-      });
-    }
+    // No icon animation (icon removed)
 
     return () => {
       ScrollTrigger.getAll().forEach(trigger => trigger.kill());
@@ -135,9 +118,7 @@ const MotivationSection = () => {
   return (
     <div ref={sectionRef} className="motivation-section">
       <div className="motivation-content">
-        <div ref={iconRef} className="motivation-icon">
-          <div className="heart-icon">💙</div>
-        </div>
+        {/* Heart icon removed as requested */}
         <h2 ref={titleRef} className="motivation-title">
           Anda Tidak Sendiri
         </h2>
@@ -160,9 +141,9 @@ const MotivationSection = () => {
           </div>
         </div>
         <div className="motivation-cta">
-          <button ref={buttonRef} className="join-button">
+          <a href="/login" ref={buttonRef} className="join-button inline-flex items-center justify-center">
             Bergabung Sekarang
-          </button>
+          </a>
         </div>
       </div>
     </div>

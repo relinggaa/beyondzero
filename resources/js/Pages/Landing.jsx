@@ -50,7 +50,8 @@ export default function Landing() {
                 <div id="testimoni-section">
                     <TestimoniSection />
                 </div>
-                <div id="about-section">
+                {/* Extra breathing room on mobile below Dome Gallery to avoid overlap */}
+                <div id="about-section" className="mt-20 sm:mt-28 md:mt-32 lg:mt-0">
                     <AboutUsSection />
                 </div>
                 

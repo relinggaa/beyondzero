@@ -20,7 +20,7 @@ export default function ServicesSection() {
                             Layanan Kesehatan Mental Kami
                         </h2>
                     </div>
-                    <p className="text-lg text-gray-300 max-w-3xl mx-auto">
+                    <p className="text-lg text-gray-300 max-w-3xl mx-auto text-justify">
                         Platform komprehensif untuk mendukung perjalanan kesehatan mental Anda dengan teknologi terdepan dan pendekatan yang personal.
                     </p>
                 </motion.div>
@@ -54,16 +54,17 @@ export default function ServicesSection() {
                         <h3 className="text-2xl font-bold text-white mb-4">
                             Temukan Layanan yang Tepat untuk Anda
                         </h3>
-                        <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
+                        <p className="text-gray-300 mb-6 max-w-2xl mx-auto text-justify">
                             Jelajahi berbagai layanan kesehatan mental kami yang dirancang khusus untuk mendukung perjalanan kesejahteraan mental Anda.
                         </p>
-                        <motion.button
+                        <motion.a
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            className="bg-white text-black px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+                            href="/login"
+                            className="bg-white text-black px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors inline-block"
                         >
                             Mulai Sekarang
-                        </motion.button>
+                        </motion.a>
                     </div>
                 </motion.div>
             </div>

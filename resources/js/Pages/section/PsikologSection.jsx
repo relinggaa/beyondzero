@@ -99,7 +99,7 @@ const PsikologSection = () => {
   }
 
   return (
-    <div className="psikolog-section pt-24">
+    <div className="psikolog-section pt-24 bg-black">
       <div className="container mx-auto px-4 py-16">
         {/* Header */}
         <motion.div
@@ -109,7 +109,6 @@ const PsikologSection = () => {
           className="text-center mb-12"
         >
           <div className="flex items-center justify-center mb-4">
-            <Users className="w-8 h-8 text-white mr-3" />
             <h2 className="text-4xl font-bold text-white">
               Tim Psikolog Profesional Kami
             </h2>
@@ -168,7 +167,7 @@ const PsikologSection = () => {
             >
               {Array.from({ length: totalSlides }).map((_, slideIndex) => (
                 <div key={slideIndex} className="carousel-slide">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 justify-items-center md:justify-items-stretch">
                     {getPsikologsForSlide(slideIndex).map((psikolog) => (
                       <PsikologCard key={psikolog.id} psikolog={psikolog} />
                     ))}
@@ -179,15 +178,17 @@ const PsikologSection = () => {
           </div>
 
           {/* Indicators */}
-          <div className="carousel-indicators">
-            {Array.from({ length: totalSlides }).map((_, index) => (
-              <button
-                key={index}
-                onClick={() => goToSlide(index)}
-                className={`indicator ${index === currentIndex ? 'active' : ''}`}
-                aria-label={`Go to slide ${index + 1}`}
-              />
-            ))}
+          <div className="w-full flex justify-center">
+            <div className="carousel-indicators">
+              {Array.from({ length: totalSlides }).map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => goToSlide(index)}
+                  className={`indicator ${index === currentIndex ? 'active' : ''}`}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
+            </div>
           </div>
         </div>
 
@@ -206,14 +207,14 @@ const PsikologSection = () => {
             <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
               Pilih psikolog yang sesuai dengan kebutuhan Anda dan mulailah konseling profesional untuk kesejahteraan mental yang lebih baik.
             </p>
-            <motion.button
+            <motion.a
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="cta-button"
-              onClick={() => setIsModalOpen(true)}
+              href="/login"
+              className="cta-button inline-block"
             >
               Lihat Semua Psikolog
-            </motion.button>
+            </motion.a>
           </div>
         </motion.div>
       </div>

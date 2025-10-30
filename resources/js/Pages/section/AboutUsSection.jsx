@@ -151,13 +151,14 @@ export default function AboutUsSection() {
               Platform kami menggunakan teknologi Natural Language Processing, Computer Vision, dan Predictive Analytics untuk menciptakan 
               pengalaman kesehatan mental yang benar-benar personal dan efektif.
             </p>
-            <motion.button
+            <motion.a
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="bg-white text-black px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+              href="/login"
+              className="bg-white text-black px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors inline-block"
             >
               Coba Teknologi AI Kami
-            </motion.button>
+            </motion.a>
           </div>
         </motion.div>
       </div>
