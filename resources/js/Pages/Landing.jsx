@@ -81,6 +81,7 @@ export default function Landing() {
                                     miniAvatarUrl={avatarImg}
                                     iconUrl="https://cdn-icons-png.flaticon.com/512/1384/1384069.png"
                                     showUserInfo={true}
+                                    className="landing-compact"
                                     enableTilt={true}
                                     enableMobileTilt={false}
                                     onContactClick={() => console.log('Contact clicked')}
@@ -95,6 +96,7 @@ export default function Landing() {
                                     miniAvatarUrl={avatarMeguns}
                                     iconUrl="https://cdn-icons-png.flaticon.com/512/1384/1384069.png"
                                     showUserInfo={true}
+                                    className="landing-compact"
                                     enableTilt={true}
                                     enableMobileTilt={false}
                                     onContactClick={() => console.log('Contact clicked')}
@@ -109,6 +111,7 @@ export default function Landing() {
                                     miniAvatarUrl={avatarOpung}
                                     iconUrl="https://cdn-icons-png.flaticon.com/512/1384/1384069.png"
                                     showUserInfo={true}
+                                    className="landing-compact"
                                     enableTilt={true}
                                     enableMobileTilt={false}
                                     onContactClick={() => console.log('Contact clicked')}
@@ -117,12 +120,7 @@ export default function Landing() {
 
                         </div>
 
-                        {/* Footer Text */}
-                        <div className="text-center mt-16">
-                            <p className="text-white/60 text-sm">
-                                Dibuat dengan ❤️ untuk kesehatan mental yang lebih baik
-                            </p>
-                        </div>
+                        {/* Footer Text removed as requested */}
                     </div>
                 </div>
 

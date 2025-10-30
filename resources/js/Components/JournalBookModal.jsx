@@ -7,6 +7,7 @@ export default function JournalBookModal({ journal, onClose, onEdit, onDelete })
     const [currentPage, setCurrentPage] = useState(0);
     const [isOpening, setIsOpening] = useState(true);
     const [isAnimating, setIsAnimating] = useState(true);
+    const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' ? window.innerWidth < 768 : false);
 
     // Close animation after opening
     React.useEffect(() => {
@@ -15,6 +16,13 @@ export default function JournalBookModal({ journal, onClose, onEdit, onDelete })
             setIsAnimating(false);
         }, 800); // Match the animation duration
         return () => clearTimeout(timer);
+    }, []);
+
+    // track viewport to adapt book size on mobile
+    React.useEffect(() => {
+        const onResize = () => setIsMobile(window.innerWidth < 768);
+        window.addEventListener('resize', onResize);
+        return () => window.removeEventListener('resize', onResize);
     }, []);
 
     const formatDate = (dateString) => {
@@ -137,9 +145,9 @@ export default function JournalBookModal({ journal, onClose, onEdit, onDelete })
 
             {/* Book Only - Centered with zoom-in animation */}
             <div 
-                className={`flex items-center justify-center h-full transition-all duration-800 ${isOpening ? 'animate-zoomInFromBook' : ''}`}
+                className={`flex ${isMobile ? 'items-start pt-2' : 'items-center'} justify-center h-full transition-all duration-800 ${isOpening ? 'animate-zoomInFromBook' : ''}`}
             >
-                {/* Vector Book Illustration - Left Side */}
+                {/* Vector Book Illustration - Desktop Left / Mobile Top */}
                 <div className="hidden lg:block absolute left-8 z-0 pointer-events-none">
                     <img 
                         src={vectorModalBookImage} 
@@ -148,15 +156,18 @@ export default function JournalBookModal({ journal, onClose, onEdit, onDelete })
                         style={{ maxHeight: '80vh' }}
                     />
                 </div>
+                <div className="lg:hidden absolute -top-2 left-1/2 -translate-x-1/2 z-0 pointer-events-none">
+                    <img src={vectorModalBookImage} alt="Vector Book" className="w-28 opacity-80" />
+                </div>
 
-                <div className={`relative flex flex-col items-center justify-center ${isOpening ? 'animate-openBook' : ''}`}>
+                <div className={`relative flex flex-col items-center justify-center ${isMobile ? 'mt-2' : 'mt-5'} ${isOpening ? 'animate-openBook' : ''}`}>
                     <HTMLFlipBook
-                        width={700}
-                        height={900}
-                        minWidth={400}
-                        maxWidth={700}
-                        minHeight={500}
-                        maxHeight={900}
+                        width={isMobile ? 260 : 700}
+                        height={isMobile ? 460 : 900}
+                        minWidth={isMobile ? 240 : 400}
+                        maxWidth={isMobile ? 300 : 700}
+                        minHeight={isMobile ? 420 : 500}
+                        maxHeight={isMobile ? 520 : 900}
                         size="stretch"
                         maxShadowOpacity={0.8}
                         showCover={true}

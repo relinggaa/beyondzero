@@ -12,7 +12,7 @@ export default function BookCoverGallery({ journals = [], onJournalClick }) {
     };
 
     return (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 md:gap-8 items-start">
             {journals.map((journal, index) => (
                 <button
                     key={journal.id}
@@ -25,7 +25,7 @@ export default function BookCoverGallery({ journals = [], onJournalClick }) {
                 >
                     {/* Book Cover dengan gambar coverBuku.png */}
                     <div 
-                        className="relative w-full h-[400px] rounded-lg shadow-2xl overflow-hidden cursor-pointer transform transition-all duration-300 hover:shadow-3xl"
+                        className="relative w-full aspect-[9/16] rounded-lg shadow-2xl overflow-hidden cursor-pointer transform transition-all duration-300 hover:shadow-3xl"
                         style={{
                             boxShadow: '0 10px 30px rgba(0, 0, 0, 0.5)',
                             backgroundImage: `url(${coverBukuImage})`,
@@ -38,19 +38,19 @@ export default function BookCoverGallery({ journals = [], onJournalClick }) {
                         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/60"></div>
 
                         {/* Cover Content */}
-                        <div className="relative h-full flex flex-col items-center justify-center p-8 text-center z-10">
+                        <div className="relative h-full flex flex-col items-center justify-center p-4 md:p-6 text-center z-10">
                             {/* Icon */}
-                            <div className="w-20 h-20 bg-white/90 rounded-full flex items-center justify-center mb-5 shadow-xl backdrop-blur-sm">
-                                <span className="text-4xl">{journal.mood}</span>
+                            <div className="w-14 h-14 md:w-16 md:h-16 bg-white/90 rounded-full flex items-center justify-center mb-4 shadow-xl backdrop-blur-sm">
+                                <span className="text-3xl md:text-4xl">{journal.mood}</span>
                             </div>
 
                             {/* Title */}
-                            <h3 className="text-white font-serif text-2xl font-bold mb-3 line-clamp-2 px-2 drop-shadow-lg">
+                            <h3 className="text-white font-serif text-xl md:text-2xl font-bold mb-2 md:mb-3 line-clamp-2 px-2 drop-shadow-lg">
                                 {journal.title || 'Untitled'}
                             </h3>
 
                             {/* Date */}
-                            <p className="text-white/90 text-sm mb-6 drop-shadow-md">
+                            <p className="text-white/90 text-xs md:text-sm mb-4 md:mb-6 drop-shadow-md">
                                 {formatDateShort(journal.date)}
                             </p>
 

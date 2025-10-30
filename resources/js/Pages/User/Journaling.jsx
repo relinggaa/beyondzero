@@ -395,19 +395,16 @@ export default function Journaling({ journals = [] }) {
 
             {/* Modal Form - Book Style */}
             {isModalOpen && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-[9999]">
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-3 z-[9999]">
                     {/* Book Container */}
-                    <div className="relative w-full max-w-5xl">
+                    <div className="relative w-[92vw] max-w-lg md:max-w-5xl">
                         {/* Book Shadow */}
                         <div className="absolute -inset-4 bg-black/40 rounded-3xl blur-2xl"></div>
                         
-                        {/* Book */}
-                        <div className="relative bg-gradient-to-br from-slate-800/70 via-slate-700/60 to-slate-900/70 rounded-2xl shadow-2xl overflow-hidden border-4 border-slate-500/40 backdrop-blur-md" style={{
-                            transform: 'perspective(1000px) rotateY(-2deg)',
-                            transformStyle: 'preserve-3d'
-                        }}>
+                        {/* Book / Sheet - mobile uses flat sheet; desktop shows tilted book */}
+                        <div className="relative bg-gradient-to-br from-slate-800/85 via-slate-800/75 to-slate-900/85 rounded-2xl shadow-2xl overflow-hidden border-2 md:border-4 border-slate-500/40 backdrop-blur-md md:[transform:perspective(1000px)_rotateY(-2deg)] md:[transform-style:preserve-3d]">
                             {/* Book Pages */}
-                            <div className="bg-gradient-to-r from-slate-900/60 via-slate-800/50 to-slate-900/60 min-h-[80vh] max-h-[90vh] overflow-y-auto">
+                            <div className="bg-gradient-to-r from-slate-900/75 via-slate-800/65 to-slate-900/75 min-h-[82vh] md:min-h-[80vh] max-h-[92vh] md:max-h-[90vh] overflow-y-auto">
                                 {/* Book Binding Indicator */}
                                 <div className="absolute left-0 top-0 bottom-0 w-2 bg-gradient-to-r from-slate-600 via-slate-700 to-transparent"></div>
                                 

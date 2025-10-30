@@ -478,6 +478,13 @@
     padding: 6px 12px;
     font-size: 11px;
   }
+
+  /* Compact variant for Landing page */
+  .pc-card-wrapper.landing-compact .pc-details h3 { font-size: min(3.2svh, 1.8em); }
+  .pc-card-wrapper.landing-compact .pc-details p { font-size: 12px; }
+  .pc-card-wrapper.landing-compact .pc-handle { font-size: 12px; }
+  .pc-card-wrapper.landing-compact .pc-status { font-size: 9px; }
+  .pc-card-wrapper.landing-compact .pc-contact-btn { font-size: 10px; padding: 5px 10px; }
 }
 
 @media (max-width: 480px) {
@@ -491,12 +498,12 @@
   }
 
   .pc-details h3 {
-    font-size: min(3.5svh, 2em);
+    font-size: min(3svh, 1.6em);
   }
 
   .pc-details p {
-    font-size: 12px;
-    top: -8px;
+    font-size: 11px;
+    top: -10px;
   }
 
   .pc-user-info {
@@ -517,18 +524,24 @@
   }
 
   .pc-handle {
-    font-size: 12px;
+    font-size: 11px;
   }
 
   .pc-status {
-    font-size: 9px;
+    font-size: 8px;
   }
 
   .pc-contact-btn {
-    padding: 5px 10px;
-    font-size: 10px;
+    padding: 4px 9px;
+    font-size: 9px;
     border-radius: 50px;
   }
+
+  .pc-card-wrapper.landing-compact .pc-details h3 { font-size: min(2.3svh, 1.1em); }
+  .pc-card-wrapper.landing-compact .pc-details p { font-size: 10px; }
+  .pc-card-wrapper.landing-compact .pc-handle { font-size: 10px; }
+  .pc-card-wrapper.landing-compact .pc-status { font-size: 7.5px; }
+  .pc-card-wrapper.landing-compact .pc-contact-btn { font-size: 8.5px; padding: 3px 8px; }
 }
 
 @media (max-width: 320px) {
@@ -538,11 +551,11 @@
   }
 
   .pc-details h3 {
-    font-size: min(3svh, 1.5em);
+    font-size: min(2.6svh, 1.3em);
   }
 
   .pc-details p {
-    font-size: 11px;
+    font-size: 10px;
   }
 
   .pc-user-info {
@@ -560,16 +573,16 @@
   }
 
   .pc-handle {
-    font-size: 11px;
+    font-size: 10px;
   }
 
   .pc-status {
-    font-size: 8px;
+    font-size: 7px;
   }
 
   .pc-contact-btn {
-    padding: 4px 8px;
-    font-size: 9px;
+    padding: 3px 7px;
+    font-size: 8px;
     border-radius: 50px;
   }
 }
