@@ -1,4 +1,4 @@
-import { TextReveal } from "@/components/ui/text-reveal"
+import { TextReveal } from "@/Components/ui/text-reveal"
 import React from "react";
 
 export default function QuotesSection() {
