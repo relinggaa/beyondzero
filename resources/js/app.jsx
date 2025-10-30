@@ -5,6 +5,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "../css/app.css";
 import { Ziggy } from "./ziggy";
+import "./lib/preloadAssets";
 
 createInertiaApp({
     resolve: (name) => {
