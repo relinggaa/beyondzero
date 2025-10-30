@@ -9,9 +9,9 @@ import TestimoniSection from "./section/TestimoniSection";
 import AboutUsSection from "./section/AboutUsSection";
 import Footer from "./section/Footer";
 import ProfileCard from "../Components/ProfileCard";
-import avatarImg from "../img/relinggaa.png";
-import avatarMeguns from "../img/meguns.png";  
-import avatarOpung from "../img/opung.png";
+const avatarImg = "/img/relinggaa.png";
+const avatarMeguns = "/img/meguns.png";  
+const avatarOpung = "/img/Opung.png";
 export default function Landing() {
     const [showNavbar, setShowNavbar] = useState(false);
     const quotesRef = useRef(null);
