@@ -19,31 +19,31 @@ export default function MoodTemplates({ moodTemplates, onUseTemplate }) {
                                 {/* Custom Image for templates */}
                                 {template.id === 'awful' ? (
                                     <img 
-                                        src="/storage/img/template_1.png" 
+                                        src="/img/template_1.png" 
                                         alt="Mental Health Template" 
                                         className="w-60 h-60 object-contain"
                                     />
                                 ) : template.id === 'bad' ? (
                                     <img 
-                                        src="/storage/img/template_2.png" 
+                                        src="/img/template_2.png" 
                                         alt="Cognitive Restructuring Template" 
                                         className="w-60 h-60 object-contain"
                                     />
                                 ) : template.id === 'normal' ? (
                                     <img 
-                                        src="/storage/img/template_3.png" 
+                                        src="/img/template_3.png" 
                                         alt="Exposure Therapy Template" 
                                         className="w-60 h-60 object-contain"
                                     />
                                 ) : template.id === 'good' ? (
                                     <img 
-                                        src="/storage/img/template_4.png" 
+                                        src="/img/template_4.png" 
                                         alt="Interoceptive Exposure Template" 
                                         className="w-60 h-60 object-contain"
                                     />
                                 ) : template.id === 'amazing' ? (
                                     <img 
-                                        src="/storage/img/template_5.png" 
+                                        src="/img/template_5.png" 
                                         alt="Mindfulness Meditation Template" 
                                         className="w-60 h-60 object-contain"
                                     />
