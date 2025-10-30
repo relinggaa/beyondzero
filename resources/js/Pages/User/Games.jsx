@@ -90,7 +90,8 @@ export default function Games() {
             category: 'Puzzle',
             difficulty: 'Medium',
             rating: 4.6,
-            players: '1 Player'
+            players: '1 Player',
+            isComingSoon: true
         },
         {
             id: 'meditation',
@@ -103,7 +104,8 @@ export default function Games() {
             category: 'Meditation',
             difficulty: 'Easy',
             rating: 4.9,
-            players: '1 Player'
+            players: '1 Player',
+            isComingSoon: true
         },
         {
             id: 'math',
@@ -116,7 +118,8 @@ export default function Games() {
             category: 'Educational',
             difficulty: 'Medium',
             rating: 4.1,
-            players: '1 Player'
+            players: '1 Player',
+            isComingSoon: true
         },
         {
             id: 'stress-relief',
@@ -143,7 +146,8 @@ export default function Games() {
             category: 'Therapy',
             difficulty: 'Easy',
             rating: 4.4,
-            players: '1 Player'
+            players: '1 Player',
+            isComingSoon: true
         },
         {
             id: 'sound-healing',
@@ -156,7 +160,8 @@ export default function Games() {
             category: 'Therapy',
             difficulty: 'Easy',
             rating: 4.6,
-            players: '1 Player'
+            players: '1 Player',
+            isComingSoon: true
         },
         {
             id: 'mindfulness',
@@ -169,7 +174,8 @@ export default function Games() {
             category: 'Meditation',
             difficulty: 'Medium',
             rating: 4.8,
-            players: '1 Player'
+            players: '1 Player',
+            isComingSoon: true
         },
     ];
 
@@ -178,11 +184,11 @@ export default function Games() {
             case 'memory':
                 return 'https://images.unsplash.com/photo-1520975916090-3105956dac38?q=80&w=1200&auto=format&fit=crop';
             case 'reaction':
-                return 'https://images.unsplash.com/photo-1520974735194-7d4b9a83ae2d?q=80&w=1200&auto=format&fit=crop';
+                return 'https://images.unsplash.com/photo-1520697830682-bbb6e85e2b0b?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1170';
             case 'breathing':
-                return 'https://images.unsplash.com/photo-1520975652208-92b9631f57b7?q=80&w=1200&auto=format&fit=crop';
+                return 'https://plus.unsplash.com/premium_photo-1674081975816-9fcd2abeec38?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1074';
             case 'focus':
-                return 'https://images.unsplash.com/photo-1520974735194-2e6b2f5edf74?q=80&w=1200&auto=format&fit=crop';
+                return 'https://images.unsplash.com/photo-1504507926084-34cf0b939964?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1170';
             case 'puzzle':
                 return 'https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=1200&auto=format&fit=crop';
             case 'meditation':
@@ -682,6 +688,16 @@ export default function Games() {
                                             </div>
                                         )}
                                         
+                                        {/* Coming Soon Badge */}
+                                        {game.isComingSoon && (
+                                            <div className="absolute -top-2 -left-2 z-10">
+                                                <div className="bg-gradient-to-r from-slate-600 to-slate-700 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center space-x-1 border border-slate-500/50">
+                                                    <Clock className="w-3 h-3" />
+                                                    <span>COMING SOON</span>
+                                                </div>
+                                            </div>
+                                        )}
+                                        
                                         {/* Game Card - image + bottom panel */}
                                         <div className="rounded-2xl overflow-hidden bg-slate-900/80 border border-blue-800/30 shadow-xl">
                                             {/* Image */}
@@ -698,10 +714,24 @@ export default function Games() {
                                                         <span>{game.players}</span>
                                                     </div>
                                                     <button
-                                                        onClick={() => game.id === 'stress-relief' ? window.location.href = '/games/stress-relief' : startGame(game.id)}
-                                                        className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-md border border-blue-500/40"
+                                                        onClick={() => {
+                                                            if (game.isComingSoon) {
+                                                                return;
+                                                            }
+                                                            if (game.id === 'stress-relief') {
+                                                                window.location.href = '/games/stress-relief';
+                                                            } else {
+                                                                startGame(game.id);
+                                                            }
+                                                        }}
+                                                        disabled={game.isComingSoon}
+                                                        className={`px-3 py-1.5 text-white text-xs rounded-md border ${
+                                                            game.isComingSoon
+                                                                ? 'bg-slate-600 text-slate-400 cursor-not-allowed border-slate-500/40'
+                                                                : 'bg-blue-600 hover:bg-blue-700 border-blue-500/40'
+                                                        }`}
                                                     >
-                                                        Join
+                                                        {game.isComingSoon ? 'Coming Soon' : 'Join'}
                                                     </button>
                                                 </div>
                                             </div>

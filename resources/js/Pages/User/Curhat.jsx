@@ -15,6 +15,7 @@ export default function Curhat({ auth }) {
     const [sessions, setSessions] = useState([]);
     const [loading, setLoading] = useState(true);
     const chatContainerRef = useRef(null);
+    const lastSpokenIdRef = useRef(null);
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [sessionToDelete, setSessionToDelete] = useState(null);
     const [isListening, setIsListening] = useState(false);
@@ -23,6 +24,8 @@ export default function Curhat({ auth }) {
     const [voiceStatus, setVoiceStatus] = useState('');
     const [isSpeaking, setIsSpeaking] = useState(false);
     const [speechSynthesis, setSpeechSynthesis] = useState(null);
+    const silenceTimeoutRef = useRef(null);
+    const recognitionBufferRef = useRef('');
 
     // Axios defaults for Sanctum/session auth
     axios.defaults.withCredentials = true;
@@ -44,7 +47,7 @@ export default function Curhat({ auth }) {
     const loadChatSessions = async () => {
         try {
             console.log('📡 Loading chat sessions...');
-            const response = await axios.get('/api/chat/sessions');
+            const response = await axios.get('/api/chat/sessions', { params: { category: 'curhat' } });
             console.log('📋 Sessions response:', response.data);
             
             if (response.data.success) {
@@ -84,6 +87,21 @@ export default function Curhat({ auth }) {
         }
     };
 
+    // Pastikan ada sesi aktif (khusus kategori curhat)
+    const ensureActiveSessionId = async () => {
+        if (selectedSession) return selectedSession;
+        try {
+            const res = await axios.get('/api/chat/sessions/active', { params: { category: 'curhat' } });
+            if (res.data?.success && res.data.data?.id) {
+                setSelectedSession(res.data.data.id);
+                return res.data.data.id;
+            }
+        } catch (e) {
+            console.error('Gagal memastikan sesi aktif (curhat):', e);
+        }
+        return null;
+    };
+
     // Load messages for selected session
     const loadChatMessages = async (sessionId) => {
         try {
@@ -107,7 +125,8 @@ export default function Curhat({ auth }) {
             console.log('🆕 Creating new chat session...');
             const response = await axios.post('/api/chat/sessions', {
                 title: 'Curhat Baru',
-                mood: null
+                mood: null,
+                category: 'curhat'
             });
             console.log('📝 New session response:', response.data);
             
@@ -189,27 +208,45 @@ export default function Curhat({ auth }) {
             
             if (SpeechRecognition) {
                 const recognitionInstance = new SpeechRecognition();
-                recognitionInstance.continuous = false;
-                recognitionInstance.interimResults = false;
+                recognitionInstance.continuous = true; // dengarkan terus sampai dihentikan
+                recognitionInstance.interimResults = true; // hasil sementara untuk deteksi jeda
                 recognitionInstance.lang = 'id-ID'; // Indonesian language
                 
                 recognitionInstance.onstart = () => {
                     setIsListening(true);
                     setVoiceStatus('Mendengarkan...');
+                    recognitionBufferRef.current = '';
+                    if (silenceTimeoutRef.current) clearTimeout(silenceTimeoutRef.current);
+                    // auto-stop setelah 5 detik tanpa aktivitas
+                    silenceTimeoutRef.current = setTimeout(() => {
+                        try { recognitionInstance.stop(); } catch (e) {}
+                        const text = (recognitionBufferRef.current || '').trim();
+                        if (text) {
+                            setMessage(text);
+                            handleSendMessage(text);
+                            setVoiceStatus('');
+                        }
+                    }, 5000);
                 };
                 
                 recognitionInstance.onresult = (event) => {
-                    const transcript = event.results[0][0].transcript;
+                    const transcript = Array.from(event.results)
+                        .map(r => r[0]?.transcript || '')
+                        .join(' ');
+                    recognitionBufferRef.current = transcript;
                     setMessage(transcript);
                     setVoiceStatus(`Diterjemahkan: "${transcript}"`);
-                    
-                    // Auto-send message after voice recognition
-                    setTimeout(() => {
-                        if (transcript && typeof transcript === 'string' && transcript.trim()) {
-                            handleSendMessage();
+                    // reset timer 5 detik setiap ada aktivitas
+                    if (silenceTimeoutRef.current) clearTimeout(silenceTimeoutRef.current);
+                    silenceTimeoutRef.current = setTimeout(() => {
+                        try { recognitionInstance.stop(); } catch (e) {}
+                        const text = (recognitionBufferRef.current || '').trim();
+                        if (text) {
+                            setMessage(text);
+                            handleSendMessage(text);
                             setVoiceStatus('');
                         }
-                    }, 500);
+                    }, 5000);
                 };
                 
                 recognitionInstance.onerror = (event) => {
@@ -217,6 +254,7 @@ export default function Curhat({ auth }) {
                     setIsListening(false);
                     setVoiceStatus(`Error: ${event.error}`);
                     setTimeout(() => setVoiceStatus(''), 3000);
+                    if (silenceTimeoutRef.current) clearTimeout(silenceTimeoutRef.current);
                 };
                 
                 recognitionInstance.onend = () => {
@@ -224,6 +262,7 @@ export default function Curhat({ auth }) {
                     if (!voiceStatus.includes('Error')) {
                         setVoiceStatus('');
                     }
+                    if (silenceTimeoutRef.current) clearTimeout(silenceTimeoutRef.current);
                 };
                 
                 setRecognition(recognitionInstance);
@@ -310,6 +349,17 @@ export default function Curhat({ auth }) {
         scrollToBottom();
     }, [chatMessages]);
 
+    // Auto-speak last AI reply (prevents lost TTS after voice flow/reloads)
+    useEffect(() => {
+        if (!chatMessages || chatMessages.length === 0) return;
+        const last = chatMessages[chatMessages.length - 1];
+        if (last?.type === 'ai' && lastSpokenIdRef.current !== last.id) {
+            // kecilkan delay agar tidak balapan dengan re-render
+            setTimeout(() => speakText(last.message), 120);
+            lastSpokenIdRef.current = last.id;
+        }
+    }, [chatMessages]);
+
     // Function to send message to Gemini (replaces Ollama)
     const sendMessageToOllama = async (userMessage) => {
         setIsTyping(true);
@@ -360,8 +410,11 @@ export default function Curhat({ auth }) {
     const saveMessageToDatabase = async (messageData) => {
         try {
             console.log('Attempting to save message:', messageData);
-            
-            const response = await axios.post(`/api/chat/sessions/${selectedSession}/messages`, {
+            // Pastikan pakai session id yang valid
+            const sessionId = selectedSession || await ensureActiveSessionId();
+            if (!sessionId) throw new Error('Tidak ada session aktif');
+
+            const response = await axios.post(`/api/chat/sessions/${sessionId}/messages`, {
                 type: messageData.type,
                 message: messageData.message,
                 timestamp: messageData.timestamp
@@ -372,7 +425,9 @@ export default function Curhat({ auth }) {
             if (response.data.success) {
                 console.log('Message saved successfully, reloading messages');
                 // Reload messages to get updated data
-                await loadChatMessages(selectedSession);
+                await loadChatMessages(sessionId);
+                // Refresh left sidebar so status tidak lagi "Belum dimulai"
+                await loadChatSessions();
             } else {
                 console.error('Failed to save message:', response.data);
                 throw new Error('Failed to save message to database');
@@ -387,12 +442,24 @@ export default function Curhat({ auth }) {
     const startListening = () => {
         if (recognition && !isListening) {
             setMessage(''); // Clear current message
+            recognitionBufferRef.current = '';
+            // Prime TTS using current user gesture (click mic)
+            try {
+                if (speechSynthesis) {
+                    speechSynthesis.resume();
+                    const warm = new SpeechSynthesisUtterance('');
+                    warm.volume = 0;
+                    warm.rate = 1;
+                    speechSynthesis.speak(warm);
+                }
+            } catch (e) {}
             recognition.start();
         }
     };
 
     const stopListening = () => {
         if (recognition && isListening) {
+            if (silenceTimeoutRef.current) clearTimeout(silenceTimeoutRef.current);
             recognition.stop();
         }
     };
@@ -406,32 +473,38 @@ export default function Curhat({ auth }) {
     };
 
     // Text-to-speech function
-    const speakText = (text) => {
-        if (speechSynthesis && text) {
-            // Stop any ongoing speech
-            speechSynthesis.cancel();
-            
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'id-ID'; // Indonesian language
-            utterance.rate = 0.9; // Slightly slower for better understanding
-            utterance.pitch = 1;
-            utterance.volume = 0.8;
-            
-            utterance.onstart = () => {
-                setIsSpeaking(true);
-            };
-            
-            utterance.onend = () => {
-                setIsSpeaking(false);
-            };
-            
-            utterance.onerror = (event) => {
-                console.error('Speech synthesis error:', event.error);
-                setIsSpeaking(false);
-            };
-            
-            speechSynthesis.speak(utterance);
-        }
+    const speakText = async (text) => {
+        if (!speechSynthesis || !text) return;
+        // hentikan recognition dan timer agar TTS tidak diblokir
+        try { if (recognition && isListening) recognition.stop(); } catch (e) {}
+        if (silenceTimeoutRef.current) clearTimeout(silenceTimeoutRef.current);
+
+        const waitForVoices = () => new Promise((resolve) => {
+            const voices = window.speechSynthesis?.getVoices?.() || [];
+            if (voices.length) return resolve();
+            const handler = () => { window.speechSynthesis.removeEventListener('voiceschanged', handler); resolve(); };
+            window.speechSynthesis.addEventListener('voiceschanged', handler);
+            setTimeout(resolve, 500);
+        });
+        await waitForVoices();
+        await new Promise((r) => setTimeout(r, 150));
+
+        speechSynthesis.cancel();
+        try { speechSynthesis.resume(); } catch (e) {}
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'id-ID';
+        utterance.rate = 0.95;
+        utterance.pitch = 1;
+        utterance.volume = 0.9;
+        let resumeTicker;
+        utterance.onstart = () => {
+            setIsSpeaking(true);
+            resumeTicker = setInterval(() => { try { window.speechSynthesis.resume(); } catch (e) {} }, 200);
+            setTimeout(() => { if (resumeTicker) { clearInterval(resumeTicker); resumeTicker = null; } }, 1500);
+        };
+        utterance.onend = () => { if (resumeTicker) { clearInterval(resumeTicker); resumeTicker = null; } setIsSpeaking(false); };
+        utterance.onerror = (event) => { console.error('Speech synthesis error:', event.error); if (resumeTicker) { clearInterval(resumeTicker); resumeTicker = null; } setIsSpeaking(false); };
+        speechSynthesis.speak(utterance);
     };
 
     const stopSpeaking = () => {
@@ -444,27 +517,29 @@ export default function Curhat({ auth }) {
     // --- end helpers ---
 
     // Function to handle send message - Simplified version for testing
-    const handleSendMessage = async () => {
+    const handleSendMessage = async (customMessage = null) => {
         console.log('=== handleSendMessage START ===');
         console.log('Current state:', { 
-            message: message.trim(), 
+            message: (customMessage ?? message).trim(), 
             selectedSession, 
             isTyping,
             sessionsCount: sessions.length 
         });
         
-        if (!message.trim()) {
+        const toSend = (customMessage ?? message).trim();
+        if (!toSend) {
             console.log('❌ No message to send');
             return;
         }
         
-        if (!selectedSession) {
-            console.log('❌ No session selected');
-            alert('Tidak ada session yang dipilih. Silakan pilih atau buat session baru.');
+        const activeId = await ensureActiveSessionId();
+        if (!activeId) {
+            console.log('❌ No session selected and cannot create one');
+            alert('Tidak ada session yang dipilih. Silakan buat session baru.');
             return;
         }
         
-        const messageToSend = message.trim();
+        const messageToSend = toSend;
         console.log('✅ Sending message:', messageToSend);
         
         // Clear input immediately
@@ -618,7 +693,9 @@ export default function Curhat({ auth }) {
                                         <h4 className="text-white font-medium">{session.title}</h4>
                                         <p className="text-white/60 text-sm">{formatDate(session.created_at)}</p>
                                         <span className="text-white text-xs font-medium">
-                                            {session.mood || 'Belum dimulai'}
+                                            {session.messages && session.messages.length > 0
+                                                ? 'Sudah dimulai'
+                                                : (session.mood || 'Belum dimulai')}
                                         </span>
                                     </div>
                                     <div className="flex items-center space-x-2">

@@ -28,7 +28,7 @@ export default function MessageInput({
                 />
                 {/* Send Button */}
                 <button 
-                    onClick={onSendMessage}
+                    onClick={() => onSendMessage()}
                     disabled={isAnalyzing || !message.trim()}
                     className="bg-white hover:bg-white/90 text-black p-2 lg:p-3 rounded-xl transition-all duration-200 hover:scale-105 flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
                 >

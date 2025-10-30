@@ -12,9 +12,9 @@ export default function NavbarUser() {
                 <div className="flex items-center justify-between">
                     {/* Logo/Brand */}
                     <div className="flex items-center">
-                        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">
+                        <Link href="/" className="text-xl sm:text-2xl lg:text-3xl font-bold text-white hover:text-white/80 transition-colors">
                            FixYou
-                        </h1>
+                        </Link>
                     </div>
 
                     {/* Mobile Menu Button */}
