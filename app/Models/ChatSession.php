@@ -16,6 +16,7 @@ class ChatSession extends Model
         'title',
         'mood',
         'is_active',
+        'category',
     ];
 
     protected $casts = [

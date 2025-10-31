@@ -14,9 +14,14 @@ class ChatController extends Controller
     /**
      * Display a listing of the user's chat sessions.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $chatSessions = ChatSession::where('user_id', Auth::id())
+        $category = $request->get('category');
+        $query = ChatSession::where('user_id', Auth::id());
+        if ($category) {
+            $query->where('category', $category);
+        }
+        $chatSessions = $query
             ->with(['messages' => function($query) {
                 $query->orderBy('timestamp', 'asc');
             }])
@@ -37,6 +42,7 @@ class ChatController extends Controller
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
             'mood' => 'nullable|string|max:255',
+            'category' => 'nullable|string|max:50',
         ]);
 
         if ($validator->fails()) {
@@ -46,11 +52,18 @@ class ChatController extends Controller
             ], 422);
         }
 
+        // Deactivate other active sessions in the same category for this user
+        ChatSession::where('user_id', Auth::id())
+            ->when($request->get('category'), fn($q) => $q->where('category', $request->get('category')))
+            ->where('is_active', true)
+            ->update(['is_active' => false]);
+
         $chatSession = ChatSession::create([
             'user_id' => Auth::id(),
             'title' => $request->title,
             'mood' => $request->mood,
             'is_active' => true,
+            'category' => $request->get('category'),
         ]);
 
         return response()->json([
@@ -158,6 +171,14 @@ class ChatController extends Controller
             ], 422);
         }
 
+        // If activating this session, deactivate other sessions in the same category
+        if ($request->boolean('is_active')) {
+            ChatSession::where('user_id', Auth::id())
+                ->where('id', '!=', $sessionId)
+                ->when($chatSession->category, fn($q) => $q->where('category', $chatSession->category))
+                ->update(['is_active' => false]);
+        }
+
         $chatSession->update($request->only(['title', 'mood', 'is_active']));
 
         return response()->json([
@@ -193,10 +214,12 @@ class ChatController extends Controller
     /**
      * Get or create active chat session for user.
      */
-    public function getActiveSession()
+    public function getActiveSession(Request $request)
     {
+        $category = $request->get('category');
         $activeSession = ChatSession::where('user_id', Auth::id())
             ->where('is_active', true)
+            ->when($category, fn($q) => $q->where('category', $category))
             ->with(['messages' => function($query) {
                 $query->orderBy('timestamp', 'asc');
             }])
@@ -209,6 +232,7 @@ class ChatController extends Controller
                 'title' => 'Curhat Baru',
                 'mood' => null,
                 'is_active' => true,
+                'category' => $category,
             ]);
         }
 
