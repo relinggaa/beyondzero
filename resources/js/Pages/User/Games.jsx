@@ -77,7 +77,8 @@ export default function Games() {
             category: 'Training',
             difficulty: 'Hard',
             rating: 4.3,
-            players: '1 Player'
+            players: '1 Player',
+            isComingSoon: true
         },
         {
             id: 'puzzle',
@@ -366,8 +367,6 @@ export default function Games() {
                 startBreathingExercise();
                 break;
             case 'focus':
-                startFocusTraining();
-                break;
             case 'puzzle':
             case 'meditation':
             case 'math':
@@ -497,27 +496,15 @@ export default function Games() {
 
             case 'focus':
                 return (
-                    <div className="space-y-6">
-                        <div className="flex justify-between items-center">
-                            <h3 className="text-xl font-semibold text-white">Focus Master</h3>
-                            <div className="text-white/70">Score: {focusScore}</div>
+                    <div className="space-y-6 text-center">
+                        <h3 className="text-xl font-semibold text-white">Focus Master</h3>
+                        <div className="bg-gradient-to-br from-blue-400 to-cyan-400 rounded-xl p-8">
+                            <div className="text-white">
+                                <Target className="w-24 h-24 mx-auto mb-4" />
+                                <h4 className="text-2xl font-bold mb-2">Coming Soon!</h4>
+                                <p className="text-white/80">Game latihan konsentrasi sedang dalam pengembangan</p>
+                            </div>
                         </div>
-                        <div className="relative bg-gradient-to-br from-blue-400 to-cyan-400 rounded-xl h-96 shadow-lg">
-                            {targetVisible && (
-                                <button
-                                    onClick={handleTargetClick}
-                                    className="absolute w-8 h-8 bg-yellow-400 rounded-full hover:bg-yellow-300 transition-all duration-200 shadow-lg hover:shadow-xl"
-                                    style={{
-                                        left: `${targetPosition.x}%`,
-                                        top: `${targetPosition.y}%`,
-                                        transform: 'translate(-50%, -50%)'
-                                    }}
-                                ></button>
-                            )}
-                        </div>
-                        <p className="text-white/70 text-center">
-                            Klik target kuning yang muncul untuk mendapat poin!
-                        </p>
                     </div>
                 );
 
