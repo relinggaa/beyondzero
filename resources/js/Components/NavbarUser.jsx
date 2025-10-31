@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, usePage } from "@inertiajs/react";
+import { Link, usePage, router } from "@inertiajs/react";
 
 export default function NavbarUser() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -74,13 +74,13 @@ export default function NavbarUser() {
                         <span className="text-white/90 text-sm font-medium px-2">
                             Halo, {auth?.user?.name || 'User'}
                         </span>
-                        <Link
-                            href="/logout"
-                            method="post"
+                        <button
+                            type="button"
+                            onClick={() => router.post('/logout')}
                             className="bg-white hover:bg-white/90 text-black px-4 lg:px-6 py-2 rounded-full transition-all duration-200 font-semibold text-xs lg:text-sm tracking-wide"
                         >
                             Logout
-                        </Link>
+                        </button>
                     </div>
                 </div>
 
@@ -125,7 +125,11 @@ export default function NavbarUser() {
                                 Healing
                             </a>
                          
-                            <button className="bg-white hover:bg-white/90 text-black px-4 py-2 rounded-full transition-all duration-200 font-bold text-sm tracking-wide w-full mt-4">
+                            <button
+                                type="button"
+                                onClick={() => router.post('/logout')}
+                                className="bg-white hover:bg-white/90 text-black px-4 py-2 rounded-full transition-all duration-200 font-bold text-sm tracking-wide w-full mt-4"
+                            >
                                 Logout
                             </button>
                         </div>
