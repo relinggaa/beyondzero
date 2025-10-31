@@ -91,7 +91,7 @@ export default function Landing() {
                                 />
                                 <ProfileCard
                                     name="Mega Bunawi"
-                                    title="System Analyst-Sofware Quality Assurance"
+                                    title="System Analyst & Sofware Quality Assurance"
                                     handle="megabunawi"
                                     status="Online"
                                     contactText="Contact Me"
@@ -106,7 +106,7 @@ export default function Landing() {
                                 />
                                 <ProfileCard
                                     name="Rasendriya Abel"
-                                    title="AI Engineer-Backend Developer"
+                                    title="AI Engineer & Backend Developer"
                                     handle="RasendriyaAbel"
                                     status="Online"
                                     contactText="Contact Me"
