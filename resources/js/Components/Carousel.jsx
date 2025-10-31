@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { motion, useMotionValue, useTransform } from 'motion/react';
 import { Brain, BookOpen, MessageCircle, Calendar, Heart } from 'lucide-react';
 import React from 'react';
@@ -57,19 +57,65 @@ export default function Carousel({
   pauseOnHover = false,
   loop = false,
   round = false,
-  showArrows = false
+  showArrows = false,
+  onNavigate = null
 }) {
   const containerPadding = 16;
   const [screenWidth, setScreenWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1024);
+  const containerRef = useRef(null);
+  const [containerWidth, setContainerWidth] = useState(0);
   
-  // Responsive width calculation - Full width with max constraints
+  // Get container width from parent
+  useEffect(() => {
+    const updateWidth = () => {
+      if (containerRef.current && containerRef.current.parentElement) {
+        const parentWidth = containerRef.current.parentElement.offsetWidth;
+        setContainerWidth(parentWidth || 0);
+      }
+    };
+    
+    updateWidth();
+    window.addEventListener('resize', updateWidth);
+    return () => window.removeEventListener('resize', updateWidth);
+  }, []);
+  
+  // Responsive width calculation - Use container width if available, otherwise fallback to screen-based calculation
   const getResponsiveWidth = () => {
-    const maxWidth = Math.min(screenWidth - 64, 1200); // Max 1200px with 32px padding on each side
-    if (screenWidth < 640) return Math.min(screenWidth - 32, 400); // Mobile
-    if (screenWidth < 768) return Math.min(screenWidth - 48, 500); // Small tablet
-    if (screenWidth < 1024) return Math.min(screenWidth - 64, 700); // Tablet
-    if (screenWidth < 1280) return Math.min(screenWidth - 80, 900); // Desktop
-    return Math.min(screenWidth - 96, 1200); // Large desktop
+    if (containerWidth > 0) {
+      // Dapatkan parent element yang memiliki padding untuk arrow
+      let element = containerRef.current?.parentElement;
+      let totalPadding = 0;
+      
+      // Cari parent dengan padding untuk arrow (biasanya #carousel-wrapper atau parent-nya)
+      while (element && element !== document.body) {
+        const computedStyle = window.getComputedStyle(element);
+        const paddingLeft = parseInt(computedStyle.paddingLeft) || 0;
+        const paddingRight = parseInt(computedStyle.paddingRight) || 0;
+        
+        // Jika padding besar (untuk arrow space), kurangi dari width
+        if (paddingLeft >= 64 || paddingRight >= 64) {
+          totalPadding = paddingLeft + paddingRight;
+          break;
+        }
+        
+        element = element.parentElement;
+      }
+      
+      // Untuk desktop, kurangi padding arrow jika ada
+      const isDesktop = screenWidth >= 768;
+      if (isDesktop && totalPadding > 0) {
+        return containerWidth;
+      }
+      
+      return containerWidth;
+    }
+    // Fallback calculation
+    const maxWidth = Math.min(screenWidth - 64, 1200);
+    if (screenWidth < 640) return Math.min(screenWidth - 32, 400);
+    if (screenWidth < 768) return Math.min(screenWidth - 48, 500);
+    if (screenWidth < 1024) return Math.min(screenWidth - 64, 700);
+    if (screenWidth < 1280) return Math.min(screenWidth - 80, 900);
+    return Math.min(screenWidth - 96, 1200);
   };
   
   const responsiveWidth = getResponsiveWidth();
@@ -82,7 +128,6 @@ export default function Carousel({
   const [isHovered, setIsHovered] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
 
-  const containerRef = useRef(null);
   const carouselRef = useRef(null);
   const itemsRef = useRef([]);
   
@@ -208,47 +253,50 @@ export default function Carousel({
         }
       };
 
+  // Navigation handlers
+  const handleNext = useCallback(() => {
+    setCurrentIndex(prev => (prev === carouselItems.length - 1 ? (loop ? 0 : prev) : prev + 1));
+  }, [carouselItems.length, loop]);
+
+  const handlePrev = useCallback(() => {
+    setCurrentIndex(prev => (prev === 0 ? (loop ? items.length - 1 : 0) : prev - 1));
+  }, [items.length, loop]);
+
+  // Expose navigation methods via callback
+  useEffect(() => {
+    if (onNavigate) {
+      onNavigate({
+        next: handleNext,
+        prev: handlePrev
+      });
+    }
+  }, [onNavigate, handleNext, handlePrev]);
+
   return (
     <div
       ref={containerRef}
       className={`carousel-container ${round ? 'round' : ''}`}
       style={{
-        width: `${responsiveWidth}px`,
+        width: '100%',
+        maxWidth: '100%',
+        position: 'relative',
         ...(round && { height: `${responsiveWidth}px`, borderRadius: '50%' })
       }}>
-      {/* Mobile arrows */}
-      {showArrows && (
-        <>
-          <button
-            className="md:hidden absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-black/80 hover:bg-black/90 text-white rounded-full p-3 border border-white/40 shadow-md active:scale-95"
-            onClick={() => setCurrentIndex(prev => (prev === 0 ? (loop ? items.length - 1 : 0) : prev - 1))}
-            aria-label="Prev"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"/></svg>
-          </button>
-          <button
-            className="md:hidden absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-black/80 hover:bg-black/90 text-white rounded-full p-3 border border-white/40 shadow-md active:scale-95"
-            onClick={() => setCurrentIndex(prev => (prev === carouselItems.length - 1 ? (loop ? 0 : prev) : prev + 1))}
-            aria-label="Next"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"/></svg>
-          </button>
-        </>
-      )}
-      <motion.div
-        ref={carouselRef}
-        className="carousel-track"
-        drag="x"
-        {...dragProps}
-        style={{
-          width: itemWidth,
-          gap: `${GAP}px`,
-          x
-        }}
-        onDragEnd={handleDragEnd}
-        animate={{ x: -(currentIndex * trackItemOffset) }}
-        transition={effectiveTransition}
-        onAnimationComplete={handleAnimationComplete}>
+      <div className="carousel-inner" style={{ overflow: 'hidden' }}>
+        <motion.div
+          ref={carouselRef}
+          className="carousel-track"
+          drag="x"
+          {...dragProps}
+          style={{
+            width: itemWidth,
+            gap: `${GAP}px`,
+            x
+          }}
+          onDragEnd={handleDragEnd}
+          animate={{ x: -(currentIndex * trackItemOffset) }}
+          transition={effectiveTransition}
+          onAnimationComplete={handleAnimationComplete}>
         {carouselItems.map((item, index) => {
           return (
             <motion.div
@@ -286,7 +334,8 @@ export default function Carousel({
             </motion.div>
           );
         })}
-      </motion.div>
+        </motion.div>
+      </div>
       <div className={`carousel-indicators-container ${round ? 'round' : ''}`}>
         <div className="carousel-indicators">
           {items.map((_, index) => (

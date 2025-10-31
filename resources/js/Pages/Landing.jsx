@@ -99,7 +99,7 @@ export default function Landing() {
                                     miniAvatarUrl={avatarMeguns}
                                     iconUrl="https://cdn-icons-png.flaticon.com/512/1384/1384069.png"
                                     showUserInfo={true}
-                                    className="landing-compact"
+                                    className="landing-compact mega-bunawi-card"
                                     enableTilt={true}
                                     enableMobileTilt={false}
                                     onContactClick={() => console.log('Contact clicked')}

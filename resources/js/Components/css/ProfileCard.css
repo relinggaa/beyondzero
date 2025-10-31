@@ -418,6 +418,11 @@
   -webkit-background-clip: text;
 }
 
+/* Smaller subtitle/title text for Mega Bunawi card specifically (not the name) */
+.pc-card-wrapper.mega-bunawi-card .pc-details p {
+  font-size: 11px !important;
+}
+
 .pc-details p {
   font-weight: 600;
   position: relative;
@@ -512,6 +517,9 @@
   .pc-card-wrapper.landing-compact .pc-handle { font-size: 12px; }
   .pc-card-wrapper.landing-compact .pc-status { font-size: 9px; }
   .pc-card-wrapper.landing-compact .pc-contact-btn { font-size: 10px; padding: 5px 10px; }
+  
+  /* Smaller subtitle for Mega Bunawi card */
+  .pc-card-wrapper.mega-bunawi-card .pc-details p { font-size: 10px !important; }
 }
 
 @media (max-width: 480px) {
@@ -569,8 +577,10 @@
   .pc-card-wrapper.landing-compact .pc-handle { font-size: 10px; }
   .pc-card-wrapper.landing-compact .pc-status { font-size: 7.5px; }
   .pc-card-wrapper.landing-compact .pc-contact-btn { font-size: 8.5px; padding: 3px 8px; }
+  
+  /* Smaller subtitle for Mega Bunawi card on mobile */
+  .pc-card-wrapper.mega-bunawi-card .pc-details p { font-size: 9px !important; }
 }
-
 @media (max-width: 320px) {
   .pc-card {
     height: 55svh;
