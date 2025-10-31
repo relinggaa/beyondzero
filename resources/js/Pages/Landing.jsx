@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
+import { usePage } from "@inertiajs/react";
 import HeroSection from "./section/HeroSection";
 import ServicesSection from "./section/ServicesSection";
 import QuotesSection from "./section/QuotesSection";
 import DomeGalerySession from "./section/DomeGalerySession";
 import PsikologSection from "./section/PsikologSection";
 import NavbarLanding from "../Components/NavbarLanding";
+import NavbarUser from "../Components/NavbarUser";
 import TestimoniSection from "./section/TestimoniSection";
 import AboutUsSection from "./section/AboutUsSection";
 import Footer from "./section/Footer";
@@ -15,6 +17,7 @@ const avatarOpung = "/img/Opung.png";
 export default function Landing() {
     const [showNavbar, setShowNavbar] = useState(false);
     const quotesRef = useRef(null);
+    const { auth } = usePage().props;
 
     useEffect(() => {
         const handleScroll = () => {
@@ -35,7 +38,7 @@ export default function Landing() {
 
     return (
         <>
-            <NavbarLanding showNavbar={showNavbar} />
+            {auth?.user ? <NavbarUser /> : <NavbarLanding showNavbar={showNavbar} />}
             <div className="landing">
                 <div ref={quotesRef} id="quotes-section">
                     <QuotesSection />

@@ -56,7 +56,8 @@ export default function Carousel({
   autoplayDelay = 3000,
   pauseOnHover = false,
   loop = false,
-  round = false
+  round = false,
+  showArrows = false
 }) {
   const containerPadding = 16;
   const [screenWidth, setScreenWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1024);
@@ -215,6 +216,25 @@ export default function Carousel({
         width: `${responsiveWidth}px`,
         ...(round && { height: `${responsiveWidth}px`, borderRadius: '50%' })
       }}>
+      {/* Mobile arrows */}
+      {showArrows && (
+        <>
+          <button
+            className="md:hidden absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-black/80 hover:bg-black/90 text-white rounded-full p-3 border border-white/40 shadow-md active:scale-95"
+            onClick={() => setCurrentIndex(prev => (prev === 0 ? (loop ? items.length - 1 : 0) : prev - 1))}
+            aria-label="Prev"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"/></svg>
+          </button>
+          <button
+            className="md:hidden absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-black/80 hover:bg-black/90 text-white rounded-full p-3 border border-white/40 shadow-md active:scale-95"
+            onClick={() => setCurrentIndex(prev => (prev === carouselItems.length - 1 ? (loop ? 0 : prev) : prev + 1))}
+            aria-label="Next"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"/></svg>
+          </button>
+        </>
+      )}
       <motion.div
         ref={carouselRef}
         className="carousel-track"

@@ -1,9 +1,10 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useForm, Link } from "@inertiajs/react";
 import LayoutUser from "../../Components/Layout/LayoutUser";
 import backgroundPsikologImage from "../../../img/background_psikolog.png";
 import { Card, Badge, Button, Avatar } from 'flowbite-react';
 import PsikologCard from "../../Components/PsikologCard";
+import { geminiGenerate } from "@/lib/gemini";
 
 export default function Psikolog({ psikologs }) {
     const [selectedPsikolog, setSelectedPsikolog] = useState(null);
@@ -14,6 +15,8 @@ export default function Psikolog({ psikologs }) {
     const [chatMessage, setChatMessage] = useState("");
     const [chatMessages, setChatMessages] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
+    const [currentPage, setCurrentPage] = useState(0);
+    const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' ? window.innerWidth < 640 : true);
 
     const { data, setData, post, processing, errors } = useForm({
         psikolog_id: "",
@@ -134,7 +137,7 @@ export default function Psikolog({ psikologs }) {
         });
     };
 
-    const OLLAMA_API_BASE = 'http://localhost:5004';
+    // Gemini will be used for AI responses (see resources/js/lib/gemini.js)
 
     const handleOpenChatbot = () => {
         setIsChatbotOpen(true);
@@ -188,44 +191,33 @@ export default function Psikolog({ psikologs }) {
             setChatMessages(prev => [...prev, { id: loadingId, type: 'ai', message: 'Mengetik...', timestamp: '' }]);
 
             try {
-                const res = await fetch(`${OLLAMA_API_BASE}/chat`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        message: newMessage.message, 
-                        timestamp: newMessage.timestamp,
-                        context: buildPageContext()
-                    })
-                });
-                const data = await res.json();
+                const prompt = [
+                    'Anda adalah AI asisten ramah untuk halaman daftar Psikolog. Jawab singkat (2-5 kalimat), empatik, dan relevan.',
+                    'Jangan beri diagnosis. Boleh sarankan langkah ringan seperti mencari topik keahlian yang sesuai atau membuat jadwal.',
+                    `Konteks halaman:\n${buildPageContext()}`,
+                    `Pesan pengguna: "${newMessage.message}"`
+                ].join('\n');
+
+                const aiText = await geminiGenerate(prompt);
 
                 // Hapus placeholder loading
                 setChatMessages(prev => prev.filter(m => m.id !== loadingId));
                 setIsChatbotLoading(false);
 
-                if (data.success) {
-                    setChatMessages(prev => [...prev, {
-                        id: Date.now() + 3,
-                        type: 'ai',
-                        message: data.response,
-                        timestamp: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
-                    }]);
-                } else {
-                    setChatMessages(prev => [...prev, {
-                        id: Date.now() + 4,
-                        type: 'ai',
-                        message: `Maaf, saya tidak bisa merespons saat ini: ${data.error || 'Unknown error'}`,
-                        timestamp: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
-                    }]);
-                }
+                setChatMessages(prev => [...prev, {
+                    id: Date.now() + 3,
+                    type: 'ai',
+                    message: aiText,
+                    timestamp: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+                }]);
             } catch (err) {
-                // Hapus placeholder loading dan tampilkan error
+                // Hapus placeholder loading dan tampilkan fallback
                 setChatMessages(prev => prev.filter(m => m.id !== loadingId));
                 setIsChatbotLoading(false);
                 setChatMessages(prev => [...prev, {
                     id: Date.now() + 5,
                     type: 'ai',
-                    message: `Gagal terhubung ke AI. Pastikan layanan Ollama API berjalan di ${OLLAMA_API_BASE}.`,
+                    message: 'Maaf, AI sedang tidak tersedia. Coba lagi nanti ya.',
                     timestamp: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
                 }]);
             }
@@ -250,6 +242,20 @@ export default function Psikolog({ psikologs }) {
             return searchFields.includes(query);
         });
     }, [psikologList, searchQuery]);
+
+    // Pagination for mobile view
+    useEffect(() => {
+        const onResize = () => setIsMobile(window.innerWidth < 640);
+        window.addEventListener('resize', onResize);
+        return () => window.removeEventListener('resize', onResize);
+    }, []);
+
+    const perPage = isMobile ? 4 : filteredPsikologs.length;
+    const totalPages = Math.max(1, Math.ceil(filteredPsikologs.length / perPage));
+    const pageItems = useMemo(() => {
+        const start = currentPage * perPage;
+        return filteredPsikologs.slice(start, start + perPage);
+    }, [filteredPsikologs, currentPage, perPage]);
 
     return (
         <LayoutUser>
@@ -344,15 +350,41 @@ export default function Psikolog({ psikologs }) {
 
                 {/* Psikolog Cards Grid */}
                 {filteredPsikologs.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {filteredPsikologs.map((psikolog) => (
+                    <>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-7 md:gap-6">
+                        {pageItems.map((psikolog) => (
                             <PsikologCard 
                                 key={psikolog.id}
                                 psikolog={psikolog}
+                                className="psikolog-card-compact"
                                 onClick={() => handleDetailClick(psikolog)}
                             />
                         ))}
                     </div>
+                    {isMobile && totalPages > 1 && (
+                        <div className="flex items-center justify-center mt-4 space-x-4">
+                            <button
+                                onClick={() => setCurrentPage(p => Math.max(0, p - 1))}
+                                className="bg-white/10 border border-white/20 text-white px-3 py-2 rounded-full active:scale-95"
+                                disabled={currentPage === 0}
+                            >
+                                Prev
+                            </button>
+                            <div className="flex space-x-2">
+                                {Array.from({ length: totalPages }).map((_, i) => (
+                                    <span key={i} className={`w-2 h-2 rounded-full ${i === currentPage ? 'bg-white' : 'bg-white/40'}`}></span>
+                                ))}
+                            </div>
+                            <button
+                                onClick={() => setCurrentPage(p => Math.min(totalPages - 1, p + 1))}
+                                className="bg-white/10 border border-white/20 text-white px-3 py-2 rounded-full active:scale-95"
+                                disabled={currentPage === totalPages - 1}
+                            >
+                                Next
+                            </button>
+                        </div>
+                    )}
+                    </>
                 ) : (
                     <div className="text-center py-20">
                         <div className="inline-block p-6 bg-gradient-to-br from-slate-800 to-blue-900 rounded-full mb-6 border border-blue-600/30">

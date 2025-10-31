@@ -232,7 +232,7 @@ export default function MoodTracker() {
             console.log('✅ Connected to WebSocket server');
             setIsConnected(true);
             if (selectedSession) {
-                newSocket.emit('join_session', { session_id: `session_${selectedSession}` });
+            newSocket.emit('join_session', { session_id: `session_${selectedSession}` });
             }
         });
 
@@ -250,7 +250,7 @@ export default function MoodTracker() {
             console.log('🔄 Reconnected to WebSocket after', attemptNumber, 'attempts');
             setIsConnected(true);
             if (selectedSession) {
-                newSocket.emit('join_session', { session_id: `session_${selectedSession}` });
+            newSocket.emit('join_session', { session_id: `session_${selectedSession}` });
             }
         });
 
@@ -287,11 +287,12 @@ export default function MoodTracker() {
                     aiResponse = generateAIResponse(data, '');
                 }
                 
-                // Add AI message
+                // Add AI message (sertakan jenis mood)
+                const moodLine = `\n\nAnalisis mood: ${data.mood || 'Unknown'} (confidence ${(data.confidence * 100).toFixed(1)}%)`;
                 const aiMessage = {
                     id: Date.now() + 1,
                     type: 'ai',
-                    message: aiResponse,
+                    message: `${aiResponse}${moodLine}`,
                     timestamp: new Date().toLocaleTimeString('en-US', { 
                         hour: '2-digit', 
                         minute: '2-digit',
@@ -311,7 +312,7 @@ export default function MoodTracker() {
                                 'X-CSRF-TOKEN': getCsrfToken()
                             },
                             credentials: 'include',
-                            body: JSON.stringify({ type: 'ai', message: aiResponse, timestamp: new Date().toISOString() })
+                            body: JSON.stringify({ type: 'ai', message: `${aiResponse}${moodLine}`, timestamp: new Date().toISOString() })
                         });
                     }
                 } catch (e) {
@@ -462,53 +463,72 @@ export default function MoodTracker() {
         }
     }, []);
 
-    // Fungsi untuk analisis mood menggunakan ML
+    // Util: ambil JSON dari output teks LLM
+    const parseJsonFromText = (text) => {
+        try {
+            const direct = JSON.parse(text);
+            return direct;
+        } catch {}
+        try {
+            const match = text.match(/\{[\s\S]*\}/);
+            if (match) return JSON.parse(match[0]);
+        } catch {}
+        return null;
+    };
+
+    // Prompt rule-based (mengadopsi aturan dari simple_mood_api.py)
+    const buildMoodAnalysisPrompt = (userMessage) => {
+        const rulebook = `
+Anda adalah sistem analisis mood berbasis aturan sederhana. Klasifikasikan pesan pengguna menjadi salah satu kelas: ["Amazing", "Good", "Normal", "Bad", "Awful"].
+Aturan penilaian ringkas (berbasis kata kunci):
+- Awful: frasa sangat negatif (contoh: "hari terburuk", "sangat sedih", "tidak ada energi", "tidak mandi", "tidak makan", "terpuruk", "depresi", "tidak ada aktivitas positif", "menangis", "tidak bertenaga", "tidak mood buat ngapa ngapain", "sangat tidak bersemangat", dst.) bobot kuat.
+- Bad: negatif umum (contoh: "buruk", "sedih", "lelah", "stres", "tekanan", "masalah", "tidak semangat", "tidak produktif", "ragu", "cemas", "tidak yakin", "rendah diri", dst.) bobot sedang.
+- Normal: netral (contoh: "biasa", "normal", "stabil", "seimbang", "tidak ada yang istimewa").
+- Good: positif (contoh: "baik", "bagus", "senang", "positif", "semangat", "produktif", dst.).
+- Amazing: sangat positif (contoh: "luar biasa", "fantastis", "sangat bahagia", "energi tinggi", "hari terbaik", dst.).
+Indikator aktivitas negatif menambah skor Awful/Bad (contoh: "tidak ada energi", "tidak mandi", "hanya tidur"). Aktivitas positif menambah skor Good/Amazing (contoh: "sholat", "jalan-jalan", "membaca", "belajar", "olahraga", "menulis", "coding", "musik").
+Beberapa aturan khusus (contoh):
+- "hari terburuk" sangat memperkuat Awful.
+- "lumayan baik" memperkuat Good dan menurunkan Amazing.
+- Kombinasi seperti "lelah dan stres" + "bangun terlambat" memperkuat Bad.
+Hitung skor per kelas secara heuristik dan pilih mood dengan skor tertinggi. Hitung confidence (0.4-1.0) berdasar selisih skor teratas dengan skor berikutnya dan skala keseluruhan.
+Berikan juga saran singkat (1-2 kalimat) yang empatik dan praktis sesuai mood.
+
+Kembalikan hasil sebagai JSON murni:
+{
+  "success": true,
+  "mood": "Amazing|Good|Normal|Bad|Awful",
+  "confidence": 0.0-1.0,
+  "suggestion": "string"
+}
+Tanpa penjelasan tambahan di luar JSON.`;
+        return [
+            rulebook,
+            `Pesan pengguna: "${userMessage}"`,
+            'Output hanya JSON valid.'
+        ].join('\n\n');
+    };
+
+    // Analisis mood menggunakan Gemini (mengadopsi rulebook di atas)
     const analyzeMoodWithML = async (userMessage) => {
         setIsAnalyzing(true);
-        
         try {
-            // Extract activities dari pesan user
-            const activities = extractActivitiesFromMessage(userMessage);
-            
-            // Get current time dan weekday
-            const now = new Date();
-            const time = now.toLocaleTimeString('en-US', { 
-                hour: '2-digit', 
-                minute: '2-digit',
-                hour12: true 
-            });
-            const weekday = now.toLocaleDateString('en-US', { weekday: 'long' });
-            
-            // Prepare data untuk ML prediction
-            const mlData = {
-                time: time,
-                weekday: weekday,
-                activities: activities.join(' | ')
-            };
-            
-            // Call Simple Mood API (lebih akurat)
-            const response = await fetch('http://localhost:5002/analyze-mood', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    text: userMessage
-                })
-            });
-            
-            const result = await response.json();
-            
-            if (result.success) {
+            const prompt = buildMoodAnalysisPrompt(userMessage);
+            const llmText = await geminiGenerate(prompt);
+            const json = parseJsonFromText(llmText) || {};
+            if (json && json.success && json.mood) {
+                const result = {
+                    success: true,
+                    mood: json.mood,
+                    confidence: typeof json.confidence === 'number' ? json.confidence : 0.6,
+                    suggestion: json.suggestion || ''
+                };
                 setMlPrediction(result);
                 return result;
-            } else {
-                console.error('ML Prediction failed:', result.error);
-                return null;
             }
-            
+            return null;
         } catch (error) {
-            console.error('Error analyzing mood:', error);
+            console.error('Error analyzing mood (Gemini):', error);
             return null;
         } finally {
             setIsAnalyzing(false);
@@ -597,30 +617,30 @@ export default function MoodTracker() {
         // Stop TTS yang masih berjalan dan 'poke' resume agar tidak ke-pause oleh kebijakan browser
         speechSynthesis.cancel();
         try { speechSynthesis.resume(); } catch (e) {}
-        const utterance = new SpeechSynthesisUtterance(text);
+            const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'id-ID';
         utterance.rate = 0.95;
-        utterance.pitch = 1;
+            utterance.pitch = 1;
         utterance.volume = 0.9;
         let resumeTicker;
-        utterance.onstart = () => {
-            setIsSpeaking(true);
+            utterance.onstart = () => {
+                setIsSpeaking(true);
             // beberapa browser auto-pause TTS; panggil resume berkala di awal
             resumeTicker = setInterval(() => {
                 try { window.speechSynthesis.resume(); } catch (e) {}
             }, 200);
             setTimeout(() => { if (resumeTicker) { clearInterval(resumeTicker); resumeTicker = null; } }, 1500);
-        };
-        utterance.onend = () => {
+            };
+            utterance.onend = () => {
             if (resumeTicker) { clearInterval(resumeTicker); resumeTicker = null; }
-            setIsSpeaking(false);
-        };
-        utterance.onerror = (event) => {
-            console.error('Speech synthesis error:', event.error);
+                setIsSpeaking(false);
+            };
+            utterance.onerror = (event) => {
+                console.error('Speech synthesis error:', event.error);
             if (resumeTicker) { clearInterval(resumeTicker); resumeTicker = null; }
-            setIsSpeaking(false);
-        };
-        speechSynthesis.speak(utterance);
+                setIsSpeaking(false);
+            };
+            speechSynthesis.speak(utterance);
     };
 
     // Fungsi untuk generate AI response berdasarkan ML prediction
@@ -717,146 +737,81 @@ export default function MoodTracker() {
             });
         }
         
-        // Analyze mood with WebSocket
-        if (socket && isConnected) {
-            setIsAnalyzing(true);
-            socket.emit('analyze_mood', { text: messageToSend, session_id: `session_${sessionId}` });
-            // fallback ke HTTP jika 7 detik tidak ada hasil dari WS
-            if (wsFallbackTimerRef.current) clearTimeout(wsFallbackTimerRef.current);
-            wsFallbackTimerRef.current = setTimeout(async () => {
-                if (!isAnalyzing) return;
-                const mlResult = await analyzeMoodWithML(messageToSend);
-                let aiResponse = '';
-                try {
-                    const prompt = [
-                        'Anda adalah AI pendengar curhat yang empatik. Gunakan konteks mood untuk merespon singkat (2-5 kalimat).',
-                        'Hindari diagnosis medis. Boleh beri saran praktis ringan.',
-                        `Mood: ${mlResult?.mood || 'Unknown'} (confidence ${(mlResult?.confidence || 0) * 100}%)`,
-                        `Saran internal: ${mlResult?.suggestion || '-'}`,
-                        `Pesan pengguna: "${messageToSend}"`,
-                    ].join('\n');
-                    aiResponse = await geminiGenerate(prompt);
-                } catch (e) {
-                    aiResponse = generateAIResponse(mlResult, messageToSend);
-                }
-                // tampilkan dan simpan AI
-                const aiMessage = {
-                    id: Date.now() + 1,
-                    type: 'ai',
-                    message: aiResponse,
-                    timestamp: new Date().toLocaleTimeString('en-US', { 
-                        hour: '2-digit', 
-                        minute: '2-digit',
-                        hour12: true 
-                    })
-                };
-                setChatMessages(prev => [...prev, aiMessage]);
-                try {
-                    if (sessionId) {
-                        await fetch(`/api/chat/sessions/${sessionId}/messages`, {
-                            method: 'POST',
-                            headers: { 
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': getCsrfToken()
-                            },
-                            credentials: 'include',
-                            body: JSON.stringify({ type: 'ai', message: aiResponse, timestamp: new Date().toISOString() })
-                        });
-                    }
-                } catch (e) {}
-                // update mood via fallback juga
-                try {
-                    if (sessionId && mlResult?.mood) {
-                        await fetch(`/api/chat/sessions/${sessionId}`, {
-                            method: 'PUT',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': getCsrfToken()
-                            },
-                            credentials: 'include',
-                            body: JSON.stringify({ mood: mlResult.mood })
-                        });
-                        refreshSessions();
-                    }
-                } catch (e) {}
-                setIsAnalyzing(false);
-                setTimeout(scrollToBottom, 100);
-            }, 7000);
-        } else {
-            // Fallback to HTTP API if WebSocket not available
-            const mlResult = await analyzeMoodWithML(messageToSend);
-            
-            // Generate AI response (prefer Gemini)
-            let aiResponse = '';
-            try {
-                const prompt = [
-                    'Anda adalah AI pendengar curhat yang empatik. Gunakan konteks mood untuk merespon singkat (2-5 kalimat).',
-                    'Hindari diagnosis medis. Boleh beri saran praktis ringan.',
-                    `Mood: ${mlResult?.mood || 'Unknown'} (confidence ${(mlResult?.confidence || 0) * 100}%)`,
-                    `Saran internal: ${mlResult?.suggestion || '-'}`,
-                    `Pesan pengguna: "${messageToSend}"`,
-                ].join('\n');
-                aiResponse = await geminiGenerate(prompt);
-            } catch (e) {
-                aiResponse = generateAIResponse(mlResult, messageToSend);
-            }
-            // Update mood sesi (fallback path)
-            try {
-                if (sessionId && mlResult?.mood) {
-                    await fetch(`/api/chat/sessions/${sessionId}`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': getCsrfToken()
-                        },
-                        credentials: 'include',
-                        body: JSON.stringify({ mood: mlResult.mood })
-                    });
-                    refreshSessions();
-                }
-            } catch (e) {
-                console.error('Gagal update mood sesi (fallback):', e);
-            }
-            
-            // Add AI message
-            const aiMessage = {
-                id: Date.now() + 1,
-                type: 'ai',
-                message: aiResponse,
-                timestamp: new Date().toLocaleTimeString('en-US', { 
-                    hour: '2-digit', 
-                    minute: '2-digit',
-                    hour12: true 
-                })
-            };
-            
-            setChatMessages(prev => [...prev, aiMessage]);
-
-            // Simpan AI message ke DB
-            try {
-                if (sessionId) {
-                    await fetch(`/api/chat/sessions/${sessionId}/messages`, {
-                        method: 'POST',
-                        headers: { 
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': getCsrfToken()
-                        },
-                        credentials: 'include',
-                        body: JSON.stringify({ type: 'ai', message: aiResponse, timestamp: new Date().toISOString() })
-                    });
-                }
-            } catch (e) {
-                console.error('Gagal menyimpan pesan AI:', e);
-            }
-            
-            // Auto-scroll after AI response
-            setTimeout(scrollToBottom, 100);
-            
-            // Speak AI response
-            setTimeout(() => {
-                speakText(aiResponse);
-            }, 500);
+        // Analisis mood menggunakan Gemini (tanpa WS/HTTP lokal)
+        const mlResult = await analyzeMoodWithML(messageToSend);
+        
+        // Generate AI response (prefer Gemini) berdasarkan hasil analisis
+        let aiResponse = '';
+        try {
+            const prompt = [
+                'Anda adalah AI pendengar curhat yang empatik. Gunakan konteks mood untuk merespon singkat (2-5 kalimat).',
+                'Hindari diagnosis medis. Boleh beri saran praktis ringan.',
+                `Mood: ${mlResult?.mood || 'Unknown'} (confidence ${(mlResult?.confidence || 0) * 100}%)`,
+                `Saran internal: ${mlResult?.suggestion || '-'}`,
+                `Pesan pengguna: "${messageToSend}"`,
+            ].join('\n');
+            aiResponse = await geminiGenerate(prompt);
+        } catch (e) {
+            aiResponse = generateAIResponse(mlResult, messageToSend);
         }
+
+        // Update mood sesi
+        try {
+            if (sessionId && mlResult?.mood) {
+                await fetch(`/api/chat/sessions/${sessionId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': getCsrfToken()
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({ mood: mlResult.mood })
+                });
+                refreshSessions();
+            }
+        } catch (e) {
+            console.error('Gagal update mood sesi:', e);
+        }
+        
+        // Add AI message (sertakan jenis mood)
+        const moodLine = `\n\nAnalisis mood: ${mlResult?.mood || 'Unknown'}${typeof mlResult?.confidence === 'number' ? ` (confidence ${(mlResult.confidence * 100).toFixed(1)}%)` : ''}`;
+        const aiMessage = {
+            id: Date.now() + 1,
+            type: 'ai',
+            message: `${aiResponse}${moodLine}`,
+            timestamp: new Date().toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: true 
+            })
+        };
+        
+        setChatMessages(prev => [...prev, aiMessage]);
+
+        // Simpan AI message ke DB
+        try {
+            if (sessionId) {
+                await fetch(`/api/chat/sessions/${sessionId}/messages`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': getCsrfToken()
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({ type: 'ai', message: `${aiResponse}${moodLine}`, timestamp: new Date().toISOString() })
+                });
+            }
+        } catch (e) {
+            console.error('Gagal menyimpan pesan AI:', e);
+        }
+        
+        // Auto-scroll after AI response
+        setTimeout(scrollToBottom, 100);
+        
+        // Speak AI response
+        setTimeout(() => {
+            speakText(aiResponse);
+        }, 500);
         
         // Clear input
         setMessage('');

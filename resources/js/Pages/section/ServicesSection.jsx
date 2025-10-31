@@ -30,7 +30,7 @@ export default function ServicesSection() {
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.2 }}
-                    className="flex justify-center w-full"
+                    className="relative mx-auto w-full max-w-[620px] md:max-w-[820px] lg:max-w-[980px]"
                 >
                     <Carousel
                         baseWidth={1200}
@@ -39,6 +39,7 @@ export default function ServicesSection() {
                         pauseOnHover={true}
                         loop={true}
                         round={false}
+                        showArrows={true}
                     />
                 </motion.div>
 

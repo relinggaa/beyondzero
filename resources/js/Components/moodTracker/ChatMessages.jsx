@@ -22,6 +22,27 @@ export default function ChatMessages({
         });
     };
 
+    const extractMoodInfo = (text) => {
+        if (typeof text !== 'string') return { clean: text, mood: null, confidence: null };
+        const regex = /\n\nAnalisis mood:\s*([A-Za-z]+)\s*(?:\(confidence\s*([0-9.]+)%\))?/i;
+        const match = text.match(regex);
+        if (!match) return { clean: text, mood: null, confidence: null };
+        const clean = text.replace(regex, '').trim();
+        const mood = match[1];
+        const confidence = match[2] ? Number(match[2]) : null;
+        return { clean, mood, confidence };
+    };
+
+    const moodBadgeClasses = (mood) => {
+        const m = String(mood || '').toLowerCase();
+        if (m === 'amazing') return 'bg-cyan-500/20 border-cyan-400 text-cyan-200';
+        if (m === 'good') return 'bg-green-500/20 border-green-400 text-green-200';
+        if (m === 'normal') return 'bg-gray-500/20 border-gray-400 text-gray-200';
+        if (m === 'bad') return 'bg-orange-500/20 border-orange-400 text-orange-200';
+        if (m === 'awful') return 'bg-red-500/20 border-red-400 text-red-200';
+        return 'bg-slate-500/20 border-slate-400 text-slate-200';
+    };
+
     return (
         <div className="bg-black/30 backdrop-blur-md rounded-2xl p-4 lg:p-6 mb-6 border border-white/20 max-w-full overflow-hidden">
             <div className="flex items-center justify-between mb-4">
@@ -103,7 +124,21 @@ export default function ChatMessages({
                                     ? 'bg-gradient-to-r from-cyan-400 to-teal-500 text-white shadow-lg' 
                                     : 'bg-black/40 backdrop-blur-md text-white border border-white/20 shadow-lg'
                             }`}>
-                                <p className="text-xs lg:text-sm break-words font-medium">{msg.message}</p>
+                                {msg.type === 'ai' ? (() => {
+                                    const { clean, mood, confidence } = extractMoodInfo(msg.message || '');
+                                    return (
+                                        <>
+                                            {mood && (
+                                                <div className={`mb-2 px-3 py-2 rounded-xl border ${moodBadgeClasses(mood)} text-[11px] lg:text-xs font-semibold`}> 
+                                                    Analisis mood: {mood}{typeof confidence === 'number' ? ` (confidence ${confidence.toFixed(1)}%)` : ''}
+                                                </div>
+                                            )}
+                                            <p className="text-xs lg:text-sm break-words font-medium">{clean}</p>
+                                        </>
+                                    );
+                                })() : (
+                                    <p className="text-xs lg:text-sm break-words font-medium">{msg.message}</p>
+                                )}
                                 <p className={`text-xs mt-1 font-light ${
                                     msg.type === 'user' ? 'text-white/70' : 'text-white/50'
                                 }`}>

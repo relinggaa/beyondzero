@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useCallback } from 'react';
 import { motion } from 'motion/react';
 
-const PsikologCard = ({ psikolog, onClick }) => {
+const PsikologCard = ({ psikolog, onClick, className = '' }) => {
   const cardRef = useRef(null);
 
   const handleMouseMove = useCallback((e) => {
@@ -96,7 +96,7 @@ const PsikologCard = ({ psikolog, onClick }) => {
   };
 
   return (
-    <div className="pc-card-wrapper" ref={cardRef}>
+    <div className={`pc-card-wrapper ${className}`} ref={cardRef}>
       <div className="pc-card" onClick={onClick}>
         <div className="pc-inside">
           <div className="pc-shine"></div>

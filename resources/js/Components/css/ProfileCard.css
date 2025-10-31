@@ -35,6 +35,35 @@
   touch-action: none;
 }
 
+/* Compact variant for psikolog listing on mobile */
+.psikolog-card-compact .pc-card {
+  height: 40svh;
+  max-height: 240px;
+}
+.psikolog-card-compact .pc-inside { padding: 12px; }
+.psikolog-card-compact .avatar { width: 90px; height: 90px; }
+
+@media (max-width: 640px) {
+  .psikolog-card-compact .pc-card { height: 34svh; max-height: 190px; }
+  .psikolog-card-compact .pc-inside { padding: 10px; }
+  .psikolog-card-compact .avatar { width: 80px; height: 80px; }
+  .psikolog-card-compact .pc-name-text { font-size: 13px; }
+  .psikolog-card-compact .pc-name-sub { font-size: 10.5px; }
+  .psikolog-card-compact .pc-more-btn { padding: 5px 10px; font-size: 11px; }
+}
+
+/* Further compact fonts and button to avoid covering face */
+.psikolog-card-compact .pc-name-area { padding-top: 6px; padding-bottom: 8px; }
+.psikolog-card-compact .pc-name-text { font-size: 12px; line-height: 1.1; }
+.psikolog-card-compact .pc-name-sub { font-size: 10px; opacity: 0.9; }
+.psikolog-card-compact .pc-more-btn { font-size: 10px; padding: 4px 9px; border-radius: 10px; }
+
+@media (max-width: 640px) {
+  .psikolog-card-compact .pc-name-text { font-size: 11px; }
+  .psikolog-card-compact .pc-name-sub { font-size: 9.5px; }
+  .psikolog-card-compact .pc-more-btn { font-size: 9.5px; padding: 4px 8px; }
+}
+
 .pc-card-wrapper::before {
   content: '';
   position: absolute;
