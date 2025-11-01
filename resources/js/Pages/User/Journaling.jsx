@@ -13,6 +13,7 @@ export default function Journaling({ journals = [] }) {
     const [searchQuery, setSearchQuery] = useState("");
     const [filterMonth, setFilterMonth] = useState("");
     const [filterYear, setFilterYear] = useState("");
+    const [moodError, setMoodError] = useState("");
     const { data, setData, post, put, delete: destroy, processing, errors } = useForm({
         title: "",
         date: "",
@@ -43,10 +44,21 @@ export default function Journaling({ journals = [] }) {
 
     const handleMoodSelect = (mood) => {
         setData('mood', mood.emoji);
+        setMoodError(""); // Clear error when mood is selected
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        
+        // Validate mood
+        if (!data.mood || data.mood.trim() === "") {
+            setMoodError("Mohon pilih mood Anda terlebih dahulu");
+            toast.error("Mohon pilih mood Anda terlebih dahulu");
+            return;
+        }
+        
+        setMoodError(""); // Clear error if validation passes
+        
         if (editingJournal) {
             // Edit existing journal
             put(`/journaling/${editingJournal.id}`, {
@@ -74,6 +86,7 @@ export default function Journaling({ journals = [] }) {
 
     const handleEdit = (journal) => {
         setEditingJournal(journal);
+        setMoodError(""); // Clear mood error when editing
         setData({
             title: journal.title || '',
             date: journal.date,
@@ -104,6 +117,7 @@ export default function Journaling({ journals = [] }) {
     const handleCloseModal = () => {
         setIsModalOpen(false);
         setEditingJournal(null);
+        setMoodError(""); // Clear mood error when closing modal
         setData({
             title: "",
             date: "",
@@ -477,6 +491,9 @@ export default function Journaling({ journals = [] }) {
                                         </button>
                                     ))}
                                 </div>
+                                {moodError && (
+                                    <p className="mt-2 text-red-400 text-sm font-medium">{moodError}</p>
+                                )}
                             </div>
                                         </div>
 
