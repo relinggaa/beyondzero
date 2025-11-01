@@ -748,11 +748,6 @@ export default function Curhat({ auth }) {
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-white font-semibold text-base lg:text-lg">Chat Terbaru</h3>
                             <div className="flex items-center space-x-2">
-                                {/* Ollama Connection Status */}
-                                <div className={`flex items-center space-x-2 ${isConnected ? 'text-white' : 'text-white/50'}`}>
-                                    <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-white' : 'bg-white/30'} ${isConnected ? 'animate-pulse' : ''}`}></div>
-                                    <span className="text-sm">{isConnected ? 'Ollama Connected' : 'Ollama Disconnected'}</span>
-                                </div>
                                 {/* Typing Indicator */}
                                 {isTyping && (
                                     <div className="flex items-center space-x-2 text-white">
@@ -798,13 +793,6 @@ export default function Curhat({ auth }) {
                                     <p className="text-white/70 text-sm lg:text-base max-w-md">
                                         Ceritakan apa yang mengganggu pikiranmu atau hal-hal yang ingin dibagikan. Mulai curhat dengan mengetik pesan di bawah ini.
                                     </p>
-                                    {!isConnected && (
-                                        <div className="mt-4 p-3 bg-white/10 border border-white/20 rounded-lg">
-                                            <p className="text-white/70 text-sm">
-                                                ⚠️ Ollama tidak terhubung. Pastikan Ollama sudah berjalan untuk menggunakan AI chatbot.
-                                            </p>
-                                        </div>
-                                    )}
                                 </div>
                             ) : (
                                 // Chat messages
