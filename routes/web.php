@@ -113,6 +113,13 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/sessions/{sessionId}/messages', [ChatController::class, 'storeMessage']);
     });
 
+    // Journals API (session-auth) for dashboard summary
+    Route::get('/api/journals', [JournalController::class, 'apiIndex']);
+
+    // Dashboard counts API (session-auth)
+    Route::get('/api/dashboard/activity-counts', [App\Http\Controllers\DashboardController::class, 'activityCounts']);
+    Route::get('/api/dashboard/summary', [App\Http\Controllers\DashboardController::class, 'summary']);
+
     // Admin routes
     Route::middleware(['role:admin'])->group(function () {
         Route::get('/admin', [AdminController::class, 'dashboard']);

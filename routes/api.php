@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\GeminiController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\PsikologController;
+use App\Http\Controllers\JournalController;
 use App\Http\Controllers\StressReliefController;
 
 Route::get('/user', function (Request $request) {
@@ -30,6 +31,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/history', [StressReliefController::class, 'getHistory']);
         Route::get('/tips', [StressReliefController::class, 'getTips']);
     });
+
+    // Journals API moved to web.php to use session-based auth
 });
 
 // Public API Routes

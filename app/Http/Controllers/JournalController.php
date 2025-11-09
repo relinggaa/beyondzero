@@ -25,6 +25,31 @@ class JournalController extends Controller
     }
 
     /**
+     * Journals API: return user's journals as JSON for dashboard summary.
+     */
+    public function apiIndex()
+    {
+        $journals = Journal::where('user_id', Auth::id())
+            ->orderBy('date', 'desc')
+            ->get(['id','title','date','mood','created_at']);
+
+        // Hitung jumlah jurnal bulan ini
+        $start = Carbon::now()->startOfMonth()->toDateString();
+        $end = Carbon::now()->endOfMonth()->toDateString();
+        $monthCount = Journal::where('user_id', Auth::id())
+            ->whereBetween('date', [$start, $end])
+            ->count();
+
+        return response()->json([
+            'success' => true,
+            'count' => $journals->count(),
+            'month_count' => $monthCount,
+            'data' => $journals,
+            'latest' => $journals->first(),
+        ]);
+    }
+
+    /**
      * Store a newly created journal.
      */
     public function store(Request $request)

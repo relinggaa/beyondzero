@@ -38,7 +38,7 @@ export default function NavbarLanding({ showNavbar = true }) {
     ];
 
     return (
-        <div className="fixed top-0 left-0 right-0 z-50 flex justify-center items-start pt-4 px-4">
+        <div className="fixed top-0 left-0 right-0 z-[10000] flex justify-center items-start pt-4 px-4">
             <nav className={`transition-all duration-300 ${
                 isScrolled 
                     ? 'bg-black/80 backdrop-blur-lg border border-white/20' 
@@ -115,7 +115,7 @@ export default function NavbarLanding({ showNavbar = true }) {
 
                 {/* Mobile Navigation Menu */}
                 {isMobileMenuOpen && (
-                    <div className="md:hidden absolute top-full left-0 right-0 mt-2 z-50">
+                    <div className="md:hidden absolute top-full left-0 right-0 mt-2 z-[10000]">
                         <div className="px-4 py-3 space-y-2 bg-black/80 backdrop-blur-lg border border-white/20 rounded-2xl">
                             {navItems.map((item) => (
                                 <button

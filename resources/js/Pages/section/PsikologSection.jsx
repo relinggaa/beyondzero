@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { usePage, router } from '@inertiajs/react';
 import { motion } from 'motion/react';
 import PsikologCard from '../../Components/PsikologCard';
 import PsikologModal from '../../Components/PsikologModal';
 import { ChevronLeft, ChevronRight, Users, Star } from 'lucide-react';
 
 const PsikologSection = () => {
+  const { auth } = usePage().props;
   const [psikologs, setPsikologs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -169,7 +171,11 @@ const PsikologSection = () => {
                 <div key={slideIndex} className="carousel-slide">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6 justify-items-center md:justify-items-stretch">
                     {getPsikologsForSlide(slideIndex).map((psikolog) => (
-                      <PsikologCard key={psikolog.id} psikolog={psikolog} />
+                      <PsikologCard 
+                        key={psikolog.id} 
+                        psikolog={psikolog} 
+                        onClick={() => auth?.user ? router.visit('/psikolog') : router.visit('/login')}
+                      />
                     ))}
                   </div>
                 </div>
@@ -210,7 +216,8 @@ const PsikologSection = () => {
             <motion.a
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              href="/login"
+              href={auth?.user ? "/psikolog" : "/login"}
+              data-skip-dashboard-redirect
               className="cta-button inline-block"
             >
               Lihat Semua Psikolog

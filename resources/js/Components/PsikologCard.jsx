@@ -113,7 +113,7 @@ const PsikologCard = ({ psikolog, onClick, className = '' }) => {
           <div className="pc-name-area">
             <div className="pc-name-text">{psikolog.name}</div>
             <div className="pc-name-sub">{psikolog.expertise?.[0] || 'Psikolog'}</div>
-            <button type="button" className="pc-more-btn" onClick={onClick}>
+            <button type="button" className="pc-more-btn" data-skip-dashboard-redirect onClick={onClick}>
               Selengkapnya
             </button>
           </div>

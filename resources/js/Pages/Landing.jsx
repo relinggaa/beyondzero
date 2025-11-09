@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { usePage } from "@inertiajs/react";
+import { usePage, router } from "@inertiajs/react";
 import HeroSection from "./section/HeroSection";
 import ServicesSection from "./section/ServicesSection";
 import QuotesSection from "./section/QuotesSection";
@@ -35,6 +35,31 @@ export default function Landing() {
         
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
+
+    // Intercept clicks inside landing content when user is logged in
+    useEffect(() => {
+        if (!auth?.user) return;
+        const container = document.querySelector('.landing');
+        if (!container) return;
+
+        const handleClick = (e) => {
+            const target = e.target.closest('a, button');
+            if (!target) return;
+            // Skip clicks coming from any nav element
+            if (target.closest('nav')) return;
+            // Skip if marked to bypass dashboard redirect (e.g., Psikolog CTA)
+            if (target.matches('[data-skip-dashboard-redirect]')) return;
+            // Skip if anchor explicitly goes to psikolog list
+            const href = target.getAttribute && target.getAttribute('href');
+            if (href && href.includes('/psikolog')) return;
+
+            e.preventDefault();
+            router.visit('/dashboard');
+        };
+
+        container.addEventListener('click', handleClick);
+        return () => container.removeEventListener('click', handleClick);
+    }, [auth?.user]);
 
     return (
         <>
@@ -87,7 +112,7 @@ export default function Landing() {
                                     className="landing-compact"
                                     enableTilt={true}
                                     enableMobileTilt={false}
-                                    onContactClick={() => console.log('Contact clicked')}
+                                    onContactClick={() => auth?.user ? router.visit('/dashboard') : console.log('Contact clicked')}
                                 />
                                 <ProfileCard
                                     name="Mega Bunawi"
@@ -102,7 +127,7 @@ export default function Landing() {
                                     className="landing-compact mega-bunawi-card"
                                     enableTilt={true}
                                     enableMobileTilt={false}
-                                    onContactClick={() => console.log('Contact clicked')}
+                                    onContactClick={() => auth?.user ? router.visit('/dashboard') : console.log('Contact clicked')}
                                 />
                                 <ProfileCard
                                     name="Rasendriya Abel"
@@ -117,7 +142,7 @@ export default function Landing() {
                                     className="landing-compact"
                                     enableTilt={true}
                                     enableMobileTilt={false}
-                                    onContactClick={() => console.log('Contact clicked')}
+                                    onContactClick={() => auth?.user ? router.visit('/dashboard') : console.log('Contact clicked')}
                                 />
                       
 
