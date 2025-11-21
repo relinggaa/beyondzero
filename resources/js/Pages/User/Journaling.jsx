@@ -415,8 +415,8 @@ export default function Journaling({ journals = [] }) {
                         {/* Book Shadow */}
                         <div className="absolute -inset-4 bg-black/40 rounded-3xl blur-2xl"></div>
                         
-                        {/* Book / Sheet - mobile uses flat sheet; desktop shows tilted book */}
-                        <div className="relative bg-gradient-to-br from-slate-800/85 via-slate-800/75 to-slate-900/85 rounded-2xl shadow-2xl overflow-hidden border-2 md:border-4 border-slate-500/40 backdrop-blur-md md:[transform:perspective(1000px)_rotateY(-2deg)] md:[transform-style:preserve-3d]">
+                        {/* Book / Sheet - mobile uses flat sheet; desktop shows flat book */}
+                        <div className="relative bg-gradient-to-br from-slate-800/85 via-slate-800/75 to-slate-900/85 rounded-2xl shadow-2xl overflow-hidden border-2 md:border-4 border-slate-500/40 backdrop-blur-md">
                             {/* Book Pages */}
                             <div className="bg-gradient-to-r from-slate-900/75 via-slate-800/65 to-slate-900/75 min-h-[82vh] md:min-h-[80vh] max-h-[92vh] md:max-h-[90vh] overflow-y-auto">
                                 {/* Book Binding Indicator */}
