@@ -168,3 +168,5 @@ ml/htmlcov/
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+.vercel
