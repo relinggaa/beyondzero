@@ -1,0 +1,66 @@
+# Dependencies
+node_modules
+vendor
+npm-debug.log
+yarn-error.log
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Environment files
+.env
+.env.backup
+.env.production
+.env.local
+.env.*.local
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Laravel
+storage/*.key
+bootstrap/cache/*
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+auth.json
+
+# Build artifacts (akan di-build di dalam Docker)
+public/build
+public/hot
+public/storage
+
+# Testing
+.phpunit.cache
+coverage
+tests/_output
+
+# Documentation
+README.md
+*.md
+docs
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose.yml
+
+# Vercel
+.vercel
+vercel.json
+
+# Other
+*.log
+*.cache
+
