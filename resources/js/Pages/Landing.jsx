@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { usePage, router } from "@inertiajs/react";
 import HeroSection from "./section/HeroSection";
 import ServicesSection from "./section/ServicesSection";
@@ -15,26 +15,21 @@ const avatarImg = "/img/relinggaa.png";
 const avatarMeguns = "/img/meguns.png";  
 const avatarOpung = "/img/Opung.png";
 export default function Landing() {
-    const [showNavbar, setShowNavbar] = useState(false);
-    const quotesRef = useRef(null);
+    const [showAlert, setShowAlert] = useState(false);
     const { auth } = usePage().props;
 
+    // Show alert on first visit
     useEffect(() => {
-        const handleScroll = () => {
-            if (quotesRef.current) {
-                const quotesBottom = quotesRef.current.offsetTop + quotesRef.current.offsetHeight;
-                const scrollPosition = window.scrollY;
-                
-                // Show navbar even earlier - when user scrolls past 30% of QuotesSection
-                setShowNavbar(scrollPosition > quotesBottom * 0.3);
-            }
-        };
-
-        window.addEventListener('scroll', handleScroll);
-        handleScroll(); 
-        
-        return () => window.removeEventListener('scroll', handleScroll);
+        const hasSeenAlert = localStorage.getItem('fixyou-hosting-alert-seen');
+        if (!hasSeenAlert) {
+            setTimeout(() => setShowAlert(true), 500);
+        }
     }, []);
+
+    const handleCloseAlert = () => {
+        setShowAlert(false);
+        localStorage.setItem('fixyou-hosting-alert-seen', 'true');
+    };
 
     // Intercept clicks inside landing content when user is logged in
     useEffect(() => {
@@ -63,21 +58,42 @@ export default function Landing() {
 
     return (
         <>
-            {auth?.user ? <NavbarUser /> : <NavbarLanding showNavbar={showNavbar} />}
+            {auth?.user ? <NavbarUser /> : <NavbarLanding />}
+      
+            {/* Hosting Alert Modal */}
+            {showAlert && (
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center">
+                    {/* Overlay */}
+                    <div 
+                        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+                        onClick={handleCloseAlert}
+                    ></div>
+                    {/* Alert Dialog */}
+                    <div className="relative w-full max-w-md mx-4 transform transition-all duration-200">
+                        <div className="rounded-2xl overflow-hidden border border-white/20 bg-black/90 backdrop-blur-md shadow-2xl">
+                            <div className="px-6 py-5 border-b border-white/10">
+                                <h3 className="text-white text-xl font-semibold">Pemberitahuan</h3>
+                            </div>
+                            <div className="px-6 py-5">
+                                <p className="text-white/90 text-base leading-relaxed">
+                                    Kami memohon maaf jika terdapat ketidaksempurnaan dalam tampilan atau fitur yang tersedia. Hal ini disebabkan oleh keterbatasan pada platform hosting yang kami gunakan saat ini. Kami akan terus berusaha meningkatkan kualitas layanan ke depannya.
+                                </p>
+                            </div>
+                            <div className="px-6 py-4 flex items-center justify-end border-t border-white/10">
+                                <button
+                                    onClick={handleCloseAlert}
+                                    className="px-6 py-2.5 text-sm font-semibold rounded-xl bg-white text-black hover:bg-white/90 transition-colors shadow-lg"
+                                >
+                                    Mengerti
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div className="landing">
-                <div ref={quotesRef} id="quotes-section">
-                    <QuotesSection />
-                </div>
-                <DomeGalerySession />
-                <div id="services-section">
-                    <ServicesSection />
-                </div>
-                <div id="psikolog-section">
-                    <PsikologSection />
-                </div>
-                <div id="testimoni-section">
-                    <TestimoniSection />
-                </div>
+             
                 {/* Extra breathing room on mobile below Dome Gallery to avoid overlap */}
                 <div id="about-section" className="mt-20 sm:mt-28 md:mt-32 lg:mt-0">
                     <AboutUsSection />

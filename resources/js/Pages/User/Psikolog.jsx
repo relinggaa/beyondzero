@@ -382,7 +382,7 @@ export default function Psikolog({ psikologs }) {
                         <div className="flex items-start justify-between mb-6">
                                         <div className="flex items-center space-x-4">
                                             <img
-                                                src={selectedPsikolog.image ? `/storage/${selectedPsikolog.image}` : 'https://via.placeholder.com/80x80/06b6d4/ffffff?text=IMG'}
+                                                src={selectedPsikolog.image ? (selectedPsikolog.image.startsWith('psikologs/') ? `/storage/${selectedPsikolog.image}` : `/storage/psikologs/${selectedPsikolog.image}`) : 'https://via.placeholder.com/80x80/06b6d4/ffffff?text=IMG'}
                                                 alt={selectedPsikolog.name}
                                                 className="w-20 h-20 rounded-full object-cover border-4 border-cyan-400/30"
                                             />

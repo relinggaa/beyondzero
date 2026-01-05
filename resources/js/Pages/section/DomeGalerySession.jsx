@@ -2,7 +2,7 @@ import DomeGallery from '../../Components/DomeGallery';
 import React, { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import './DomeGalerySession.css';
+// CSS moved to app.css for better production bundling
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -152,11 +152,11 @@ const MotivationSection = () => {
 
 export default function App() {
   return (
-    <div className="bg-black -mt-32">
-      <div className="container mx-auto px-6 py-4">
+    <div className="bg-black -mt-32 dome-gallery-session">
+      <div className="dome-gallery-container container mx-auto px-6 py-4">
         <div className="grid grid-cols-12 gap-8 min-h-[80vh]">
           {/* DomeGallery Section */}
-          <div className="col-span-7 flex items-center justify-center">
+          <div className="dome-gallery-col col-span-7 flex items-center justify-center">
             <div className="w-full h-full max-w-4xl max-h-4xl flex items-center justify-center">
               <DomeGallery 
                 autoRotate={true}
@@ -172,7 +172,7 @@ export default function App() {
           </div>
           
           {/* Motivation Section */}
-          <div className="col-span-5 flex items-center justify-center">
+          <div className="motivation-col col-span-5 flex items-center justify-center">
             <div className="w-full max-w-md">
               <MotivationSection />
             </div>

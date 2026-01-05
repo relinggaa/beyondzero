@@ -239,7 +239,7 @@ export default function TambahDataPsikolog({ psikologs, admin }) {
                             <div className="flex items-center space-x-4 mb-4">
                                 <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-cyan-400">
                                     <img
-                                        src={psikolog.image ? `/storage/${psikolog.image}` : 'https://via.placeholder.com/64x64/06b6d4/ffffff?text=IMG'}
+                                        src={psikolog.image ? (psikolog.image.startsWith('psikologs/') ? `/storage/${psikolog.image}` : `/storage/psikologs/${psikolog.image}`) : 'https://via.placeholder.com/64x64/06b6d4/ffffff?text=IMG'}
                                         alt={psikolog.name}
                                         className="w-full h-full object-cover"
                                     />
@@ -405,7 +405,7 @@ export default function TambahDataPsikolog({ psikologs, admin }) {
                                                         <p className="text-sm text-slate-600 mb-2">Preview:</p>
                                                         <div className="w-24 h-24 rounded-lg overflow-hidden border border-slate-300">
                                                             <img
-                                                                src={typeof data.image === 'string' ? `/storage/${data.image}` : URL.createObjectURL(data.image)}
+                                                                src={typeof data.image === 'string' ? (data.image.startsWith('psikologs/') ? `/storage/${data.image}` : `/storage/psikologs/${data.image}`) : URL.createObjectURL(data.image)}
                                                                 alt="Preview"
                                                                 className="w-full h-full object-cover"
                                                             />

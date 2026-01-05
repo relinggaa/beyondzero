@@ -35,7 +35,7 @@ export default function ProfilPsikolog({ psikolog }) {
                         <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
                             <div className="text-center">
                                 <img
-                                    src={psikolog.image ? `/storage/${psikolog.image}` : 'https://via.placeholder.com/120x120/06b6d4/ffffff?text=IMG'}
+                                    src={psikolog.image ? (psikolog.image.startsWith('psikologs/') ? `/storage/${psikolog.image}` : `/storage/psikologs/${psikolog.image}`) : 'https://via.placeholder.com/120x120/06b6d4/ffffff?text=IMG'}
                                     alt={psikolog.name}
                                     className="w-24 h-24 rounded-full object-cover border-4 border-cyan-400/30 mx-auto mb-4"
                                 />

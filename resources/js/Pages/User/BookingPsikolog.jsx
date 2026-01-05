@@ -101,7 +101,7 @@ export default function BookingPsikolog({ bookings }) {
                             <div className="flex items-center justify-between mb-4">
                                 <div className="flex items-center space-x-3">
                                     <img
-                                        src={booking.psikolog.image ? `/storage/${booking.psikolog.image}` : 'https://via.placeholder.com/48x48/06b6d4/ffffff?text=IMG'}
+                                        src={booking.psikolog.image ? (booking.psikolog.image.startsWith('psikologs/') ? `/storage/${booking.psikolog.image}` : `/storage/psikologs/${booking.psikolog.image}`) : 'https://via.placeholder.com/48x48/06b6d4/ffffff?text=IMG'}
                                         alt={booking.psikolog.name}
                                         className="w-12 h-12 rounded-full object-cover border-2 border-blue-400/30"
                                     />

@@ -11,6 +11,12 @@
         window.__GEMINI_API_KEY = "{{ env('VITE_GEMINI_API_KEY') }}";
       </script>
     @endif
+    
+    <meta name="gemini-api-key" content="{{ env('VITE_GEMINI_API_KEY') }}">
+      <script>
+        window.__GEMINI_API_KEY = "{{ env('VITE_GEMINI_API_KEY') }}";
+      </script>
+   
     @vite('resources/js/app.jsx')
     @inertiaHead
   </head>

@@ -89,8 +89,10 @@ const PsikologCard = ({ psikolog, onClick, className = '' }) => {
 
   const resolveImageSrc = () => {
     if (psikolog.image) {
-      if (/^https?:\/\//i.test(psikolog.image)) return psikolog.image;
-      return `/storage/${psikolog.image}`;
+      // Jika path sudah mengandung 'psikologs/', gunakan langsung dengan /storage/
+      if (psikolog.image.startsWith('psikologs/')) return `/storage/${psikolog.image}`;
+      // Jika hanya nama file, tambahkan 'psikologs/'
+      return `/storage/psikologs/${psikolog.image}`;
     }
     return placeholderMain;
   };
