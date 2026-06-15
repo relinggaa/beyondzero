@@ -7,21 +7,21 @@ Dokumen ini mendefinisikan seluruh kebutuhan desain (*design requirements*) dan 
 ## BAGIAN 1: Definisi Design Requirements
 
 ### Tahap 1: Create Problem & Vision Statements
-Tahap ini bertujuan untuk merumuskan akar masalah (*problem*) dan arah solusi rancangan (*vision*) secara terstruktur guna menyelaraskan kebutuhan bisnis dan pengguna.
+Tahap ini bertujuan untuk merumuskan akar masalah (*problem*) dan arah solusi rancangan (*vision*) secara terstruktur guna menyelaraskan kebutuhan bisnis dan pengguna sebelum adanya platform rancangan baru.
 
 #### A. Problem Statement (Pernyataan Masalah)
 Mengikuti format standar template pada slide:
 > **Format:** *Company X's customer satisfaction ratings are low. Market share has diminished by 10 percent over the past year because users have inadequate tools to perform tasks X, Y, and Z that would help them meet their goal of G.*
 
-**Penerapan pada BeyondZero:**
-> Tingkat kepuasan pengguna platform kesehatan mental **BeyondZero** masih rendah. Retensi aktif pengguna bulanan telah menurun sebesar 10 persen selama setahun terakhir karena pengguna memiliki alat bantu yang tidak memadai untuk melakukan **pelacakan mood harian secara real-time (X)**, **curhat secara privat tanpa hambatan stigma sosial (Y)**, dan **melakukan pemesanan sesi konseling psikolog profesional yang instan (Z)** yang akan membantu mereka mencapai tujuan mereka yaitu **menjaga keseimbangan kesehatan emosional dan mental (G)**.
+**Penerapan pada keadaan sebelum BeyondZero ada:**
+> Tingkat kepuasan **anak muda dan remaja Indonesia** terhadap **ketersediaan platform kesehatan mental digital (Company X)** masih sangat rendah (belum memadai). Partisipasi aktif remaja dalam menjaga kesejahteraan psikologis menurun sebesar 10 persen selama setahun terakhir karena belum adanya platform terintegrasi, sehingga mereka hanya memiliki alat bantu yang tidak memadai untuk melakukan **pelacakan emosi dan mood secara mandiri dan dinamis (X)**, **mencurahkan perasaan (curhat) secara privat tanpa takut dihakimi (Y)**, serta **melakukan janji temu konseling secara cepat dan terjangkau (Z)** yang akan membantu mereka memenuhi tujuan mereka yaitu **menjaga kesehatan mental dan keseimbangan emosional di usia muda (G)**.
 
 #### B. Vision Statement (Pernyataan Visi)
 Mengikuti format standar template pada slide:
 > **Format:** *The new design of Product X will help users achieve G by allowing them to do X, Y, and Z with greater [accuracy, efficiency, and so on], and without problems A, B, and C that they currently experience. This will dramatically improve Company X's customer satisfaction ratings and lead to increased market share.*
 
-**Penerapan pada BeyondZero:**
-> Desain baru dari **BeyondZero** akan membantu pengguna mencapai **keseimbangan kesehatan emosional dan mental (G)** dengan memungkinkan mereka melakukan **pelacakan mood otomatis berbasis teks (X)**, **curhat interaktif bersama asisten AI empatik 24/7 (Y)**, dan **reservasi psikolog berlisensi secara real-time (Z)** dengan tingkat **[efisiensi, akurasi pelacakan, kenyamanan interaksi, dan privasi data]** yang lebih tinggi, serta tanpa masalah **stigma sosial (A)**, **biaya awal konseling yang mahal (B)**, dan **proses antrean administrasi manual (C)** yang saat ini mereka alami. Hal ini secara dramatis akan meningkatkan tingkat kepuasan pengguna **BeyondZero** dan mengarah pada peningkatan retensi serta pangsa pasar platform.
+**Penerapan pada BeyondZero (sebagai solusi rancangan baru):**
+> Desain baru dari aplikasi **BeyondZero (Product X)** akan membantu **anak muda dan remaja Indonesia** mencapai **kesehatan mental dan keseimbangan emosional di usia muda (G)** dengan memungkinkan mereka melakukan **pelacakan mood otomatis berbasis teks harian (X)**, **berkonsultasi/curhat dengan asisten AI empatik secara real-time 24/7 (Y)**, dan **melakukan pemesanan psikolog profesional secara instan (Z)** dengan tingkat **[efisiensi, akurasi pelacakan, kenyamanan, dan privasi]** yang lebih tinggi, serta tanpa masalah **stigma sosial di lingkungan sekitar (A)**, **biaya konsultasi tradisional yang sangat mahal (B)**, dan **akses psikolog yang sulit dijangkau (C)** yang saat ini mereka alami. Hal ini secara dramatis akan meningkatkan tingkat kepuasan **anak muda dan remaja Indonesia** terhadap **ketersediaan platform kesehatan mental digital (Company X)** dan mengarah pada peningkatan partisipasi aktif platform.
 
 ---
 
