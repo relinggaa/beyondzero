@@ -187,55 +187,164 @@ Struktur hierarki antarmuka aplikasi dibagi menjadi:
 
 ### Langkah 4: Sketch Interaction Framework - Key Path Scenario & Storyboarding
 
-Di bawah ini digambarkan alur interaksi kunci (*Key Path*) dalam bentuk skenario alur layar terstruktur (*storyboarding*) untuk 2 tugas utama:
+Di bawah ini digambarkan alur interaksi kunci (*Key Path*) dalam bentuk skenario alur layar terstruktur (*storyboarding*) untuk seluruh 6 fitur utama pengguna pada aplikasi **FixYou**:
 
-#### **Skenario A: Pengguna Mencatat Jurnal Harian & Mendapat Analisis Sentimen**
+---
+
+#### **Skenario A: Pelacakan Mood Harian Cepat (Mood Tracker)**
+Skenario ini digunakan untuk melacak perasaan dan aktivitas pengguna secara cepat setiap harinya.
 ```
 [Halaman Dashboard]
       │
-      ├─► Klik tombol "+ Buat Jurnal Baru" di widget Jurnal.
+      ├─► Klik tombol emoji emosi di widget "Bagaimana Perasaanmu?" (misal: Good).
+      │
+[Modal Detail Log Mood]
+      │
+      ├─► Pengguna mengetik deskripsi singkat tentang mengapa ia merasakan hal tersebut.
+      ├─► Memilih tag aktivitas pendukung (misal: Pekerjaan, Olahraga, Istirahat).
+      ├─► Menekan tombol "Simpan Mood".
+      │
+[Halaman Dashboard (Hasil)]
+      │
+      └─► Widget beranda terbarui, menampilkan grafik garis tren mingguan yang meningkat, 
+          dan memberikan skor rata-rata emosi pengguna untuk minggu tersebut.
+```
+
+* **Storyboarding Penjelasan Tampilan**:
+  1. **Layar 1 (Dashboard)**: Di bagian atas, terdapat barisan 5 emoji interaktif dengan efek melayang (*hover*) berkilau (Awful 😢, Bad 🙁, Normal 😐, Good 🙂, Amazing 😀).
+  2. **Layar 2 (Modal Tulis Cerita)**: Setelah emoji diklik, muncul modal *glassmorphism* kecil dengan kolom teks berbunyi: *"Ada apa hari ini? Tuliskan dalam beberapa kata..."* serta tombol pilihan aktivitas berupa ikon kecil (*Work, Health, Sleep*).
+  3. **Layar 3 (Grafik Tren)**: Grafik garis dinamis di dashboard beranimasi dari kiri ke kanan, menandai titik mood hari ini dengan warna yang sesuai (misal: Hijau untuk *Good*).
+
+---
+
+#### **Skenario B: Sesi Curhat Interaktif bersama Asisten Virtual (Curhat AI)**
+Skenario ketika pengguna mengalami kecemasan mendadak dan membutuhkan dukungan emosional instan tanpa stigma.
+```
+[Menu Utama/Sidebar]
+      │
+      ├─► Memilih menu "Curhat AI".
+      │
+[Halaman Chat Curhat AI]
+      │
+      ├─► Sistem memuat sesi chat aktif (membuat baru jika belum ada).
+      ├─► Pengguna mengetik keluhannya di kolom chat dan menekan tombol "Kirim".
+      ├─► AI merespons dalam hitungan detik dengan respons empatik.
+      ├─► AI memberikan opsi coping/teknik menenangkan (misal: link relaksasi).
+      ├─► Pengguna menyelesaikan obrolan dengan mengklik "Selesaikan Sesi".
+```
+
+* **Storyboarding Penjelasan Tampilan**:
+  1. **Layar 1 (Halaman Chat)**: Desain menyerupai antarmuka *instant messaging* yang modern dengan nuansa gelap. Balon obrolan pengguna berwarna indigo gelap, sedangkan balon obrolan AI berwarna abu-abu kehijauan lembut untuk kenyamanan mata.
+  2. **Layar 2 (Widget Coping AI)**: Saat AI mendeteksi tingkat stres tinggi dari kata kunci obrolan, di bawah balon chat AI muncul tombol opsi dinamis: *"Butuh bantuan cepat? [Mulai Latihan Napas]"*.
+  3. **Layar 3 (Riwayat Sesi)**: Menampilkan daftar riwayat percakapan lama di panel kiri yang dikelompokkan berdasarkan tanggal dan emosi sesi tersebut.
+
+---
+
+#### **Skenario C: Menulis Jurnal Terstruktur & Refleksi Diri (Structured Journaling)**
+Skenario untuk menuangkan emosi secara mendalam melalui petunjuk jurnal harian terstruktur.
+```
+[Halaman Dashboard Jurnal]
+      │
+      ├─► Klik tombol "+ Tulis Jurnal Hari Ini".
       │
 [Halaman Editor Jurnal]
       │
-      ├─► Pengguna mengisi judul dan tanggal hari ini.
-      ├─► Memilih Mood Emoji representasi perasaan hari itu.
-      ├─► Mengisi kolom terstruktur (Gratitude, Challenge, Reflection).
+      ├─► Memilih tanggal (sistem memvalidasi agar tidak ada tanggal ganda).
+      ├─► Mengetik judul jurnal.
+      ├─► Memilih emoji mood dasar.
+      ├─► Mengisi kolom refleksi: Gratitude (syukur), Challenge (tantangan), Affirmation (afirmasi).
       ├─► Menekan tombol "Simpan Jurnal".
       │
-[Halaman Riwayat Jurnal (Hasil)]
+[Halaman Daftar Jurnal]
       │
-      └─► Sistem menyimpan jurnal, memproses teks dengan NLP ML, dan menampilkan 
-          kartu jurnal baru dengan tag sentimen mood otomatis serta pesan tips kesehatan mental.
+      └─► Menampilkan kartu jurnal baru di bagian atas daftar arsip jurnal dengan 
+          layout estetik, lengkap dengan ringkasan poin bersyukur dan mood hari itu.
 ```
 
 * **Storyboarding Penjelasan Tampilan**:
-  1. **Layar 1 (Dashboard)**: Terdapat kartu *widget* jurnal dengan visual ringkasan jurnal terakhir dan tombol besar `+ Tulis Jurnal`.
-  2. **Layar 2 (Form Editor)**: Desain form bersih menggunakan panel *glassmorphism*. Di bagian atas ada pemilihan 5 emoji besar. Di bawahnya berderet kolom teks editor berlatar gelap yang nyaman untuk mengetik di malam hari.
-  3. **Layar 3 (Popup Berhasil/Toast)**: Setelah menekan simpan, muncul transisi animasi halus tanda centang hijau dengan teks *"Jurnal berhasil disimpan! Selamat berefleksi hari ini."*
+  1. **Layar 1 (Daftar Arsip Jurnal)**: Layout grid yang menampilkan kartu-kartu jurnal lama seperti lembaran *scrapbook* digital yang rapi, berurut dari yang terbaru.
+  2. **Layar 2 (Form Editor)**: Terdiri atas beberapa bagian terpisah (*sections*) dengan judul yang inspiratif (contoh: *"3 Hal yang Saya Syukuri Hari Ini"*).
+  3. **Layar 3 (Detail View)**: Halaman detail jurnal yang menampilkan seluruh isi tulisan dengan tipografi bergaya serif yang elegan dan opsi tombol untuk mengedit (`Edit`) atau menghapus (`Delete`) jurnal.
 
-#### **Skenario B: Pengguna Melakukan Pemesanan Konseling Psikolog**
+---
+
+#### **Skenario D: Pemesanan Sesi Konseling Psikolog Profesional (Booking Psikolog)**
+Skenario bagi pengguna yang ingin menjadwalkan konseling profesional secara mandiri baik tatap muka maupun jarak jauh.
 ```
-[Halaman Layanan Psikolog]
+[Halaman Layanan Konseling]
       │
-      ├─► Pengguna memfilter spesialisasi: "Kecemasan" (Anxiety).
-      ├─► Menelusuri kartu profil psikolog berlisensi.
-      ├─► Klik tombol "Pilih Jadwal" pada psikolog yang diinginkan.
+      ├─► Menggunakan dropdown filter untuk memilih spesialisasi (misal: "Academic Stress").
+      ├─► Melihat daftar kartu profil psikolog berlisensi.
+      ├─► Klik tombol "Book Appointment" pada psikolog terpilih.
       │
-[Form Booking Psikolog]
+[Form Janji Temu]
       │
-      ├─► Memilih Tipe Sesi: "Online" / "Offline".
-      ├─► Menentukan tanggal pada kalender interaktif (hari esok dst).
-      ├─► Memilih jam yang tersedia (misal: 14.00 - 15.00).
-      ├─► Menulis catatan keluhan singkat pada text area.
-      ├─► Mengklik tombol "Konfirmasi Pemesanan".
+      ├─► Memilih jenis konsultasi: "Online" (Video Call) / "Offline" (Klinik).
+      ├─► Memilih slot tanggal pada kalender interaktif (slot penuh akan berwarna abu-abu).
+      ├─► Memilih slot waktu jam (misal: 10:00 - 11:00).
+      ├─► Menuliskan catatan/keluhan awal yang ingin disampaikan.
+      ├─► Klik "Konfirmasi Pemesanan".
       │
-[Halaman Riwayat Pemesanan (Hasil)]
+[Halaman Riwayat Booking]
       │
-      └─► Pengguna dialihkan ke halaman riwayat booking dengan status pemesanan 
-          "Pending" (menunggu persetujuan psikolog). Tombol "Batalkan Jadwal" aktif jika ada perubahan.
+      └─► Menampilkan status pesanan sebagai "Pending" (menunggu persetujuan psikolog). 
+          Pengguna dapat membatalkan pesanan lewat tombol "Cancel" sebelum dikonfirmasi.
 ```
 
 * **Storyboarding Penjelasan Tampilan**:
-  1. **Layar 1 (Direktori)**: Layout grid menampilkan barisan kartu psikolog. Setiap kartu menonjolkan nama, rating bintang, dan tag spesialisasi (misal: *Depresi, Karir*).
-  2. **Layar 2 (Modal Booking)**: Dialog modal melayang di atas layar dengan kalender visual (tanggal yang penuh akan berwarna abu-abu dan tidak dapat diklik). Pilihan jam ditampilkan dalam bentuk tombol-tombol pill (*time-slots*).
-  3. **Layar 3 (Riwayat Booking)**: Tabel daftar pemesanan menampilkan detail janji temu terbaru di baris paling atas, dengan warna indikator status kuning berkedip lembut untuk melambangkan proses konfirmasi.
+  1. **Layar 1 (Direktori Psikolog)**: Kartu profil psikolog yang menonjolkan foto psikolog, sertifikasi (e.g., S.Psi., M.Psi., Psikolog), rating bintang, dan harga per sesi.
+  2. **Layar 2 (Kalender Booking)**: Penjadwal visual di mana slot waktu ditampilkan dalam bentuk kotak-kotak *pill* hijau jika tersedia (*available*) dan merah/abu jika sudah terisi.
+  3. **Layar 3 (Riwayat Booking)**: Daftar linimasa janji temu yang dikelompokkan berdasarkan status (*Upcoming, Completed, Cancelled*) dengan lencana status berwarna-warni.
+
+---
+
+#### **Skenario E: Meredakan Stres Instan melalui Permainan (Stress Relief Games)**
+Skenario pereda kecemasan dan pengalihan stres secara instan menggunakan permainan interaktif sederhana.
+```
+[Menu Pustaka Games]
+      │
+      ├─► Memilih game "Pernapasan Dalam" atau "Bubble Pop Relief".
+      │
+[Layar Area Permainan]
+      │
+      ├─► Pengguna mengikuti animasi lingkaran pernapasan (Tarik - Tahan - Hembuskan) 
+      │   atau mengetuk gelembung di layar untuk memecahkannya dengan efek suara menenangkan.
+      ├─► Permainan memberikan feedback visual yang damai.
+      │
+[Layar Selesai Game]
+      │
+      └─► Menampilkan pesan apresiasi, menanyakan kondisi mood pengguna pasca bermain, 
+          dan memberikan tombol kembali ke dashboard utama.
+```
+
+* **Storyboarding Penjelasan Tampilan**:
+  1. **Layar 1 (Pustaka Game)**: Antarmuka minimalis menampilkan pilihan game dengan ikon beranimasi lembut (contoh: ilustrasi paru-paru bergerak untuk latihan napas).
+  2. **Layar 2 (Animasi Game Pernapasan)**: Tampilan layar penuh dengan lingkaran gradien biru-hijau yang membesar saat pengguna harus menarik napas, diam beberapa saat, dan mengecil saat harus mengembuskan napas.
+  3. **Layar 3 (Animasi Bubble Pop)**: Kanvas interaktif berisi barisan gelembung transparan yang memberikan efek getar (*haptic*) dan suara letupan lembut (*soft pop sound*) ketika disentuh oleh pengguna.
+
+---
+
+#### **Skenario F: Analisis Sentimen & Prediksi Kondisi Mental (ML Prediction)**
+Skenario untuk mendeteksi tingkat kecemasan atau stres mendalam menggunakan model deteksi emosi otomatis berbasis Machine Learning.
+```
+[Menu Utama]
+      │
+      ├─► Masuk ke halaman "ML Prediction".
+      │
+[Form Input ML]
+      │
+      ├─► Pengguna memasukkan teks cerita/curhat panjang mengenai masalahnya saat ini.
+      ├─► Mengklik tombol "Analisis Kondisi Mental saya".
+      │
+[Layar Hasil Prediksi AI]
+      │
+      └─► Sistem memproses tulisan dengan API ML, menampilkan tingkat emosi dominan 
+          (Amazing, Good, Normal, Bad, Awful), Confidence Score (e.g., 85%), 
+          analisis jumlah aktivitas positif/negatif, serta rekomendasi penanganan yang disesuaikan.
+```
+
+* **Storyboarding Penjelasan Tampilan**:
+  1. **Layar 1 (Input Prediksi)**: Textbox besar dengan batas tulisan minimal 20 kata untuk akurasi analisis, dilengkapi animasi indikator penghitung karakter di bagian pojok kanan bawah.
+  2. **Layar 2 (Proses Analisis)**: Animasi pemindaian (*scanning loader*) berdesain futuristik yang melambangkan kecerdasan buatan sedang menganalisis nuansa teks masukan pengguna.
+  3. **Layar 3 (Dashboard Hasil)**: Panel hasil yang menampilkan skor tingkat emosi dalam bentuk diagram lingkaran (*donut chart*), persentase kepercayaan, dan kolom rekomendasi yang menyarankan artikel relaksasi atau konsultasi psikolog jika terdeteksi indikasi depresi/stres berat.
+
