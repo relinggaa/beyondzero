@@ -1,6 +1,6 @@
-# Dokumen Kebutuhan Desain & Interaction Framework: BeyondZero
+# Dokumen Kebutuhan Desain & Interaction Framework: FixYou
 
-Dokumen ini mendefinisikan seluruh kebutuhan desain (*design requirements*) dan kerangka interaksi (*interaction framework*) pada aplikasi kesehatan mental berbasis AI **BeyondZero**, dengan merincikan setiap tahapan proses beserta hasil yang diperoleh.
+Dokumen ini mendefinisikan seluruh kebutuhan desain (*design requirements*) dan kerangka interaksi (*interaction framework*) pada aplikasi kesehatan mental berbasis AI **FixYou**, dengan merincikan setiap tahapan proses beserta hasil yang diperoleh.
 
 ---
 
@@ -13,15 +13,15 @@ Tahap ini bertujuan untuk merumuskan akar masalah (*problem*) dan arah solusi ra
 Mengikuti format standar template pada slide:
 > **Format:** *Company X's customer satisfaction ratings are low. Market share has diminished by 10 percent over the past year because users have inadequate tools to perform tasks X, Y, and Z that would help them meet their goal of G.*
 
-**Penerapan pada keadaan sebelum BeyondZero ada:**
+**Penerapan pada keadaan sebelum FixYou ada:**
 > Tingkat kepuasan **anak muda dan remaja Indonesia** terhadap **ketersediaan platform kesehatan mental digital (Company X)** masih sangat rendah (belum memadai). Partisipasi aktif remaja dalam menjaga kesejahteraan psikologis menurun sebesar 10 persen selama setahun terakhir karena belum adanya platform terintegrasi, sehingga mereka hanya memiliki alat bantu yang tidak memadai untuk melakukan **pelacakan emosi dan mood secara mandiri dan dinamis (X)**, **mencurahkan perasaan (curhat) secara privat tanpa takut dihakimi (Y)**, serta **melakukan janji temu konseling secara cepat dan terjangkau (Z)** yang akan membantu mereka memenuhi tujuan mereka yaitu **menjaga kesehatan mental dan keseimbangan emosional di usia muda (G)**.
 
 #### B. Vision Statement (Pernyataan Visi)
 Mengikuti format standar template pada slide:
 > **Format:** *The new design of Product X will help users achieve G by allowing them to do X, Y, and Z with greater [accuracy, efficiency, and so on], and without problems A, B, and C that they currently experience. This will dramatically improve Company X's customer satisfaction ratings and lead to increased market share.*
 
-**Penerapan pada BeyondZero (sebagai solusi rancangan baru):**
-> Desain baru dari aplikasi **BeyondZero (Product X)** akan membantu **anak muda dan remaja Indonesia** mencapai **kesehatan mental dan keseimbangan emosional di usia muda (G)** dengan memungkinkan mereka melakukan **pelacakan mood otomatis berbasis teks harian (X)**, **berkonsultasi/curhat dengan asisten AI empatik secara real-time 24/7 (Y)**, dan **melakukan pemesanan psikolog profesional secara instan (Z)** dengan tingkat **[efisiensi, akurasi pelacakan, kenyamanan, dan privasi]** yang lebih tinggi, serta tanpa masalah **stigma sosial di lingkungan sekitar (A)**, **biaya konsultasi tradisional yang sangat mahal (B)**, dan **akses psikolog yang sulit dijangkau (C)** yang saat ini mereka alami. Hal ini secara dramatis akan meningkatkan tingkat kepuasan **anak muda dan remaja Indonesia** terhadap **ketersediaan platform kesehatan mental digital (Company X)** dan mengarah pada peningkatan partisipasi aktif platform.
+**Penerapan pada FixYou (sebagai solusi rancangan baru):**
+> Desain baru dari aplikasi **FixYou (Product X)** akan membantu **anak muda dan remaja Indonesia** mencapai **kesehatan mental dan keseimbangan emosional di usia muda (G)** dengan memungkinkan mereka melakukan **pelacakan mood otomatis berbasis teks harian (X)**, **berkonsultasi/curhat dengan asisten AI empatik secara real-time 24/7 (Y)**, dan **melakukan pemesanan psikolog profesional secara instan (Z)** dengan tingkat **[efisiensi, akurasi pelacakan, kenyamanan, dan privasi]** yang lebih tinggi, serta tanpa masalah **stigma sosial di lingkungan sekitar (A)**, **biaya konsultasi tradisional yang sangat mahal (B)**, dan **akses psikolog yang sulit dijangkau (C)** yang saat ini mereka alami. Hal ini secara dramatis akan meningkatkan tingkat kepuasan **anak muda dan remaja Indonesia** terhadap **ketersediaan platform kesehatan mental digital (Company X)** dan mengarah pada peningkatan partisipasi aktif platform.
 
 ---
 
@@ -62,7 +62,7 @@ Skenario konteks menggambarkan interaksi persona dengan sistem dalam kehidupan s
 >
 > Pukul 23.30 WIB, Rian duduk sendirian di kamarnya dengan cemas. Tugas akhir pemrograman harus dikumpulkan besok pagi, namun programnya masih mengalami *error*. Jantung Rian berdegup kencang dan ia merasa mulai sesak napas karena stres yang menumpuk. Ia tidak ingin mengganggu temannya yang sudah tidur dan merasa sungkan jika harus menghubungi orang tuanya.
 >
-> Rian mengambil ponselnya dan membuka aplikasi **BeyondZero**. Dari beranda, ia langsung memilih menu **"Curhat AI"**. Rian menuliskan kekhawatirannya: *"Aku stres banget, kodenya error terus padahal besok pagi harus dikumpul. Aku takut ga lulus matkul ini."*
+> Rian mengambil ponselnya dan membuka aplikasi **FixYou**. Dari beranda, ia langsung memilih menu **"Curhat AI"**. Rian menuliskan kekhawatirannya: *"Aku stres banget, kodenya error terus padahal besok pagi harus dikumpul. Aku takut ga lulus matkul ini."*
 >
 > Dalam hitungan detik, asisten AI membalas dengan pesan hangat dan penuh emotif, memvalidasi perasaannya, serta menyarankan agar ia tidak memaksakan diri. AI menawarkan bantuan cepat: *"Rian, wajar sekali merasa tegang. Bagaimana jika kita meredakan ketegangan fisikmu dulu? Cobalah ikuti panduan napas di game stress relief kita selama 3 menit."*
 >
@@ -120,7 +120,7 @@ Elemen-elemen ini dibagi berdasarkan halaman/fitur utama:
 
 ```mermaid
 graph TD
-    A[BeyondZero UI Elements] --> B[Data Elements / Informasi]
+    A[FixYou UI Elements] --> B[Data Elements / Informasi]
     A --> C[Functional Elements / Kontrol]
     
     B --> B1[User Profile & Riwayat Mood]
